@@ -6,8 +6,16 @@ from sqlalchemy import pool
 from alembic import context
 
 # Import models
-from src.models import Base  # Adjust import path as needed
-from src.models import building, charge, maintenance, owner, tenant, transaction, unit, utility
+from sqlmodel import SQLModel as Base  # Adjust import path as needed
+from src.models.building import *
+from src.models.charge import *
+from src.models.maintenance import *
+from src.models.owner import *
+from src.models.tenant import *
+from src.models.transaction import *
+from src.models.unit import *
+from src.models.utility import *
+
 target_metadata = Base.metadata
 
 # this is the Alembic Config object, which provides

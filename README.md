@@ -43,8 +43,16 @@ from sqlalchemy import pool
 from alembic import context
 
 # Import your models
-from src.models import Base  # Adjust import path as needed
+from sqlmodel import SQLModel as Base  # Adjust import path as needed
 target_metadata = Base.metadata
+from src.models import *
 
 # other configurations...
+```
+
+Create a New Migration
+
+```bash
+# Generate migration script
+alembic revision --autogenerate -m "initial"
 ```
