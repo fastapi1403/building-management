@@ -4,6 +4,8 @@ from sqlmodel import SQLModel, Field, Relationship
 from src.core.constants import UnitStatus
 
 class Unit(SQLModel, table=True):
+    __tablename__ = "units"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     building_id: int = Field(foreign_key="building.id")
     unit_number: str = Field(index=True)

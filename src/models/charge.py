@@ -4,6 +4,8 @@ from sqlmodel import SQLModel, Field, Relationship
 from src.core.constants import ChargeType, PaymentStatus
 
 class Charge(SQLModel, table=True):
+    __tablename__ = "charges"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     unit_id: int = Field(foreign_key="unit.id")
     amount: float

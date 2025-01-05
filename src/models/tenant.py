@@ -3,6 +3,8 @@ from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 
 class Tenant(SQLModel, table=True):
+    __tablename__ = "tenants"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)
     email: str = Field(unique=True, index=True)

@@ -3,6 +3,8 @@ from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 
 class Building(SQLModel, table=True):
+    __tablename__ = "buildings"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)
     address: str

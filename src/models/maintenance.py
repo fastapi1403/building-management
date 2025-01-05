@@ -3,6 +3,8 @@ from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 
 class Maintenance(SQLModel, table=True):
+    __tablename__ = "maintenances"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     building_id: int = Field(foreign_key="building.id")
     title: str

@@ -3,6 +3,8 @@ from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 
 class Utility(SQLModel, table=True):
+    __tablename__ = "utilities"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     building_id: int = Field(foreign_key="building.id")
     utility_type: str  # water, electricity, gas
