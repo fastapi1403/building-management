@@ -1,0 +1,17 @@
+{}
+<div class="building-card" data-building-id="{{ building.id }}">
+    <div class="building-card__header">
+        <h3 class="building-card__title">{{ building.name }}</h3>
+        <span class="building-card__status {{ building.status|lower }}">{{ building.status }}</span>
+    </div>
+    <div class="building-card__body">
+        <p><strong>Address:</strong> {{ building.address }}</p>
+        <p><strong>Units:</strong> {{ building.units_count }}</p>
+        <p><strong>Floors:</strong> {{ building.floors }}</p>
+    </div>
+    <div class="building-card__footer">
+        <a href="{{ url_for('buildings.view', id=building.id) }}" class="btn btn-primary">View Details</a>
+        <button class="btn btn-secondary" onclick="editBuilding({{ building.id }})">Edit</button>
+    </div>
+</div>
+{}

@@ -1,0 +1,10 @@
+<div class="units-grid">
+    {}
+    <div class="unit-card {{ unit.status | lower }}">
+        <div class="unit-header">
+            <h3>Unit {{ unit.number }}</h3>
+            <span class="status-badge">{{ unit.status }}</span>
+        </div>
+        <div class="unit-info">
+            <p><i class="fas fa-building"></i> {{ unit.building.name }}</p>
+            <p><i class="fas fa-ruler-combined"></i> {{ unit.area }} m²</p>
