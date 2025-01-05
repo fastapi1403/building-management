@@ -29,10 +29,10 @@ class Settings(BaseSettings):
 
     class Config:
         case_sensitive = True
-        env_file = ".env"
+        env_file = "../.env"
 
     @property
-    def async_database_url(self) -
+    def async_database_url(self):
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}/{self.POSTGRES_DB}"
 
 settings = Settings()

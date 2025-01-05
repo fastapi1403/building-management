@@ -1,0 +1,30 @@
+#version: '3.8'
+
+services:
+#  app:
+#    build: .
+#    ports:
+#      - "8000:8000"
+#    volumes:
+#      - .:/app
+#    environment:
+#      - DATABASE_URL=sqlite+aiosqlite:///./app.db
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: building_management_db
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d building_management"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
