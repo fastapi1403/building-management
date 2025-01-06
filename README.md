@@ -56,3 +56,4 @@ Create a New Migration
 # Generate migration script
 alembic revision --autogenerate -m "initial"
 ```
+

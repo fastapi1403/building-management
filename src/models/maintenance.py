@@ -6,7 +6,7 @@ class Maintenance(SQLModel, table=True):
     __tablename__ = "maintenances"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    building_id: int = Field(foreign_key="building.id")
+    building_id: int = Field(foreign_key="buildings.id")
     title: str
     description: str
     maintenance_type: str  # repair, regular, emergency

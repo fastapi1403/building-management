@@ -7,7 +7,7 @@ class Unit(SQLModel, table=True):
     __tablename__ = "units"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    building_id: int = Field(foreign_key="building.id")
+    building_id: int = Field(foreign_key="buildings.id")
     unit_number: str = Field(index=True)
     floor: int
     size: float
@@ -24,4 +24,4 @@ class Unit(SQLModel, table=True):
     building: "Building" = Relationship(back_populates="units")
     owner: Optional["Owner"] = Relationship(back_populates="units")
     tenant: Optional["Tenant"] = Relationship(back_populates="units")
-    charges: List["Charge"] = Relationship(back_populates="unit")
+    charges: List["Charge"] = Relationship(back_populates="units")

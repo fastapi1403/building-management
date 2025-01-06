@@ -6,7 +6,7 @@ class Utility(SQLModel, table=True):
     __tablename__ = "utilities"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    building_id: int = Field(foreign_key="building.id")
+    building_id: int = Field(foreign_key="buildings.id")
     utility_type: str  # water, electricity, gas
     reading_date: datetime
     reading_value: float

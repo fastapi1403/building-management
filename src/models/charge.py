@@ -7,7 +7,7 @@ class Charge(SQLModel, table=True):
     __tablename__ = "charges"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    unit_id: int = Field(foreign_key="unit.id")
+    unit_id: int = Field(foreign_key="units.id")
     amount: float
     charge_type: ChargeType
     description: Optional[str] = None
