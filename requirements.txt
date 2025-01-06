@@ -13,6 +13,7 @@ python-dotenv
 httpx
 pydantic-settings
 alembic
+psycopg2-binary
 
 #  ------ Tests  -------
 

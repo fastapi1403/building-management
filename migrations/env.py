@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -22,6 +23,18 @@ target_metadata = Base.metadata
 # access to the values within the .ini file in use.
 config = context.config
 
+# Get the database URL from environment variable or use default
+db_url = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres:postgres@localhost:5432/building_management_db"
+)
+
+# Override sqlalchemy.url in alembic.ini
+config.set_main_option("sqlalchemy.url", db_url)
+
+# Interpret the config file for Python logging
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
