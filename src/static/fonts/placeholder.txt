@@ -1,2 +1,0 @@
-This is a placeholder file for custom fonts
-Please add your custom font files here

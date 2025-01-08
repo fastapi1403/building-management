@@ -1,25 +1,9 @@
-# Building Management System Requirements
 fastapi
-sqlmodel
 uvicorn
-sqlalchemy
-pydantic
-python-jose
-passlib
-python-multipart
-aiofiles
-jinja2
-python-dotenv
-httpx
-pydantic-settings
+sqlmodel
+asyncpg
 alembic
-psycopg2-binary
-
-#  ------ Tests  -------
-
-pytest
-pytest-asyncio
-pytest-cov
-httpx
-asgi-lifespan
-coverage
+jinja2
+python-multipart
+python-dotenv
+pydantic-settings
