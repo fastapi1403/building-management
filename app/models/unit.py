@@ -1,7 +1,7 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
-from base import TimestampModel
+from base import TimestampMixin
 
 
 class UnitType(str, Enum):
@@ -10,7 +10,7 @@ class UnitType(str, Enum):
     OFFICE = "office"
 
 
-class Unit(TimestampModel, table=True):
+class Unit(TimestampMixin, table=True):
     __tablename__ = "units"
 
     id: Optional[int] = Field(default=None, primary_key=True)

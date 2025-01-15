@@ -1,10 +1,10 @@
 from datetime import date
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from base import TimestampModel
+from base import TimestampMixin
 
 
-class Tenant(TimestampModel, table=True):
+class Tenant(TimestampMixin, table=True):
     __tablename__ = "tenants"
 
     id: Optional[int] = Field(default=None, primary_key=True)

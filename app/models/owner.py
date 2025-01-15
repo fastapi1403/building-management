@@ -1,9 +1,9 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from base import TimestampModel
+from base import TimestampMixin
 
 
-class Owner(TimestampModel, table=True):
+class Owner(TimestampMixin, table=True):
     __tablename__ = "owners"
 
     id: Optional[int] = Field(default=None, primary_key=True)

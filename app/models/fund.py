@@ -1,9 +1,9 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from . import TimeStampModel
+from base import TimestampMixin
 
 
-class Fund(TimeStampModel, table=True):
+class Fund(TimestampMixin, table=True):
     __tablename__ = "funds"
 
     id: Optional[int] = Field(default=None, primary_key=True)
