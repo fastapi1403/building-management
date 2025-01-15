@@ -1,10 +1,10 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from base import TimestampMixin
+from mixins import TimestampMixin, SoftDeleteMixin
 from app.models.building import Building
 from app.models.unit import Unit
 
-class Floor(TimestampMixin, table=True):
+class Floor(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     __tablename__ = "floors"
 
     id: Optional[int] = Field(default=None, primary_key=True)

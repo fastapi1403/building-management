@@ -1,7 +1,7 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
-from base import TimestampMixin
+from mixins import TimestampMixin, SoftDeleteMixin
 from app.models.owner import Owner
 from app.models.tenant import Tenant
 from app.models.charge import Charge
@@ -14,7 +14,7 @@ class UnitType(str, Enum):
     OFFICE = "office"
 
 
-class Unit(TimestampMixin, table=True):
+class Unit(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     __tablename__ = "units"
 
     id: Optional[int] = Field(default=None, primary_key=True)

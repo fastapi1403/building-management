@@ -4,34 +4,7 @@ from pydantic import BaseModel, Field, validator, constr, condecimal
 from decimal import Decimal
 from enum import Enum
 
-
-class ChargeStatus(str, Enum):
-    PENDING = "pending"
-    PAID = "paid"
-    OVERDUE = "overdue"
-    CANCELLED = "cancelled"
-    PARTIALLY_PAID = "partially_paid"
-    DISPUTED = "disputed"
-
-
-class ChargeType(str, Enum):
-    MAINTENANCE = "maintenance"
-    UTILITY = "utility"
-    PARKING = "parking"
-    RENOVATION = "renovation"
-    PENALTY = "penalty"
-    DEPOSIT = "deposit"
-    RENT = "rent"
-    OTHER = "other"
-
-
-class ChargeFrequency(str, Enum):
-    ONCE = "once"
-    DAILY = "daily"
-    WEEKLY = "weekly"
-    MONTHLY = "monthly"
-    QUARTERLY = "quarterly"
-    YEARLY = "yearly"
+from models.charge import ChargeType, ChargeStatus, ChargeFrequency
 
 
 # Base Schema
@@ -39,7 +12,6 @@ class ChargeBase(BaseModel):
     title: constr(min_length=3, max_length=100)
     description: constr(max_length=500)
     amount: condecimal(gt=0, max_digits=10, decimal_places=2)
-    currency: constr(max_length=3) = "INR"
     type: ChargeType
     status: Optional[ChargeStatus] = ChargeStatus.PENDING
     due_date: date

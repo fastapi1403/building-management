@@ -1,7 +1,7 @@
 from typing import Optional
 from datetime import date
 from pydantic import BaseModel, Field, EmailStr
-from .base import TimestampSchema
+from .mixins import TimestampSchema
 
 class TenantBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)

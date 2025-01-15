@@ -1,6 +1,6 @@
 from typing import Optional, List
 from pydantic import BaseModel, Field, EmailStr
-from .base import TimestampSchema
+from .mixins import TimestampSchema
 
 class OwnerBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)

@@ -4,7 +4,7 @@ from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum
 
-from base import TimestampMixin
+from mixins import TimestampMixin, SoftDeleteMixin
 from .unit import Unit
 from .owner import Owner
 from .tenant import Tenant
@@ -43,7 +43,7 @@ class ChargeFrequency(str, Enum):
     YEARLY = "yearly"
 
 
-class Charge(TimestampMixin, table=True):
+class Charge(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     """
     Model for managing charges/fees in the building management system
     """
@@ -55,7 +55,6 @@ class Charge(TimestampMixin, table=True):
     title: str = Field(..., max_length=100)
     description: str = Field(..., max_length=500)
     amount: float = Field(..., gt=0)
-    currency: str = Field(default="INR", max_length=3)
 
     # Charge classification
     type: ChargeType = Field(
@@ -138,7 +137,7 @@ class Charge(TimestampMixin, table=True):
             self.status = ChargeStatus.OVERDUE
 
 
-class Payment(TimestampMixin, table=True):
+class Payment(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     """
     Model for tracking payments against charges
     """

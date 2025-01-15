@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 from enum import Enum
-from .base import TimestampSchema
+from .mixins import TimestampSchema
 from datetime import datetime, UTC
 
 class UnitType(str, Enum):

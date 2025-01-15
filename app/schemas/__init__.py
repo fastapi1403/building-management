@@ -1,4 +1,4 @@
-from .base import TimestampSchema
+from .mixins import TimestampSchema
 from .building import BuildingCreate, BuildingUpdate, BuildingResponse
 from .floor import FloorCreate, FloorUpdate, FloorResponse
 from .unit import UnitCreate, UnitUpdate, UnitResponse, UnitType

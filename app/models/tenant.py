@@ -1,11 +1,11 @@
 from datetime import date
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from base import TimestampMixin
+from mixins import TimestampMixin, SoftDeleteMixin
 from app.models.unit import Unit
 from app.models.charge import Charge
 
-class Tenant(TimestampMixin, table=True):
+class Tenant(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     __tablename__ = "tenants"
 
     id: Optional[int] = Field(default=None, primary_key=True)

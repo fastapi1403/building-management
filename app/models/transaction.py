@@ -1,7 +1,7 @@
 from typing import Optional
 from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
-from base import TimestampMixin
+from mixins import TimestampMixin, SoftDeleteMixin
 from app.models.fund import Fund
 
 class TransactionType(str, Enum):
@@ -9,7 +9,7 @@ class TransactionType(str, Enum):
     EXPENSE = "expense"
 
 
-class Transaction(TimestampMixin, table=True):
+class Transaction(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     __tablename__ = "transactions"
 
     id: Optional[int] = Field(default=None, primary_key=True)

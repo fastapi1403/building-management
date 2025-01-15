@@ -1,4 +1,4 @@
-from .base import TimestampModel
+from .mixins import TimestampModel
 from .building import Building
 from .floor import Floor
 from .unit import Unit

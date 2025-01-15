@@ -1,10 +1,10 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from base import TimestampMixin
+from mixins import TimestampMixin, SoftDeleteMixin
 from app.models.unit import Unit
 from app.models.charge import Charge
 
-class Owner(TimestampMixin, table=True):
+class Owner(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     __tablename__ = "owners"
 
     id: Optional[int] = Field(default=None, primary_key=True)

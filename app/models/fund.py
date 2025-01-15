@@ -5,7 +5,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum, Index
 from decimal import Decimal
 
-from base import TimestampMixin
+from mixins import TimestampMixin, SoftDeleteMixin
 from building import Building
 from cost import Cost
 from charge import Charge
@@ -40,7 +40,7 @@ class TransactionType(str, Enum):
     ADJUSTMENT = "adjustment"
 
 
-class Fund(TimestampMixin, table=True):
+class Fund(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     """
     Model for managing building funds and their transactions
     """
@@ -108,7 +108,7 @@ class Fund(TimestampMixin, table=True):
         return self.current_balance <= threshold
 
 
-class FundTransaction(TimestampMixin, table=True):
+class FundTransaction(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     """
     Model for tracking fund transactions
     """
@@ -147,7 +147,7 @@ class FundTransaction(TimestampMixin, table=True):
     )
 
 
-class FundApproval(TimestampMixin, table=True):
+class FundApproval(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     """
     Model for managing fund transaction approvals
     """

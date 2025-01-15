@@ -4,12 +4,11 @@ from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum, Index
 
-from base import TimestampMixin
+from mixins import TimestampMixin, SoftDeleteMixin
 # Type annotations for relationships
 from .building import Building
 from .unit import Unit
 from .floor import Floor
-from .vendor import Vendor
 
 
 class CostCategory(str, Enum):
@@ -47,7 +46,7 @@ class CostStatus(str, Enum):
     ON_HOLD = "on_hold"
 
 
-class Cost(TimestampMixin, table=True):
+class Cost(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     """
     Model for tracking costs and expenses in the building management system
     """
@@ -110,7 +109,6 @@ class Cost(TimestampMixin, table=True):
     building: "Building" = Relationship(back_populates="costs")
     unit: Optional["Unit"] = Relationship(back_populates="costs")
     floor: Optional["Floor"] = Relationship(back_populates="costs")
-    vendor: Optional["Vendor"] = Relationship(back_populates="costs")
     documents: List["CostDocument"] = Relationship(back_populates="cost")
 
     # Indexes for better query performance
@@ -150,7 +148,7 @@ class Cost(TimestampMixin, table=True):
         self.update_variance()
 
 
-class CostDocument(TimestampMixin, table=True):
+class CostDocument(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     """
     Model for storing documents related to costs (invoices, receipts, etc.)
     """
