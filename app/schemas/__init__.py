@@ -1,11 +1,15 @@
-from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from .base import TimestampSchema
+from .building import BuildingCreate, BuildingUpdate, BuildingResponse
+from .floor import FloorCreate, FloorUpdate, FloorResponse
+from .unit import UnitCreate, UnitUpdate, UnitResponse, UnitType
+from .owner import OwnerCreate, OwnerUpdate, OwnerResponse
+from .tenant import TenantCreate, TenantUpdate, TenantResponse
 
-
-class BaseSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-
-class TimeStampSchema(BaseSchema):
-    created_at: datetime
-    updated_at: datetime
+__all__ = [
+    "TimestampSchema",
+    "BuildingCreate", "BuildingUpdate", "BuildingResponse",
+    "FloorCreate", "FloorUpdate", "FloorResponse",
+    "UnitCreate", "UnitUpdate", "UnitResponse", "UnitType",
+    "OwnerCreate", "OwnerUpdate", "OwnerResponse",
+    "TenantCreate", "TenantUpdate", "TenantResponse",
+]

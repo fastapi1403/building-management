@@ -1,117 +1,70 @@
 from typing import Optional, List
 from pydantic import BaseModel, Field
-from .base import TimeStampSchema
-
+from .base import TimestampSchema
 
 class BuildingBase(BaseModel):
-    name: str = Field(..., description="Name of the building")
-    address: str = Field(..., description="Physical address of the building")
-    total_floors: int = Field(..., ge=1, description="Total number of floors")
-    has_elevator: bool = Field(default=False, description="Whether building has elevator")
-    has_parking: bool = Field(default=False, description="Whether building has parking")
-    total_parking_spaces: int = Field(default=0, description="Total number of parking spaces")
-    has_boiler_room: bool = Field(default=False, description="Whether building has boiler room")
-
-
-class BuildingCreate(BuildingBase):
-    pass
-
-
-class BuildingUpdate(BuildingBase):
-    name: Optional[str] = None
-    address: Optional[str] = None
-    total_floors: Optional[int] = None
-
-
-class Building(BuildingBase, TimeStampSchema):
-    id: int
+    name: str = Field(..., min_length=2, max_length=100)
+    address: str = Field(..., min_length=5, max_length=200)
+    city: str = Field(..., min_length=2, max_length=100)
+    postal_code: str = Field(..., min_length=5, max_length=10)
+    country: str = Field(default="India", min_length=2, max_length=100)
+    total_floors: int = Field(..., gt=0)
+    description: Optional[str] = Field(None, max_length=500)
 
     class Config:
-        from_attributes = True
-
-
-class BuildingDetail(Building):
-    total_units: int
-    occupied_units: int
-    total_residents: int
-    total_income: float
-    total_expenses: float
-
-# --------------------------------------------
-
-from typing import Optional, List
-from pydantic import Field, EmailStr
-from . import BaseSchema, TimeStampSchema
-
-
-class BuildingBase(BaseSchema):
-    name: str = Field(..., description="Name of the building")
-    address: str = Field(..., description="Physical address of the building")
-    total_floors: int = Field(..., ge=1, description="Total number of floors")
-    has_elevator: bool = Field(default=False, description="Whether building has elevator")
-    has_parking: bool = Field(default=False, description="Whether building has parking")
-    total_parking_spaces: int = Field(default=0, description="Total number of parking spaces")
-    has_boiler_room: bool = Field(default=False, description="Whether building has boiler room")
+        json_schema_extra = {
+            "example": {
+                "name": "Crystal Tower",
+                "address": "123 Main Street, Bandra West",
+                "city": "Mumbai",
+                "postal_code": "400050",
+                "country": "India",
+                "total_floors": 15,
+                "description": "Luxury residential building with modern amenities"
+            }
+        }
 
 
 class BuildingCreate(BuildingBase):
     pass
 
+class BuildingUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=2, max_length=100)
+    address: Optional[str] = Field(None, min_length=5, max_length=200)
+    city: Optional[str] = Field(None, min_length=2, max_length=100)
+    postal_code: Optional[str] = Field(None, min_length=5, max_length=10)
+    total_floors: Optional[int] = Field(None, gt=0)
+    description: Optional[str] = Field(None, max_length=500)
 
-class BuildingUpdate(BuildingBase):
-    name: Optional[str] = None
-    address: Optional[str] = None
-    total_floors: Optional[int] = None
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Crystal Tower Updated",
+                "address": "123 Main Street, Bandra West",
+                "city": "Mumbai",
+                "postal_code": "400050",
+                "total_floors": 20,
+                "description": "Updated luxury residential building description"
+            }
+        }
 
 
-class Building(BuildingBase, TimeStampSchema):
+class BuildingResponse(BuildingBase, TimestampSchema):
     id: int
 
     class Config:
         json_schema_extra = {
             "example": {
                 "id": 1,
-                "name": "Sunrise Apartments",
-                "address": "123 Main Street",
-                "total_floors": 5,
-                "has_elevator": True,
-                "has_parking": True,
-                "total_parking_spaces": 10,
-                "has_boiler_room": True,
-                "created_at": "2025-01-08T13:08:32",
-                "updated_at": "2025-01-08T13:08:32"
+                "name": "Crystal Tower",
+                "address": "123 Main Street, Bandra West",
+                "city": "Mumbai",
+                "postal_code": "400050",
+                "country": "India",
+                "total_floors": 15,
+                "description": "Luxury residential building with modern amenities",
+                "created_at": "2025-01-15T08:42:00Z",
+                "updated_at": "2025-01-15T08:42:00Z",
+                "deleted_at": None
             }
         }
-
-
-# ---------------------------------
-from typing import Optional, List
-from pydantic import BaseModel
-from .base import TimeStampSchema
-
-
-class BuildingBase(BaseModel):
-    name: str
-    address: str
-    total_floors: int
-    has_elevator: bool = False
-    has_parking: bool = False
-    total_parking_spaces: int = 0
-    has_boiler_room: bool = False
-
-
-class BuildingCreate(BuildingBase):
-    pass
-
-
-class BuildingUpdate(BuildingBase):
-    name: Optional[str] = None
-    address: Optional[str] = None
-    total_floors: Optional[int] = None
-
-
-class Building(BuildingBase, TimeStampSchema):
-    id: int
-    floors: List["Floor"] = []
-
-

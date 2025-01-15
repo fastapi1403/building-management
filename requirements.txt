@@ -1,6 +1,5 @@
 fastapi
 pydantic
-pydantic-settings
 uvicorn
 sqlmodel
 asyncpg
@@ -9,3 +8,4 @@ jinja2
 python-multipart
 python-dotenv
 pydantic-settings
+email-validator
