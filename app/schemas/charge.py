@@ -1,161 +1,194 @@
-from datetime import datetime, date
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, validator, constr, condecimal
+from datetime import datetime, UTC
 from decimal import Decimal
-from enum import Enum
+from typing import Optional, List
 
-from models.charge import ChargeType, ChargeStatus, ChargeFrequency
+from pydantic import Field
 
-
-# Base Schema
-class ChargeBase(BaseModel):
-    title: constr(min_length=3, max_length=100)
-    description: constr(max_length=500)
-    amount: condecimal(gt=0, max_digits=10, decimal_places=2)
-    type: ChargeType
-    status: Optional[ChargeStatus] = ChargeStatus.PENDING
-    due_date: date
-    frequency: ChargeFrequency = ChargeFrequency.ONCE
-    recurring: bool = False
-
-    # Related entities
-    building_id: int
-    unit_id: Optional[int] = None
-    owner_id: Optional[int] = None
-    tenant_id: Optional[int] = None
-
-    # Additional fields
-    is_taxable: bool = False
-    tax_rate: condecimal(ge=0, le=100, decimal_places=2) = Decimal("0.00")
-    notes: Optional[str] = None
-
-    @validator('due_date')
-    def validate_due_date(cls, v):
-        if v < date.today():
-            raise ValueError("Due date cannot be in the past")
-        return v
+from app.schemas.mixins import BaseSchema
+from models.charge import ChargeStatus, ChargeType
 
 
-# Create Schema
+class ChargeBase(BaseSchema):
+    """Base Charge Schema with common attributes"""
+    title: str = Field(...,
+                       description="Title of the charge",
+                       min_length=3,
+                       max_length=100
+                       )
+    description: Optional[str] = Field(
+        default=None,
+        description="Detailed description of the charge"
+    )
+    amount: Decimal = Field(...,
+                            description="Amount to be charged",
+                            gt=0,
+                            decimal_places=2
+                            )
+    charge_type: ChargeType = Field(...,
+                                    description="Type of the charge"
+                                    )
+    due_date: datetime = Field(...,
+                               description="Due date for the charge"
+                               )
+    status: ChargeStatus = Field(
+        default=ChargeStatus.PENDING,
+        description="Current status of the charge"
+    )
+    building_id: int = Field(...,
+                             description="ID of the building this charge belongs to"
+                             )
+    unit_id: Optional[int] = Field(
+        default=None,
+        description="ID of the unit if charge is unit-specific"
+    )
+    floor_id: Optional[int] = Field(
+        default=None,
+        description="ID of the floor if charge is floor-specific"
+    )
+    recurring: bool = Field(
+        default=False,
+        description="Whether this is a recurring charge"
+    )
+    recurring_period: Optional[str] = Field(
+        default=None,
+        description="Period for recurring charges (monthly, quarterly, yearly)"
+    )
+    notes: Optional[str] = Field(
+        default=None,
+        description="Additional notes or comments"
+    )
+    tags: List[str] = Field(
+        default_factory=list,
+        description="Tags for categorizing charges"
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                **BaseSchema.Config.json_schema_extra["example"],
+                "title": "Monthly Maintenance Fee",
+                "description": "Regular maintenance charge for January 2025",
+                "amount": "150.00",
+                "charge_type": "maintenance",
+                "due_date": "2025-01-31T00:00:00Z",
+                "status": "pending",
+                "building_id": 1,
+                "unit_id": 101,
+                "recurring": True,
+                "recurring_period": "monthly",
+                "tags": ["maintenance", "monthly"]
+            }
+        }
+
+
 class ChargeCreate(ChargeBase):
-    generated_by: constr(max_length=100) = Field(default="fastapi1403")
+    """Schema for creating a new charge"""
+    created_by: str = Field(default="fastapi1403")
+    updated_by: str = Field(default="fastapi1403")
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
-# Update Schema
-class ChargeUpdate(BaseModel):
-    title: Optional[constr(min_length=3, max_length=100)]
-    description: Optional[constr(max_length=500)]
-    amount: Optional[condecimal(gt=0, max_digits=10, decimal_places=2)]
-    status: Optional[ChargeStatus]
-    due_date: Optional[date]
-    notes: Optional[str]
-    is_taxable: Optional[bool]
-    tax_rate: Optional[condecimal(ge=0, le=100, decimal_places=2)]
+class ChargeUpdate(BaseSchema):
+    """Schema for updating an existing charge"""
+    title: Optional[str] = Field(
+        default=None,
+        min_length=3,
+        max_length=100
+    )
+    description: Optional[str] = None
+    amount: Optional[Decimal] = Field(default=None, gt=0)
+    charge_type: Optional[ChargeType] = None
+    due_date: Optional[datetime] = None
+    status: Optional[ChargeStatus] = None
+    notes: Optional[str] = None
+    tags: Optional[List[str]] = None
+    updated_by: str = Field(default="fastapi1403")
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
-    @validator('due_date')
-    def validate_due_date(cls, v):
-        if v and v < date.today():
-            raise ValueError("Due date cannot be in the past")
-        return v
 
-
-# DB Schema
 class ChargeInDB(ChargeBase):
-    id: int
-    amount_paid: condecimal(ge=0, max_digits=10, decimal_places=2) = Decimal("0.00")
-    last_payment_date: Optional[datetime]
-    payment_reference: Optional[str]
-    created_at: datetime
-    updated_at: datetime
-    deleted_at: Optional[datetime]
-
-    class Config:
-        orm_mode = True
+    """Schema for charge as stored in database"""
+    id: int = Field(..., description="Unique identifier for the charge")
 
 
-# Response Schemas
 class ChargeResponse(ChargeInDB):
-    total_amount: condecimal(max_digits=10, decimal_places=2)
-    balance_due: condecimal(max_digits=10, decimal_places=2)
-    is_overdue: bool
-    days_overdue: Optional[int]
-
-    @validator('total_amount', pre=True)
-    def calculate_total_amount(cls, v, values):
-        amount = values.get('amount', Decimal("0.00"))
-        tax_rate = values.get('tax_rate', Decimal("0.00"))
-        if values.get('is_taxable', False):
-            return amount + (amount * tax_rate / 100)
-        return amount
-
-    @validator('balance_due', pre=True)
-    def calculate_balance_due(cls, v, values):
-        total = values.get('total_amount', Decimal("0.00"))
-        paid = values.get('amount_paid', Decimal("0.00"))
-        return max(Decimal("0.00"), total - paid)
-
-    @validator('is_overdue', pre=True)
-    def calculate_is_overdue(cls, v, values):
-        due_date = values.get('due_date')
-        status = values.get('status')
-        if not due_date or status == ChargeStatus.PAID:
-            return False
-        return due_date < date.today()
-
-    @validator('days_overdue', pre=True)
-    def calculate_days_overdue(cls, v, values):
-        if not values.get('is_overdue'):
-            return None
-        due_date = values.get('due_date')
-        return (date.today() - due_date).days
+    """Schema for charge response"""
+    pass
 
 
-class ChargeList(BaseModel):
-    charges: List[ChargeResponse]
-    total_count: int
-    total_amount: condecimal(max_digits=12, decimal_places=2)
-    total_paid: condecimal(max_digits=12, decimal_places=2)
-    total_pending: condecimal(max_digits=12, decimal_places=2)
-
-
-# Payment Schema
-class ChargePayment(BaseModel):
-    amount: condecimal(gt=0, max_digits=10, decimal_places=2)
-    payment_method: str = Field(..., max_length=50)
-    payment_reference: Optional[str] = Field(None, max_length=100)
-    payment_date: datetime = Field(default_factory=lambda: datetime.now())
-    notes: Optional[str]
-
-
-# Filter Schema
-class ChargeFilter(BaseModel):
-    status: Optional[List[ChargeStatus]]
-    type: Optional[List[ChargeType]]
-    due_date_from: Optional[date]
-    due_date_to: Optional[date]
-    min_amount: Optional[condecimal(ge=0)]
-    max_amount: Optional[condecimal(ge=0)]
-    is_overdue: Optional[bool]
-    unit_id: Optional[int]
-    owner_id: Optional[int]
-    tenant_id: Optional[int]
-
-
-# Statistics Schema
-class ChargeStatistics(BaseModel):
-    total_charges: int
-    total_amount: condecimal(max_digits=12, decimal_places=2)
-    total_paid: condecimal(max_digits=12, decimal_places=2)
-    total_pending: condecimal(max_digits=12, decimal_places=2)
-    overdue_charges: int
-    overdue_amount: condecimal(max_digits=12, decimal_places=2)
-    collection_rate: float
-    average_days_to_pay: Optional[float]
-    by_type: Dict[ChargeType, condecimal]
-    by_status: Dict[ChargeStatus, int]
-    monthly_totals: List[Dict[str, Any]]
+class ChargeBulkCreate(BaseSchema):
+    """Schema for bulk charge creation"""
+    charges: List[ChargeCreate] = Field(
+        description="List of charges to create",
+        min_length=1
+    )
 
     class Config:
-        json_encoders = {
-            Decimal: lambda v: float(v)
+        json_schema_extra = {
+            "example": {
+                **BaseSchema.Config.json_schema_extra["example"],
+                "charges": [
+                    {
+                        "title": "Monthly Maintenance Fee",
+                        "description": "Regular maintenance charge for January 2025",
+                        "amount": "150.00",
+                        "charge_type": "maintenance",
+                        "due_date": "2025-01-15 14:24:22",
+                        "status": "pending",
+                        "building_id": 1,
+                        "unit_id": 101,
+                        "recurring": True,
+                        "recurring_period": "monthly",
+                        "tags": ["maintenance", "monthly"],
+                        "created_by": "fastapi1403",
+                        "updated_by": "fastapi1403"
+                    }
+                ]
+            }
+        }
+
+class ChargeFilter(BaseSchema):
+    """Schema for filtering charges"""
+    building_id: Optional[int] = None
+    unit_id: Optional[int] = None
+    floor_id: Optional[int] = None
+    charge_type: Optional[List[ChargeType]] = None
+    status: Optional[List[ChargeStatus]] = None
+    date_from: Optional[datetime] = None
+    date_to: Optional[datetime] = None
+    min_amount: Optional[Decimal] = Field(default=None, gt=0)
+    max_amount: Optional[Decimal] = Field(default=None, gt=0)
+    recurring: Optional[bool] = None
+    tags: Optional[List[str]] = None
+
+
+class ChargeStatistics(BaseSchema):
+    """Schema for charge statistics"""
+    total_charges: int = Field(..., description="Total number of charges")
+    total_amount: Decimal = Field(..., description="Total amount of all charges")
+    pending_amount: Decimal = Field(..., description="Total amount of pending charges")
+    overdue_amount: Decimal = Field(..., description="Total amount of overdue charges")
+    paid_amount: Decimal = Field(..., description="Total amount of paid charges")
+    by_type: dict = Field(..., description="Charges grouped by type")
+    by_status: dict = Field(..., description="Charges grouped by status")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                **BaseSchema.Config.json_schema_extra["example"],
+                "total_charges": 150,
+                "total_amount": "25000.00",
+                "pending_amount": "5000.00",
+                "overdue_amount": "1000.00",
+                "paid_amount": "19000.00",
+                "by_type": {
+                    "maintenance": {"count": 50, "amount": "10000.00"},
+                    "utility": {"count": 100, "amount": "15000.00"}
+                },
+                "by_status": {
+                    "pending": {"count": 20, "amount": "5000.00"},
+                    "paid": {"count": 130, "amount": "20000.00"}
+                }
+            }
         }

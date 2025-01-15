@@ -58,7 +58,6 @@ class Cost(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     title: str = Field(..., max_length=200)
     description: str = Field(..., max_length=1000)
     amount: float = Field(..., gt=0)
-    currency: str = Field(default="INR", max_length=3)
 
     # Classification
     category: CostCategory = Field(
@@ -91,11 +90,6 @@ class Cost(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     floor_id: Optional[int] = Field(default=None, foreign_key="floors.id")
     vendor_id: Optional[int] = Field(default=None, foreign_key="vendors.id")
 
-    # Approval and tracking
-    approved_by: Optional[str] = Field(default=None, max_length=100)
-    approved_date: Optional[datetime] = Field(default=None)
-    created_by: str = Field(..., max_length=100)
-
     # Additional metadata
     is_recurring: bool = Field(default=False)
     frequency_months: Optional[int] = Field(default=None)
@@ -122,7 +116,7 @@ class Cost(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
         arbitrary_types_allowed = True
 
     @property
-    def is_overbudget(self) -> bool:
+    def is_overburden(self) -> bool:
         """Check if actual cost exceeds estimated cost"""
         if self.actual_amount is None:
             return False
@@ -165,8 +159,6 @@ class CostDocument(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     mime_type: str = Field(..., max_length=100)
 
     # Metadata
-    uploaded_by: str = Field(..., max_length=100)
-    upload_date: datetime = Field(default_factory=lambda: datetime.now(UTC))
     description: Optional[str] = Field(default=None, max_length=500)
 
     # Relationship
