@@ -621,3 +621,36 @@ reconciliation = TransactionReconciliation(
     ]
 )
 ```
+
+crud/charge.py
+```python
+# Create a new charge
+charge_data = ChargeCreate(
+    title="Monthly Maintenance",
+    description="January 2025 maintenance fee",
+    amount=5000.00,
+    due_date=date(2025, 1, 31),
+    building_id=1,
+    unit_id=101
+)
+new_charge = await charge_crud.create(charge_data)
+
+# Record a payment
+updated_charge = await charge_crud.record_payment(
+    charge_id=new_charge.id,
+    payment_amount=5000.00,
+    payment_reference="PAY-20250115-001"
+)
+
+# Get statistics
+stats = await charge_crud.get_statistics(
+    building_id=1,
+    start_date=date(2025, 1, 1),
+    end_date=date(2025, 12, 31)
+)
+```
+
+crud/cost.py
+```python
+
+```
