@@ -1,0 +1,395 @@
+{% load static %}
+<header class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container-fluid">
+        <!-- Logo and Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'dashboard:index' %}">
+            <img src="{% static 'img/logo.png' %}" alt="Property Management System" height="30" class="me-2">
+            <span class="d-none d-sm-inline">Property Management System</span>
+            <span class="d-inline d-sm-none">PMS</span>
+        </a>
+
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Main Navigation -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.view_name == 'dashboard:index' %}active{% endif %}"
+                       href="{% url 'dashboard:index' %}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-building"></i> Properties
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="propertyDropdown">
+                        <li><a class="dropdown-item" href="{% url 'properties:list' %}">View All Properties</a></li>
+                        <li><a class="dropdown-item" href="{% url 'properties:units' %}">Manage Units</a></li>
+                        <li><a class="dropdown-item" href="{% url 'properties:maintenance' %}">Maintenance</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'properties:create' %}">Add New Property</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="tenantDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-users"></i> Tenants
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="tenantDropdown">
+                        <li><a class="dropdown-item" href="{% url 'tenants:list' %}">View All Tenants</a></li>
+                        <li><a class="dropdown-item" href="{% url 'tenants:leases' %}">Lease Management</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'tenants:create' %}">Add New Tenant</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="financialDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-dollar-sign"></i> Financial
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="financialDropdown">
+                        <li><a class="dropdown-item" href="{% url 'financial:payments' %}">Payments</a></li>
+                        <li><a class="dropdown-item" href="{% url 'financial:expenses' %}">Expenses</a></li>
+                        <li><a class="dropdown-item" href="{% url 'financial:invoices' %}">Invoices</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'financial:reports' %}">Financial Reports</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Right Side Navigation -->
+            <ul class="navbar-nav ms-auto">
+                <!-- Time Display -->
+                <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                    <div class="text-light">
+                        <small>
+                            <i class="far fa-clock"></i>
+                            <span id="utcTimeDisplay">2025-01-08 16:03:31 UTC</span>
+                        </small>
+                    </div>
+                </li>
+
+                <!-- Notifications -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="#" id="notificationsDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            3
+                            <span class="visually-hidden">unread notifications</span>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end notification-dropdown"
+                         aria-labelledby="notificationsDropdown">
+                        <h6 class="dropdown-header">Notifications</h6>
+                        <div class="notification-list">
+                            <a href="#" class="dropdown-item">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-exclamation-circle text-warning"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-2">
+                                        <p class="mb-0">Maintenance request #123 pending</p>
+                                        <small class="text-muted">2 hours ago</small>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-dollar-sign text-success"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-2">
+                                        <p class="mb-0">New payment received from Unit 4B</p>
+                                        <small class="text-muted">5 hours ago</small>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-file-invoice text-info"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-2">
+                                        <p class="mb-0">Monthly reports ready for review</p>
+                                        <small class="text-muted">1 day ago</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-center" href="{% url 'notifications:all' %}">
+                            View all notifications
+                        </a>
+                    </div>
+                </li>
+
+                <!-- User Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="d-none d-lg-inline ms-1">{{ request.user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li class="dropdown-header">
+                            Signed in as<br>
+                            <strong>hnejadi</strong>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'users:profile' %}">
+                            <i class="fas fa-user-cog fa-fw me-2"></i>Profile Settings
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'users:preferences' %}">
+                            <i class="fas fa-sliders-h fa-fw me-2"></i>Preferences
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'help:documentation' %}">
+                            <i class="fas fa-question-circle fa-fw me-2"></i>Help & Documentation
+                        </a></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'account:logout' %}">
+                            <i class="fas fa-sign-out-alt fa-fw me-2"></i>Sign Out
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<!-- Subheader for System Status -->
+<div class="bg-light border-bottom mt-5 py-2">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i> System Status:
+                    <span class="text-success">Operational</span>
+                </small>
+            </div>
+            <div class="col-auto">
+                <small class="text-muted">
+                    <i class="fas fa-sync"></i> Last Updated:
+                    <span id="lastUpdateDisplay">2025-01-08 16:03:31</span>
+                </small>
+            </div>
+            <div class="col-auto ms-auto">
+                <small class="text-muted">
+                    <i class="fas fa-user"></i> Current User: hnejadi
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.notification-dropdown {
+    width: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-list .dropdown-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
+.notification-list .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.navbar {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+@media (max-width: 992px) {
+    .notification-dropdown {
+        width: 100%;
+        margin: 0;
+    }
+}
+</style>
+
+
+{#
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Property Management System{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+    <!-- CSS Libraries -->
+    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/select2/css/select2.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/daterangepicker/daterangepicker.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+</head>
+<body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('dashboard.index') }}">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">PropManager</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Items -->
+            <li class="nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+                <a class="nav-link" href="{{ url_for('dashboard.index') }}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Properties Section -->
+            <li class="nav-item">
+                <a class="nav-link {% if not 'properties' in request.endpoint %}collapsed{% endif %}" href="#" data-toggle="collapse" data-target="#collapseProperties">
+                    <i class="fas fa-fw fa-home"></i>
+                    <span>Properties</span>
+                </a>
+                <div id="collapseProperties" class="collapse {% if 'properties' in request.endpoint %}show{% endif %}">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="{{ url_for('properties.list') }}">View All</a>
+                        <a class="collapse-item" href="{{ url_for('properties.add') }}">Add New</a>
+                        <a class="collapse-item" href="{{ url_for('properties.maintenance') }}">Maintenance</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Tenants Section -->
+            <li class="nav-item">
+                <a class="nav-link {% if not 'tenants' in request.endpoint %}collapsed{% endif %}" href="#" data-toggle="collapse" data-target="#collapseTenants">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Tenants</span>
+                </a>
+                <div id="collapseTenants" class="collapse {% if 'tenants' in request.endpoint %}show{% endif %}">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="{{ url_for('tenants.list') }}">View All</a>
+                        <a class="collapse-item" href="{{ url_for('tenants.add') }}">Add New</a>
+                        <a class="collapse-item" href="{{ url_for('tenants.documents') }}">Documents</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Reports Section -->
+            <li class="nav-item">
+                <a class="nav-link {% if not 'reports' in request.endpoint %}collapsed{% endif %}" href="#" data-toggle="collapse" data-target="#collapseReports">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Reports</span>
+                </a>
+                <div id="collapseReports" class="collapse {% if 'reports' in request.endpoint %}show{% endif %}">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="{{ url_for('reports.financial') }}">Financial</a>
+                        <a class="collapse-item" href="{{ url_for('reports.occupancy') }}">Occupancy</a>
+                        <a class="collapse-item" href="{{ url_for('reports.maintenance') }}">Maintenance</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Settings -->
+            <li class="nav-item {% if request.endpoint == 'settings.index' %}active{% endif %}">
+                <a class="nav-link" href="{{ url_for('settings.index') }}">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- System Time -->
+                    <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">UTC</span>
+                            </div>
+                            <div class="form-control" id="utcTimeDisplay">2025-01-08 16:13:43</div>
+                        </div>
+                    </div>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <!-- Notifications Dropdown -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <span class="badge badge-danger badge-counter">3+</span>
+                            </a>
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                                <h6 class="dropdown-header">Alerts Center</h6>
+                                <!-- Alert items will be dynamically populated -->
+                            </div>
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">hnejadi</span>
+                                <img class="img-profile rounded-circle" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                                <a class="dropdown-item" href="{{ url_for('profile.index') }}">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('settings.index') }}">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Settings
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- End of Topbar -->
+#}

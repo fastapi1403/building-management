@@ -1,0 +1,260 @@
+/**
+ * Property Management System - Alert Styles
+ * Version: 2.1.0
+ * Last Updated: 2025-01-08 17:42:33 UTC
+ * Author: Development Team
+ */
+
+/* Alert Container */
+.alerts-wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    width: 350px;
+    max-width: 90vw;
+}
+
+/* Base Alert Styles */
+.alert {
+    position: relative;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.alert.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Alert Types */
+.alert-primary {
+    background-color: #cfe2ff;
+    color: #084298;
+    border-left: 4px solid #084298;
+}
+
+.alert-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border-left: 4px solid #0f5132;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #856404;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #842029;
+    border-left: 4px solid #842029;
+}
+
+.alert-info {
+    background-color: #cff4fc;
+    color: #055160;
+    border-left: 4px solid #055160;
+}
+
+/* Alert Components */
+.alert-icon {
+    margin-right: 0.75rem;
+    font-size: 1.1em;
+    vertical-align: middle;
+}
+
+.alert-heading {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.alert-message {
+    margin-bottom: 0;
+}
+
+.alert-timestamp {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+}
+
+/* Close Button */
+.alert .close {
+    position: absolute;
+    top: 0.75rem;
+    right: 1rem;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    font-size: 1.25rem;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+}
+
+.alert .close:hover {
+    opacity: 1;
+}
+
+/* Progress Bar */
+.alert-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* System Alerts */
+.alert-system {
+    background-color: #e2e3e5;
+    color: #41464b;
+    border-left: 4px solid #41464b;
+}
+
+/* Persistent Alerts */
+.alert-persistent {
+    border-width: 2px;
+    border-style: solid;
+}
+
+/* Alert Groups */
+.alert-group {
+    margin-bottom: 1.5rem;
+}
+
+.alert-group .alert {
+    margin-bottom: 0.5rem;
+}
+
+.alert-group-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+    .alerts-wrapper {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+
+    .alert {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .alert-heading {
+        font-size: 1rem;
+    }
+
+    .alert-message {
+        font-size: 0.875rem;
+    }
+}
+
+/* Animation Keyframes */
+@keyframes alertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes alertSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Alert Animations */
+.alert-enter {
+    animation: alertSlideIn 0.3s ease forwards;
+}
+
+.alert-exit {
+    animation: alertSlideOut 0.3s ease forwards;
+}
+
+/* Alert Interactions */
+.alert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .alert {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .alert-primary {
+        background-color: #1a1a1a;
+        color: #9ec5fe;
+    }
+
+    .alert-success {
+        background-color: #1a1a1a;
+        color: #75b798;
+    }
+
+    .alert-warning {
+        background-color: #1a1a1a;
+        color: #ffda6a;
+    }
+
+    .alert-danger {
+        background-color: #1a1a1a;
+        color: #ea868f;
+    }
+
+    .alert-info {
+        background-color: #1a1a1a;
+        color: #6edff6;
+    }
+
+    .alert-system {
+        background-color: #1a1a1a;
+        color: #858789;
+    }
+}
+
+/* Accessibility */
+.alert:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.alert .close:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+}
+
+/* Print Styles */
+@media print {
+    .alerts-wrapper {
+        display: none !important;
+    }
+}

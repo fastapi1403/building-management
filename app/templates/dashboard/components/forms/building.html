@@ -1,0 +1,335 @@
+<!-- app/templates/components/forms/building.html -->
+<form id="buildingForm" class="needs-validation" novalidate>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                {% if building %}Edit{% else %}New{% endif %} Building Details
+                <small class="text-muted">Last updated: {{ moment.utc('2025-01-08 16:23:04').fromNow() }}</small>
+            </h5>
+        </div>
+        <div class="card-body">
+            <!-- Building Information -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="buildingName">Building Name *</label>
+                        <input type="text"
+                               class="form-control"
+                               id="buildingName"
+                               name="name"
+                               value="{{ building.name if building else '' }}"
+                               required>
+                        <div class="invalid-feedback">
+                            Please provide a building name.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="buildingCode">Building Code *</label>
+                        <input type="text"
+                               class="form-control"
+                               id="buildingCode"
+                               name="code"
+                               pattern="[A-Z0-9]{3,10}"
+                               value="{{ building.code if building else '' }}"
+                               required>
+                        <div class="invalid-feedback">
+                            Please provide a valid building code (3-10 uppercase letters/numbers).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Information -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="streetAddress">Street Address *</label>
+                        <input type="text"
+                               class="form-control"
+                               id="streetAddress"
+                               name="street_address"
+                               value="{{ building.street_address if building else '' }}"
+                               required>
+                        <div class="invalid-feedback">
+                            Please provide the street address.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text"
+                               class="form-control"
+                               id="city"
+                               name="city"
+                               value="{{ building.city if building else '' }}"
+                               required>
+                        <div class="invalid-feedback">
+                            Please provide the city.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="state">State/Province *</label>
+                        <input type="text"
+                               class="form-control"
+                               id="state"
+                               name="state"
+                               value="{{ building.state if building else '' }}"
+                               required>
+                        <div class="invalid-feedback">
+                            Please provide the state/province.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="zipCode">ZIP/Postal Code *</label>
+                        <input type="text"
+                               class="form-control"
+                               id="zipCode"
+                               name="zip_code"
+                               pattern="[0-9A-Z]{5,10}"
+                               value="{{ building.zip_code if building else '' }}"
+                               required>
+                        <div class="invalid-feedback">
+                            Please provide a valid postal code.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Building Details -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="yearBuilt">Year Built</label>
+                        <input type="number"
+                               class="form-control"
+                               id="yearBuilt"
+                               name="year_built"
+                               min="1800"
+                               max="2025"
+                               value="{{ building.year_built if building else '' }}">
+                        <div class="invalid-feedback">
+                            Please provide a valid year (1800-2025).
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="totalFloors">Total Floors *</label>
+                        <input type="number"
+                               class="form-control"
+                               id="totalFloors"
+                               name="total_floors"
+                               min="1"
+                               value="{{ building.total_floors if building else '' }}"
+                               required>
+                        <div class="invalid-feedback">
+                            Please provide the number of floors.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="totalUnits">Total Units *</label>
+                        <input type="number"
+                               class="form-control"
+                               id="totalUnits"
+                               name="total_units"
+                               min="1"
+                               value="{{ building.total_units if building else '' }}"
+                               required>
+                        <div class="invalid-feedback">
+                            Please provide the number of units.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="description">Building Description</label>
+                        <textarea class="form-control"
+                                  id="description"
+                                  name="description"
+                                  rows="3">{{ building.description if building else '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Building Status -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="status">Building Status *</label>
+                        <select class="form-control"
+                                id="status"
+                                name="status"
+                                required>
+                            <option value="">Select Status</option>
+                            <option value="active" {% if building and building.status == 'active' %}selected{% endif %}>Active</option>
+                            <option value="maintenance" {% if building and building.status == 'maintenance' %}selected{% endif %}>Under Maintenance</option>
+                            <option value="renovation" {% if building and building.status == 'renovation' %}selected{% endif %}>Under Renovation</option>
+                            <option value="inactive" {% if building and building.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a building status.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="manager">Building Manager</label>
+                        <select class="form-control"
+                                id="manager"
+                                name="manager_id">
+                            <option value="">Select Manager</option>
+                            {% for manager in managers %}
+                            <option value="{{ manager.id }}" {% if building and building.manager_id == manager.id %}selected{% endif %}>
+                                {{ manager.full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                    Last modified by: {{ building.modified_by if building else current_user.username }}
+                    ({{ moment.utc(building.modified_at if building else '2025-01-08 16:23:04').fromNow() if building else 'New Entry' }})
+                </small>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        {{ 'Update' if building else 'Create' }} Building
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.invalid-feedback {
+    font-size: 80%;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .btn-group {
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        flex: 1;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeBuildingForm();
+});
+
+function initializeBuildingForm() {
+    const form = document.getElementById('buildingForm');
+    const currentUser = 'hnejadi';
+    const currentTime = '2025-01-08T16:23:04Z';
+
+    // Form validation
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Auto-generate building code
+    const buildingName = document.getElementById('buildingName');
+    const buildingCode = document.getElementById('buildingCode');
+
+    buildingName.addEventListener('blur', function() {
+        if (!buildingCode.value && buildingName.value) {
+            buildingCode.value = generateBuildingCode(buildingName.value);
+        }
+    });
+
+    // Setup address autocomplete if available
+    setupAddressAutocomplete();
+}
+
+function generateBuildingCode(name) {
+    return name
+        .replace(/[^A-Za-z0-9]/g, '')
+        .toUpperCase()
+        .substring(0, 10);
+}
+
+function setupAddressAutocomplete() {
+    const addressInput = document.getElementById('streetAddress');
+    if (window.google && window.google.maps) {
+        const autocomplete = new google.maps.places.Autocomplete(addressInput);
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            fillAddressFields(place);
+        });
+    }
+}
+
+function fillAddressFields(place) {
+    for (const component of place.address_components) {
+        const componentType = component.types[0];
+        switch (componentType) {
+            case 'street_number':
+            case 'route':
+                document.getElementById('streetAddress').value = place.formatted_address;
+                break;
+            case 'locality':
+                document.getElementById('city').value = component.long_name;
+                break;
+            case 'administrative_area_level_1':
+                document.getElementById('state').value = component.short_name;
+                break;
+            case 'postal_code':
+                document.getElementById('zipCode').value = component.long_name;
+                break;
+        }
+    }
+}
+
+// Export functions for testing
+window.buildingFormUtils = {
+    generateBuildingCode,
+    fillAddressFields
+};
+</script>

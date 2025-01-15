@@ -1,28 +1,42 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-
-from app.api.v1.endpoints import index
-
-app = FastAPI()
-
-# Setting up CORS (if needed)
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    # Add other origins as needed
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+from app.config import settings
+from app.api.v1 import (
+    buildings,
+    floors,
+    units,
+    owners,
+    tenants,
+    funds,
+    transactions,
+    charges,
+    costs,
 )
 
-app.mount("/app/static", StaticFiles(directory="static"), name="static")
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Templates
 templates = Jinja2Templates(directory="app/templates")
 
-app.include_router(index.router)
+# Include routers
+app.include_router(buildings.router, prefix=settings.API_V1_STR, tags=["buildings"])
+app.include_router(floors.router, prefix=settings.API_V1_STR, tags=["floors"])
+app.include_router(units.router, prefix=settings.API_V1_STR, tags=["units"])
+app.include_router(owners.router, prefix=settings.API_V1_STR, tags=["owners"])
+app.include_router(tenants.router, prefix=settings.API_V1_STR, tags=["tenants"])
+app.include_router(funds.router, prefix=settings.API_V1_STR, tags=["funds"])
+app.include_router(transactions.router, prefix=settings.API_V1_STR, tags=["transactions"])
+app.include_router(charges.router, prefix=settings.API_V1_STR, tags=["charges"])
+app.include_router(costs.router, prefix=settings.API_V1_STR, tags=["costs"])
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Building Management System"}

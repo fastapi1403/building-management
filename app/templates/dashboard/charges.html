@@ -1,0 +1,330 @@
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDataTable();
+    initializeCharts();
+    setupDatePickers();
+    setupEventListeners();
+});
+
+// Initialize DataTable
+function initializeDataTable() {
+    $('#chargesTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '/api/v1/charges/list',
+            data: function(d) {
+                return {
+                    ...d,
+                    dateRange: $('#dateRange').val(),
+                    building: $('#buildingFilter').val(),
+                    status: $('#statusFilter').val(),
+                    chargeType: $('#chargeTypeFilter').val()
+                };
+            }
+        },
+        columns: [
+            { data: 'date', render: data => moment(data).format('DD/MM/YYYY') },
+            { data: 'charge_id' },
+            { data: 'unit_number' },
+            { data: 'resident_name' },
+            { 
+                data: 'amount',
+                render: function(data) {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD'
+                    }).format(data);
+                }
+            },
+            { data: 'charge_type' },
+            { 
+                data: 'status',
+                render: function(data) {
+                    const statusMap = {
+                        'pending': ['bg-warning', 'Pending'],
+                        'paid': ['bg-success', 'Paid'],
+                        'overdue': ['bg-danger', 'Overdue'],
+                        'partially_paid': ['bg-info', 'Partially Paid']
+                    };
+                    const [className, label] = statusMap[data] || ['bg-secondary', data];
+                    return `<span class="badge ${className}">${label}</span>`;
+                }
+            },
+            { data: 'due_date', render: data => moment(data).format('DD/MM/YYYY') },
+            {
+                data: null,
+                render: function(data, type, row) {
+                    return `
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-primary" onclick="editCharge(${row.id})" 
+                                    data-bs-toggle="tooltip" title="Edit Charge">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="viewChargeHistory(${row.id})"
+                                    data-bs-toggle="tooltip" title="View History">
+                                <i class="fas fa-history"></i>
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="recordPayment(${row.id})"
+                                    data-bs-toggle="tooltip" title="Record Payment">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCharge(${row.id})"
+                                    data-bs-toggle="tooltip" title="Delete Charge">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        ],
+        order: [[7, 'asc'], [0, 'desc']],
+        responsive: true,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"Bf>rtip',
+        buttons: [
+            {
+                extend: 'collection',
+                text: '<i class="fas fa-download"></i> Export',
+                buttons: ['csv', 'excel', 'pdf']
+            },
+            {
+                text: '<i class="fas fa-plus"></i> Add Charge',
+                className: 'btn-success',
+                action: function() {
+                    $('#chargeModal').modal('show');
+                }
+            }
+        ]
+    });
+}
+
+// Initialize Charts
+function initializeCharts() {
+    initializeChargeStatusChart();
+    initializeMonthlyTrendChart();
+    initializeChargeTypeDistribution();
+}
+
+function initializeChargeStatusChart() {
+    fetch('/api/v1/charges/status-summary')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('chargeStatusChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Paid', 'Pending', 'Overdue', 'Partially Paid'],
+                    datasets: [{
+                        data: [
+                            data.paid,
+                            data.pending,
+                            data.overdue,
+                            data.partially_paid
+                        ],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#17a2b8']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        });
+}
+
+function initializeMonthlyTrendChart() {
+    fetch('/api/v1/charges/monthly-trend')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('monthlyTrendChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: data.months,
+                    datasets: [{
+                        label: 'Total Charges',
+                        data: data.charges,
+                        borderColor: '#007bff',
+                        fill: false
+                    }, {
+                        label: 'Total Collections',
+                        data: data.collections,
+                        borderColor: '#28a745',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + value.toLocaleString()
+                            }
+                        }
+                    }
+                }
+            });
+        });
+}
+
+// Setup Date Pickers
+function setupDatePickers() {
+    $('#dateRange').daterangepicker({
+        ranges: {
+            'Today': [moment(), moment()],
+            'This Week': [moment().startOf('week'), moment().endOf('week')],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'This Year': [moment().startOf('year'), moment().endOf('year')]
+        },
+        startDate: moment().startOf('month'),
+        endDate: moment().endOf('month')
+    }, function(start, end) {
+        $('#chargesTable').DataTable().ajax.reload();
+    });
+
+    $('#chargeDueDate').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    });
+}
+
+// Event Listeners
+function setupEventListeners() {
+    $('.filter-select').on('change', function() {
+        $('#chargesTable').DataTable().ajax.reload();
+    });
+
+    $('#generateChargesBtn').on('click', function() {
+        generateRecurringCharges();
+    });
+
+    $('#bulkActionsBtn').on('click', function() {
+        handleBulkActions();
+    });
+}
+
+// CRUD Operations
+async function handleChargeSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const chargeId = document.getElementById('chargeId').value;
+
+    try {
+        const response = await fetch(`/api/v1/charges/${chargeId || ''}`, {
+            method: chargeId ? 'PUT' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Object.fromEntries(formData))
+        });
+
+        if (response.ok) {
+            $('#chargeModal').modal('hide');
+            $('#chargesTable').DataTable().ajax.reload();
+            updateDashboardStats();
+            showToast('Success', 'Charge saved successfully', 'success');
+        } else {
+            const error = await response.json();
+            showToast('Error', error.detail, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error', 'An error occurred while saving the charge', 'error');
+    }
+}
+
+async function recordPayment(chargeId) {
+    try {
+        const charge = await fetch(`/api/v1/charges/${chargeId}`).then(r => r.json());
+        document.getElementById('paymentChargeId').value = chargeId;
+        document.getElementById('paymentAmount').value = charge.remaining_amount;
+        document.getElementById('paymentDate').value = moment().format('YYYY-MM-DD');
+        $('#paymentModal').modal('show');
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error', 'Error loading charge details', 'error');
+    }
+}
+
+// Utility Functions
+function showToast(title, message, type) {
+    Toastify({
+        text: message,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: type === 'success' ? '#28a745' : '#dc3545'
+    }).showToast();
+}
+
+function updateDashboardStats() {
+    fetch('/api/v1/charges/dashboard-stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('totalCharges').textContent = data.totalCharges;
+            document.getElementById('totalCollected').textContent = data.totalCollected;
+            document.getElementById('totalPending').textContent = data.totalPending;
+            document.getElementById('totalOverdue').textContent = data.totalOverdue;
+        })
+        .catch(error => console.error('Error updating dashboard stats:', error));
+}
+
+// Bulk Operations
+function generateRecurringCharges() {
+    Swal.fire({
+        title: 'Generate Recurring Charges',
+        text: 'This will generate charges for all active recurring charges. Continue?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Generate',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/api/v1/charges/generate-recurring', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                $('#chargesTable').DataTable().ajax.reload();
+                showToast('Success', `Generated ${data.count} charges successfully`, 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error', 'Error generating recurring charges', 'error');
+            });
+        }
+    });
+}
+
+function handleBulkActions() {
+    const selectedRows = $('#chargesTable').DataTable().rows('.selected').data();
+    if (selectedRows.length === 0) {
+        showToast('Warning', 'Please select charges to process', 'warning');
+        return;
+    }
+
+    $('#bulkActionModal').modal('show');
+}
+
+// Export Functions
+function exportCharges(format) {
+    const filters = {
+        dateRange: $('#dateRange').val(),
+        building: $('#buildingFilter').val(),
+        status: $('#statusFilter').val(),
+        chargeType: $('#chargeTypeFilter').val()
+    };
+
+    window.location.href = `/api/v1/charges/export/${format}?${new URLSearchParams(filters)}`;
+}
+</script>
+{% endblock %}

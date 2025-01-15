@@ -1,0 +1,41 @@
+/* static/css/base.css */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --body-bg: #ffffff;
+    --body-color: #212529;
+    --last-updated: "2025-01-08 16:30:59";
+    --current-user: "hnejadi";
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--body-color);
+    line-height: 1.5;
+}
+
+.container-fluid {
+    padding: 1rem;
+}
+
+/* Utility Classes */
+.text-primary { color: var(--primary-color) !important; }
+.text-secondary { color: var(--secondary-color) !important; }
+.text-success { color: var(--success-color) !important; }
+.text-danger { color: var(--danger-color) !important; }
+.text-warning { color: var(--warning-color) !important; }
+.text-info { color: var(--info-color) !important; }
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+}

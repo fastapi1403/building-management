@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Property Management System Units Icon
+    Version: 2.1.0
+    Created: 2025-01-08 18:48:36 UTC
+    Author: hnejadi
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <!-- Definitions -->
+    <defs>
+        <!-- Unit Gradients -->
+        <linearGradient id="unitGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#3498DB"/>
+            <stop offset="100%" style="stop-color:#2980B9"/>
+        </linearGradient>
+        <linearGradient id="unitGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#E74C3C"/>
+            <stop offset="100%" style="stop-color:#C0392B"/>
+        </linearGradient>
+
+        <!-- Shadow Effect -->
+        <filter id="unitShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="0.5"/>
+            <feOffset dx="0.3" dy="0.3" result="offsetblur"/>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope="0.2"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- Unit Pattern -->
+        <pattern id="gridPattern" width="4" height="4" patternUnits="userSpaceOnUse">
+            <path d="M 4 0 L 0 0 0 4" fill="none" stroke="#ECF0F1" stroke-width="0.5"/>
+        </pattern>
+    </defs>
+
+    <!-- Main Container -->
+    <g transform="translate(2, 2)" filter="url(#unitShadow)">
+        <!-- Grid Background -->
+        <rect x="0" y="0" width="20" height="20" fill="#FFFFFF" stroke="#BDC3C7" stroke-width="1"/>
+
+        <!-- Unit Blocks -->
+        <!-- Top Left Unit -->
+        <g transform="translate(2, 2)">
+            <rect x="0" y="0" width="7" height="7"
+                  fill="url(#unitGradient1)"
+                  rx="1"/>
+            <rect x="1" y="1" width="2" height="2" fill="#ECF0F1" opacity="0.8"/>
+            <rect x="4" y="1" width="2" height="2" fill="#ECF0F1" opacity="0.8"/>
+            <rect x="1" y="4" width="5" height="1" fill="#ECF0F1" opacity="0.8"/>
+        </g>
+
+        <!-- Top Right Unit -->
+        <g transform="translate(11, 2)">
+            <rect x="0" y="0" width="7" height="7"
+                  fill="url(#unitGradient2)"
+                  rx="1"/>
+            <rect x="1" y="1" width="2" height="2" fill="#ECF0F1" opacity="0.8"/>
+            <rect x="4" y="1" width="2" height="2" fill="#ECF0F1" opacity="0.8"/>
+            <rect x="1" y="4" width="5" height="1" fill="#ECF0F1" opacity="0.8"/>
+        </g>
+
+        <!-- Bottom Left Unit -->
+        <g transform="translate(2, 11)">
+            <rect x="0" y="0" width="7" height="7"
+                  fill="url(#unitGradient1)"
+                  rx="1"/>
+            <rect x="1" y="1" width="2" height="2" fill="#ECF0F1" opacity="0.8"/>
+            <rect x="4" y="1" width="2" height="2" fill="#ECF0F1" opacity="0.8"/>
+            <rect x="1" y="4" width="5" height="1" fill="#ECF0F1" opacity="0.8"/>
+        </g>
+
+        <!-- Bottom Right Unit -->
+        <g transform="translate(11, 11)">
+            <rect x="0" y="0" width="7" height="7"
+                  fill="url(#unitGradient1)"
+                  rx="1"/>
+            <rect x="1" y="1" width="2" height="2" fill="#ECF0F1" opacity="0.8"/>
+            <rect x="4" y="1" width="2" height="2" fill="#ECF0F1" opacity="0.8"/>
+            <rect x="1" y="4" width="5" height="1" fill="#ECF0F1" opacity="0.8"/>
+        </g>
+
+        <!-- Connecting Lines -->
+        <path d="M9.5,5.5 L10.5,5.5 M9.5,14.5 L10.5,14.5 M5.5,9.5 L5.5,10.5 M14.5,9.5 L14.5,10.5"
+              stroke="#95A5A6"
+              stroke-width="0.5"
+              stroke-dasharray="1,1"/>
+    </g>
+
+    <!-- Status Indicator -->
+    <circle cx="20" cy="4" r="2"
+            fill="#27AE60"
+            filter="url(#unitShadow)"/>
+</svg>

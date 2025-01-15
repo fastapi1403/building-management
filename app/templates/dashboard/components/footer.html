@@ -1,0 +1,161 @@
+<!-- app/templates/components/footer.html -->
+<footer class="footer">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="footer-copyright">
+                    <p>&copy; 2025 Property Management System. All rights reserved.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="footer-info text-right">
+                    <div class="system-info">
+                        <span id="utcTimeDisplay" class="mr-3">
+                            UTC: {{ moment.utc().format('YYYY-MM-DD HH:mm:ss') }}
+                        </span>
+                        <span id="userTimeDisplay" class="mr-3">
+                            Local: {{ moment.local().format('YYYY-MM-DD HH:mm:ss') }}
+                        </span>
+                        <span id="userInfo" class="mr-3">
+                            User: {{ current_user.username }}
+                        </span>
+                        <span id="lastUpdateDisplay">
+                            Last updated: {{ moment.utc().format('YYYY-MM-DD HH:mm:ss') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="footer-links">
+                    <nav class="footer-nav">
+                        <ul class="list-inline text-center">
+                            <li class="list-inline-item">
+                                <a href="/about">About</a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="/privacy">Privacy Policy</a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="/terms">Terms of Service</a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="/contact">Contact</a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="/help">Help Center</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <div class="version-info text-center">
+                    <small>Version 2.1.0 | Environment: {{ config.ENV }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+.footer {
+    background-color: #f8f9fa;
+    padding: 1.5rem 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #dee2e6;
+    font-size: 0.875rem;
+}
+
+.footer-copyright p {
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+.footer-info {
+    color: #6c757d;
+}
+
+.system-info span {
+    display: inline-block;
+    padding: 0 10px;
+    border-right: 1px solid #dee2e6;
+}
+
+.system-info span:last-child {
+    border-right: none;
+}
+
+.footer-links {
+    margin-top: 0.5rem;
+}
+
+.footer-nav ul {
+    margin-bottom: 0;
+}
+
+.footer-nav a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-nav a:hover {
+    color: #007bff;
+}
+
+.version-info {
+    color: #999;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        position: static;
+        padding: 1rem 0;
+    }
+
+    .footer-info {
+        text-align: center !important;
+        margin-top: 1rem;
+    }
+
+    .system-info span {
+        display: block;
+        border-right: none;
+        padding: 5px 0;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize time displays
+    updateFooterTime();
+
+    // Update time every second
+    setInterval(updateFooterTime, 1000);
+});
+
+function updateFooterTime() {
+    const utcElement = document.getElementById('utcTimeDisplay');
+    const localElement = document.getElementById('userTimeDisplay');
+    const lastUpdateElement = document.getElementById('lastUpdateDisplay');
+
+    if (utcElement) {
+        utcElement.textContent = 'UTC: ' + moment.utc().format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    if (localElement) {
+        localElement.textContent = 'Local: ' + moment().format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    if (lastUpdateElement) {
+        lastUpdateElement.textContent = 'Last updated: ' + moment().format('YYYY-MM-DD HH:mm:ss');
+    }
+}
+</script>

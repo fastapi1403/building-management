@@ -1,0 +1,317 @@
+/**
+ * Property Management System - Header Styles
+ * Version: 2.1.0
+ * Last Updated: 2025-01-08 17:45:49 UTC
+ * Author: Development Team
+ */
+
+/* Main Header Container */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    z-index: 1030;
+    transition: all 0.3s ease;
+}
+
+/* Header Content Wrapper */
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 1.5rem;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+/* Logo Section */
+.header-logo {
+    display: flex;
+    align-items: center;
+    min-width: 200px;
+}
+
+.logo-image {
+    height: 36px;
+    width: auto;
+    margin-right: 1rem;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+/* Navigation Section */
+.header-nav {
+    display: flex;
+    align-items: center;
+    margin: 0 2rem;
+    flex-grow: 1;
+}
+
+.nav-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin: 0 1rem;
+    position: relative;
+}
+
+.nav-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+.nav-link.active {
+    color: #007bff;
+}
+
+/* User Section */
+.header-user {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.user-notifications {
+    position: relative;
+    margin-right: 1.5rem;
+}
+
+.notifications-icon {
+    font-size: 1.25rem;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.notifications-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #dc3545;
+    color: #fff;
+    border-radius: 50%;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: 18px;
+    text-align: center;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    object-fit: cover;
+}
+
+.user-info {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .user-info {
+        display: block;
+    }
+}
+
+.user-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+    font-size: 0.9375rem;
+}
+
+.user-role {
+    color: #6c757d;
+    font-size: 0.75rem;
+    margin: 0;
+}
+
+/* Search Bar */
+.header-search {
+    position: relative;
+    margin-right: 2rem;
+    max-width: 300px;
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 1.5rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 240px;
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1.25rem;
+    color: #2c3e50;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+@media (max-width: 991.98px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .header-nav {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background-color: #fff;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .header-nav.show {
+        display: block;
+    }
+
+    .nav-list {
+        flex-direction: column;
+    }
+
+    .nav-item {
+        margin: 0.5rem 0;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .header {
+        background-color: #1a1f24;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo-text {
+        color: #f8f9fa;
+    }
+
+    .nav-link {
+        color: #adb5bd;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+        color: #007bff;
+    }
+
+    .user-name {
+        color: #f8f9fa;
+    }
+
+    .search-input {
+        background-color: #2c3e50;
+        border-color: #495057;
+        color: #f8f9fa;
+    }
+
+    .dropdown-menu {
+        background-color: #1a1f24;
+        border: 1px solid #2c3e50;
+    }
+
+    .dropdown-item {
+        color: #f8f9fa;
+    }
+
+    .dropdown-item:hover {
+        background-color: #2c3e50;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .header {
+        position: static;
+        box-shadow: none;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .header-nav,
+    .header-search,
+    .user-notifications,
+    .mobile-menu-toggle {
+        display: none;
+    }
+}
