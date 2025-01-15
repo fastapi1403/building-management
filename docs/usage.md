@@ -377,3 +377,247 @@ payment = Payment(
     notes="January 2025 maintenance payment"
 )
 ```
+
+models/cost.py
+```python
+# Creating a new maintenance cost
+new_cost = Cost(
+    title="Annual AC Maintenance",
+    description="Regular maintenance of all AC units",
+    amount=25000.00,
+    estimated_amount=25000.00,
+    planned_date=datetime(2025, 2, 1, tzinfo=UTC),
+    category=CostCategory.MAINTENANCE,
+    priority=CostPriority.MEDIUM,
+    building_id=1,
+    created_by="fastapi1403",
+    is_recurring=True,
+    frequency_months=12
+)
+
+# Adding a document
+document = CostDocument(
+    cost_id=new_cost.id,
+    title="Maintenance Quote",
+    document_type="quote",
+    file_path="/documents/costs/2025/quote_123.pdf",
+    file_size=156789,
+    mime_type="application/pdf",
+    uploaded_by="fastapi1403"
+)
+```
+
+models/fund.py
+```python
+# Create a new maintenance fund
+maintenance_fund = Fund(
+    name="Building A Maintenance Fund",
+    description="Primary maintenance fund for Building A",
+    fund_type=FundType.MAINTENANCE,
+    building_id=1,
+    current_balance=Decimal('100000.00'),
+    minimum_balance=Decimal('20000.00'),
+    withdrawal_limit=Decimal('50000.00'),
+    manager="fastapi1403",
+    created_at=datetime(2025, 1, 15, 12, 5, 16, tzinfo=UTC)
+)
+
+# Record a transaction
+transaction = FundTransaction(
+    fund_id=maintenance_fund.id,
+    transaction_type=TransactionType.DEPOSIT,
+    amount=Decimal('25000.00'),
+    balance_after=Decimal('125000.00'),
+    reference_number="DEP-20250115-001",
+    description="Monthly maintenance collection",
+    initiated_by="fastapi1403",
+    transaction_date=datetime(2025, 1, 15, 12, 5, 16, tzinfo=UTC)
+)
+```
+
+models/transaction.py
+```python
+# Create a new maintenance payment transaction
+new_transaction = Transaction(
+    transaction_number="TXN-20250115-001",
+    amount=Decimal("5000.00"),
+    type=TransactionType.PAYMENT,
+    payment_method=PaymentMethod.BANK_TRANSFER,
+    building_id=1,
+    unit_id=101,
+    description="Monthly maintenance payment",
+    payment_reference="REF123456",
+    bank_reference="BANK789012",
+    processed_by="fastapi1403",
+    payment_date=datetime(2025, 1, 15, 12, 7, 25, tzinfo=UTC)
+)
+
+# Add a transaction split
+split = TransactionSplit(
+    transaction_id=new_transaction.id,
+    amount=Decimal("5000.00"),
+    category="maintenance",
+    description="Regular maintenance fee",
+    fund_id=1
+)
+
+# Add a transaction attachment
+attachment = TransactionAttachment(
+    transaction_id=new_transaction.id,
+    file_name="payment_receipt.pdf",
+    file_type="application/pdf",
+    file_size=125000,
+    file_path="/attachments/2025/01/payment_receipt.pdf",
+    uploaded_by="fastapi1403",
+    description="Payment receipt"
+)
+```
+
+schemas/charge.py
+```python
+# Creating a new charge
+new_charge = ChargeCreate(
+    title="Monthly Maintenance",
+    description="Monthly maintenance fee for January 2025",
+    amount=Decimal("1500.00"),
+    type=ChargeType.MAINTENANCE,
+    due_date=date(2025, 1, 31),
+    building_id=1,
+    unit_id=101,
+    is_taxable=True,
+    tax_rate=Decimal("18.00"),
+    frequency=ChargeFrequency.MONTHLY,
+    recurring=True
+)
+
+# Updating a charge
+charge_update = ChargeUpdate(
+    amount=Decimal("1600.00"),
+    due_date=date(2025, 2, 1),
+    notes="Amount adjusted for inflation"
+)
+
+# Recording a payment
+payment = ChargePayment(
+    amount=Decimal("1500.00"),
+    payment_method="bank_transfer",
+    payment_reference="REF123456",
+    notes="January maintenance payment"
+)
+```
+
+schemas/cost.py
+```python
+# Creating a new cost
+new_cost = CostCreate(
+    title="Annual AC Maintenance",
+    description="Preventive maintenance for all AC units",
+    category=CostCategory.MAINTENANCE,
+    priority=CostPriority.MEDIUM,
+    estimated_amount=Decimal("25000.00"),
+    planned_date=date(2025, 2, 15),
+    building_id=1,
+    is_recurring=True,
+    frequency_months=12,
+    tags=["maintenance", "ac", "yearly"]
+)
+
+# Updating a cost
+cost_update = CostUpdate(
+    status=CostStatus.COMPLETED,
+    actual_amount=Decimal("23500.00"),
+    completion_date=datetime(2025, 1, 15, 12, 21, 7),
+    notes="Completed under budget"
+)
+
+# Adding a document
+document = CostDocument(
+    title="Maintenance Report",
+    document_type="report",
+    file_path="/documents/2025/01/maintenance_report.pdf",
+    file_size=1024000,
+    mime_type="application/pdf",
+    description="Annual maintenance completion report"
+)   
+```
+
+schemas/fund.py
+```python
+# Creating a new fund
+new_fund = FundCreate(
+    name="Building A Maintenance Fund",
+    description="Primary maintenance fund for Building A",
+    fund_type=FundType.MAINTENANCE,
+    building_id=1,
+    current_balance=Decimal("100000.00"),
+    minimum_balance=Decimal("20000.00"),
+    target_amount=Decimal("500000.00"),
+    withdrawal_limit=Decimal("50000.00"),
+    tags=["maintenance", "building-a"]
+)
+
+# Creating a transaction
+transaction = FundTransaction(
+    transaction_type=TransactionType.DEPOSIT,
+    amount=Decimal("25000.00"),
+    reference_number="DEP-20250115-001",
+    description="Monthly maintenance collection",
+    notes="Regular monthly deposit"
+)
+
+# Creating an approval request
+approval_request = FundApprovalRequest(
+    requested_amount=Decimal("45000.00"),
+    purpose="Emergency AC repair",
+    justification="Critical repair needed for main AC system",
+    supporting_documents=["quote.pdf", "inspection_report.pdf"],
+    notes="Urgent approval needed"
+)
+```
+
+schemas/transaction.py
+```python
+# Creating a new transaction
+new_transaction = TransactionCreate(
+    amount=Decimal("5000.00"),
+    type=TransactionType.PAYMENT,
+    payment_method=PaymentMethod.BANK_TRANSFER,
+    description="Monthly maintenance payment",
+    building_id=1,
+    unit_id=101,
+    payment_reference="REF123456",
+    bank_reference="BANK789012",
+    tags=["maintenance", "monthly"]
+)
+
+# Creating a transaction split
+split = TransactionSplit(
+    amount=Decimal("5000.00"),
+    category="maintenance",
+    description="Regular maintenance fee",
+    fund_id=1
+)
+
+# Adding an attachment
+attachment = TransactionAttachment(
+    file_name="payment_receipt.pdf",
+    file_type="application/pdf",
+    file_size=156789,
+    file_path="/attachments/2025/01/payment_receipt.pdf",
+    description="Payment receipt"
+)
+
+# Creating a reconciliation record
+reconciliation = TransactionReconciliation(
+    transaction_id=1,
+    reconciled=True,
+    notes="Reconciled with bank statement",
+    differences=[
+        {
+            "field": "bank_reference",
+            "system_value": "REF123456",
+            "bank_value": "REF123456A"
+        }
+    ]
+)
+```
