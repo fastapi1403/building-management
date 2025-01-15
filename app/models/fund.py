@@ -2,7 +2,7 @@ from datetime import datetime, UTC
 from typing import Optional, List
 from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, String, Enum as SQLEnum, Index
+from sqlalchemy import Column, Enum as SQLEnum, Index
 from decimal import Decimal
 
 from mixins import TimestampMixin, SoftDeleteMixin
@@ -13,31 +13,58 @@ from charge import Charge
 
 class FundType(str, Enum):
     """Enum for fund types"""
-    MAINTENANCE = "maintenance"
-    RESERVE = "reserve"
-    SINKING = "sinking"
-    OPERATING = "operating"
-    EMERGENCY = "emergency"
-    RENOVATION = "renovation"
-    SPECIAL_ASSESSMENT = "special_assessment"
+    MAINTENANCE = "maintenance"  # Regular maintenance fund
+    RESERVE = "reserve"  # Reserve/emergency fund
+    OPERATIONAL = "operational"  # Day-to-day operations
+    RENOVATION = "renovation"  # Renovation projects
+    SPECIAL_PROJECT = "special_project"  # Special building projects
+    EMERGENCY = "emergency"  # Emergency situations
+    SINKING = "sinking"  # Long-term capital expenses
+    OTHER = "other"  # Other fund types
 
 
 class FundStatus(str, Enum):
     """Enum for fund status"""
     ACTIVE = "active"
     INACTIVE = "inactive"
-    FROZEN = "frozen"
     DEPLETED = "depleted"
+    FROZEN = "frozen"
     PENDING_APPROVAL = "pending_approval"
+    CLOSED = "closed"
 
 
 class TransactionType(str, Enum):
-    """Enum for fund transactions"""
-    DEPOSIT = "deposit"
-    WITHDRAWAL = "withdrawal"
-    TRANSFER = "transfer"
-    INTEREST = "interest"
-    ADJUSTMENT = "adjustment"
+    """Enumeration for transaction types"""
+    CONTRIBUTION = "contribution"  # Money added to fund
+    WITHDRAWAL = "withdrawal"  # Money taken from fund
+    TRANSFER_IN = "transfer_in"  # Transfer from another fund
+    TRANSFER_OUT = "transfer_out"  # Transfer to another fund
+    INTEREST = "interest"  # Interest earned
+    ADJUSTMENT = "adjustment"  # Balance adjustment
+    REFUND = "refund"  # Refund to fund
+    FEE = "fee"  # Bank or service fees
+
+
+class TransactionStatus(str, Enum):
+    """Enumeration for transaction statuses"""
+    PENDING = "pending"  # Awaiting processing
+    COMPLETED = "completed"  # Successfully processed
+    FAILED = "failed"  # Transaction failed
+    CANCELLED = "cancelled"  # Transaction cancelled
+    REVERSED = "reversed"  # Transaction reversed
+    PROCESSING = "processing"  # Currently processing
+
+
+class PaymentMethod(str, Enum):
+    """Enumeration for payment methods"""
+    CASH = "cash"
+    BANK_TRANSFER = "bank_transfer"
+    CHECK = "check"
+    CREDIT_CARD = "credit_card"
+    DEBIT_CARD = "debit_card"
+    ONLINE_PAYMENT = "online_payment"
+    INTERNAL_TRANSFER = "internal_transfer"
+    OTHER = "other"
 
 
 class Fund(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
@@ -64,7 +91,6 @@ class Fund(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     current_balance: Decimal = Field(default=Decimal('0.00'))
     target_amount: Optional[Decimal] = Field(default=None)
     minimum_balance: Decimal = Field(default=Decimal('0.00'))
-    currency: str = Field(default="INR", max_length=3)
 
     # Association
     building_id: int = Field(..., foreign_key="buildings.id")
@@ -86,7 +112,6 @@ class Fund(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     # Relationships
     building: "Building" = Relationship(back_populates="funds")
     transactions: List["FundTransaction"] = Relationship(back_populates="fund")
-    approvals: List["FundApproval"] = Relationship(back_populates="fund")
 
     __table_args__ = (
         Index('ix_funds_building_type', 'building_id', 'fund_type'),
@@ -116,6 +141,15 @@ class FundTransaction(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     fund_id: int = Field(..., foreign_key="funds.id")
+
+    status: FundStatus = Field(
+        sa_column=Column(SQLEnum(TransactionStatus)),
+        default=TransactionStatus.PENDING
+    )
+    payment_method: FundStatus = Field(
+        sa_column=Column(SQLEnum(PaymentMethod)),
+        default=PaymentMethod.BANK_TRANSFER
+    )
 
     # Transaction Details
     transaction_type: TransactionType = Field(
@@ -147,35 +181,6 @@ class FundTransaction(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     )
 
 
-class FundApproval(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
-    """
-    Model for managing fund transaction approvals
-    """
-    __tablename__ = "fund_approvals"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-    fund_id: int = Field(..., foreign_key="funds.id")
-    transaction_id: Optional[int] = Field(default=None, foreign_key="fund_transactions.id")
-
-    # Approval Details
-    requested_amount: Decimal = Field(...)
-    purpose: str = Field(..., max_length=500)
-    requested_by: str = Field(default="fastapi1403", max_length=100)
-    approved_by: Optional[str] = Field(default=None, max_length=100)
-    approved_date: Optional[datetime] = Field(default=None)
-    status: str = Field(default="pending")
-
-    # Supporting Information
-    justification: str = Field(..., max_length=1000)
-    supporting_documents: List[str] = Field(default_factory=list)
-    notes: Optional[str] = Field(default=None, max_length=1000)
-
-    # Relationships
-    fund: Fund = Relationship(back_populates="approvals")
-    transaction: Optional[FundTransaction] = Relationship(back_populates="approval")
-
-
 # Type annotations for relationships
 Fund.model_rebuild()
 FundTransaction.model_rebuild()
-FundApproval.model_rebuild()
