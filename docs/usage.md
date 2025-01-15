@@ -351,3 +351,29 @@ async def get_expiring_leases(
         for tenant in expiring_leases
     ]
 ```
+
+models/charge.py
+```python
+# Creating a new maintenance charge
+new_charge = Charge(
+    title="Monthly Maintenance",
+    description="Monthly maintenance fee for January 2025",
+    amount=1500.00,
+    due_date=datetime(2025, 1, 31, tzinfo=UTC),
+    building_id=1,
+    unit_id=101,
+    generated_by="system",
+    type=ChargeType.MAINTENANCE,
+    frequency=ChargeFrequency.MONTHLY,
+    recurring=True
+)
+
+# Recording a payment
+payment = Payment(
+    charge_id=new_charge.id,
+    amount=1500.00,
+    payment_method="bank_transfer",
+    transaction_id="TXN123456",
+    notes="January 2025 maintenance payment"
+)
+```
