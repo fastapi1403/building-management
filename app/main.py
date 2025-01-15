@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 from fastapi.templating import Jinja2Templates
 from app.config import settings
 from app.api.v1 import (
@@ -18,7 +20,25 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    description="Building Management System API"
 )
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Add error handlers
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors()}
+    )
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -37,6 +57,7 @@ app.include_router(transactions.router, prefix=settings.API_V1_STR, tags=["trans
 app.include_router(charges.router, prefix=settings.API_V1_STR, tags=["charges"])
 app.include_router(costs.router, prefix=settings.API_V1_STR, tags=["costs"])
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to Building Management System"}
+# Add health check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}

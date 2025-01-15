@@ -1,9 +1,9 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from . import TimeStampModel
+from base import TimestampModel
 
 
-class Owner(TimeStampModel, table=True):
+class Owner(TimestampModel, table=True):
     __tablename__ = "owners"
 
     id: Optional[int] = Field(default=None, primary_key=True)

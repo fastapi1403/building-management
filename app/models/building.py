@@ -1,9 +1,9 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from . import TimeStampModel
+from base import TimestampModel
 
 
-class Building(TimeStampModel, table=True):
+class Building(TimestampModel, table=True):
     __tablename__ = "buildings"
 
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -14,6 +14,7 @@ class Building(TimeStampModel, table=True):
     has_parking: bool = Field(default=False)
     total_parking_spaces: int = Field(default=0)
     has_boiler_room: bool = Field(default=False)
+    description: Optional[str] = None
 
     # Relationships
     floors: List["Floor"] = Relationship(back_populates="building")

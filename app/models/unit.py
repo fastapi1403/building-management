@@ -1,14 +1,22 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from . import TimeStampModel
+from enum import Enum
+from base import TimestampModel
 
 
-class Unit(TimeStampModel, table=True):
+class UnitType(str, Enum):
+    RESIDENTIAL = "residential"
+    COMMERCIAL = "commercial"
+    OFFICE = "office"
+
+
+class Unit(TimestampModel, table=True):
     __tablename__ = "units"
 
     id: Optional[int] = Field(default=None, primary_key=True)
     floor_id: int = Field(foreign_key="floors.id")
     unit_number: str = Field(..., index=True)
+    type: UnitType = Field(default=UnitType.RESIDENTIAL)
     area: float
     has_parking: bool = Field(default=False)
     parking_space_number: Optional[str] = None

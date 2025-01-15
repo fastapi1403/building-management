@@ -1,9 +1,10 @@
+from datetime import date
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from . import TimeStampModel
+from base import TimestampModel
 
 
-class Tenant(TimeStampModel, table=True):
+class Tenant(TimestampModel, table=True):
     __tablename__ = "tenants"
 
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -15,6 +16,8 @@ class Tenant(TimeStampModel, table=True):
     whatsapp: Optional[str] = None
     telegram: Optional[str] = None
     occupant_count: int = Field(default=1)
+    lease_start_date: date
+    lease_end_date: date
 
     # Relationships
     unit: "Unit" = Relationship(back_populates="tenant")
