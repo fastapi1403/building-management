@@ -5,7 +5,10 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum, Index
 from decimal import Decimal
 
-from .base import TimestampModel
+from base import TimestampMixin
+from building import Building
+from cost import Cost
+from charge import Charge
 
 
 class FundType(str, Enum):
@@ -37,7 +40,7 @@ class TransactionType(str, Enum):
     ADJUSTMENT = "adjustment"
 
 
-class Fund(TimestampModel, table=True):
+class Fund(TimestampMixin, table=True):
     """
     Model for managing building funds and their transactions
     """
@@ -105,7 +108,7 @@ class Fund(TimestampModel, table=True):
         return self.current_balance <= threshold
 
 
-class FundTransaction(TimestampModel, table=True):
+class FundTransaction(TimestampMixin, table=True):
     """
     Model for tracking fund transactions
     """
@@ -144,7 +147,7 @@ class FundTransaction(TimestampModel, table=True):
     )
 
 
-class FundApproval(TimestampModel, table=True):
+class FundApproval(TimestampMixin, table=True):
     """
     Model for managing fund transaction approvals
     """
@@ -173,10 +176,6 @@ class FundApproval(TimestampModel, table=True):
 
 
 # Type annotations for relationships
-from .building import Building
-from .cost import Cost
-from .charge import Charge
-
-Fund.update_forward_refs()
-FundTransaction.update_forward_refs()
-FundApproval.update_forward_refs()
+Fund.model_rebuild()
+FundTransaction.model_rebuild()
+FundApproval.model_rebuild()

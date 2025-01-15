@@ -2,6 +2,10 @@ from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
 from base import TimestampMixin
+from app.models.owner import Owner
+from app.models.tenant import Tenant
+from app.models.charge import Charge
+from app.models.floor import Floor
 
 
 class UnitType(str, Enum):
@@ -29,3 +33,5 @@ class Unit(TimestampMixin, table=True):
     owner: Optional["Owner"] = Relationship(back_populates="units")
     tenant: Optional["Tenant"] = Relationship(back_populates="unit")
     charges: List["Charge"] = Relationship(back_populates="unit")
+
+Unit.model_rebuild()

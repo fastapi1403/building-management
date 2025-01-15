@@ -2,6 +2,7 @@ fastapi
 pydantic
 uvicorn
 sqlmodel
+sqlalchemy
 asyncpg
 alembic
 jinja2

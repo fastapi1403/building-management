@@ -1,7 +1,8 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from base import TimestampMixin
-
+from app.models.unit import Unit
+from app.models.charge import Charge
 
 class Owner(TimestampMixin, table=True):
     __tablename__ = "owners"
@@ -17,3 +18,6 @@ class Owner(TimestampMixin, table=True):
     # Relationships
     units: List["Unit"] = Relationship(back_populates="owner")
     charges: List["Charge"] = Relationship(back_populates="owner")
+
+
+Owner.model_rebuild()

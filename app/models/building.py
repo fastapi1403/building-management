@@ -1,7 +1,8 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from base import TimestampMixin
-
+from app.models.floor import Floor
+from app.models.fund import Fund
 
 class Building(TimestampMixin, table=True):
     __tablename__ = "buildings"
@@ -32,3 +33,5 @@ class Building(TimestampMixin, table=True):
                 "has_boiler_room": True
             }
         }
+
+Building.model_rebuild()

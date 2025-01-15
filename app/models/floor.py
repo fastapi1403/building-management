@@ -1,7 +1,8 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from base import TimestampMixin
-
+from app.models.building import Building
+from app.models.unit import Unit
 
 class Floor(TimestampMixin, table=True):
     __tablename__ = "floors"
@@ -14,3 +15,5 @@ class Floor(TimestampMixin, table=True):
     # Relationships
     building: "Building" = Relationship(back_populates="floors")
     units: List["Unit"] = Relationship(back_populates="floor")
+
+Floor.model_rebuild()

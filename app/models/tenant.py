@@ -2,7 +2,8 @@ from datetime import date
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from base import TimestampMixin
-
+from app.models.unit import Unit
+from app.models.charge import Charge
 
 class Tenant(TimestampMixin, table=True):
     __tablename__ = "tenants"
@@ -22,3 +23,6 @@ class Tenant(TimestampMixin, table=True):
     # Relationships
     unit: "Unit" = Relationship(back_populates="tenant")
     charges: List["Charge"] = Relationship(back_populates="tenant")
+
+
+Tenant.model_rebuild()

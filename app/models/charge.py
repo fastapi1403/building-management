@@ -5,6 +5,10 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum
 
 from base import TimestampMixin
+from .unit import Unit
+from .owner import Owner
+from .tenant import Tenant
+from .building import Building
 
 
 class ChargeStatus(str, Enum):
@@ -134,7 +138,7 @@ class Charge(TimestampMixin, table=True):
             self.status = ChargeStatus.OVERDUE
 
 
-class Payment(TimestampModel, table=True):
+class Payment(TimestampMixin, table=True):
     """
     Model for tracking payments against charges
     """
@@ -155,11 +159,5 @@ class Payment(TimestampModel, table=True):
         arbitrary_types_allowed = True
 
 
-# Type annotations for relationships
-from .unit import Unit
-from .owner import Owner
-from .tenant import Tenant
-from .building import Building
-
-Charge.update_forward_refs()
-Payment.update_forward_refs()
+Charge.model_rebuild()
+Payment.model_rebuild()

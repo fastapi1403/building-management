@@ -4,7 +4,12 @@ from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum, Index
 
-from .base import TimestampModel
+from base import TimestampMixin
+# Type annotations for relationships
+from .building import Building
+from .unit import Unit
+from .floor import Floor
+from .vendor import Vendor
 
 
 class CostCategory(str, Enum):
@@ -42,7 +47,7 @@ class CostStatus(str, Enum):
     ON_HOLD = "on_hold"
 
 
-class Cost(TimestampModel, table=True):
+class Cost(TimestampMixin, table=True):
     """
     Model for tracking costs and expenses in the building management system
     """
@@ -145,7 +150,7 @@ class Cost(TimestampModel, table=True):
         self.update_variance()
 
 
-class CostDocument(TimestampModel, table=True):
+class CostDocument(TimestampMixin, table=True):
     """
     Model for storing documents related to costs (invoices, receipts, etc.)
     """
@@ -172,12 +177,5 @@ class CostDocument(TimestampModel, table=True):
     class Config:
         arbitrary_types_allowed = True
 
-
-# Type annotations for relationships
-from .building import Building
-from .unit import Unit
-from .floor import Floor
-from .vendor import Vendor
-
-Cost.update_forward_refs()
-CostDocument.update_forward_refs()
+Cost.model_rebuild()
+CostDocument.model_rebuild()
