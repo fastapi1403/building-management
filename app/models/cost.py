@@ -11,7 +11,7 @@ from .unit import Unit
 from .floor import Floor
 
 
-class CostCategory(str, Enum):
+class CostType(str, Enum):
     """Enum for cost categories"""
     MAINTENANCE = "maintenance"
     REPAIR = "repair"
@@ -44,6 +44,11 @@ class CostStatus(str, Enum):
     COMPLETED = "completed"
     CANCELLED = "cancelled"
     ON_HOLD = "on_hold"
+    DRAFT = "draft"
+    PENDING = "pending"
+    REJECTED = "rejected"
+    PAID = "paid"
+    REFUNDED = "refunded"
 
 
 class Cost(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
@@ -60,9 +65,9 @@ class Cost(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     amount: float = Field(..., gt=0)
 
     # Classification
-    category: CostCategory = Field(
-        sa_column=Column(SQLEnum(CostCategory)),
-        default=CostCategory.MAINTENANCE
+    cost_type: CostType = Field(
+        sa_column=Column(SQLEnum(CostType)),
+        default=CostType.MAINTENANCE
     )
     priority: CostPriority = Field(
         sa_column=Column(SQLEnum(CostPriority)),
