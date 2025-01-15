@@ -1,7 +1,7 @@
 from datetime import datetime, UTC
 from typing import Optional
 from sqlmodel import SQLModel, Field
-from pydantic import validator, field_validator
+from pydantic import validator, field_validator, model_validator
 
 
 class TimestampModel(SQLModel):
@@ -15,7 +15,8 @@ class TimestampModel(SQLModel):
     )
     deleted_at: Optional[datetime] = Field(default=None)
 
-    @field_validator("updated_at", mode="before")
-    @classmethod
-    def set_updated_at(cls, v, info):
-        return datetime.now(UTC)  # Changed from utcnow() to now(UTC)
+    # Using model_validator instead of field_validator for this case
+    @model_validator(mode='before')
+    def set_updated_at(cls, values):
+        values['updated_at'] = datetime.now(UTC)
+        return values
