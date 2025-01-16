@@ -1,5 +1,5 @@
 from typing import Optional, List
-from pydantic import Field, EmailStr
+from pydantic import Field, EmailStr, ConfigDict
 from app.schemas.mixins import BaseSchema
 from app.models.owner import OwnerType, OwnerStatus
 
@@ -70,10 +70,10 @@ class OwnerBase(BaseSchema):
         description="Whatsapp number or ID"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
                 "name": "John Doe",
                 "owner_type": "individual",
                 "status": "active",
@@ -85,6 +85,7 @@ class OwnerBase(BaseSchema):
                 "tags": ["resident", "primary"]
             }
         }
+    )
 
 
 class OwnerCreate(OwnerBase):
@@ -143,10 +144,9 @@ class OwnerBulkCreate(BaseSchema):
         min_length=1
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
                 "owners": [
                     {
                         "name": "John Doe",
@@ -162,6 +162,7 @@ class OwnerBulkCreate(BaseSchema):
                 ]
             }
         }
+    )
 
 
 class OwnerFilter(BaseSchema):
@@ -185,10 +186,9 @@ class OwnerStatistics(BaseSchema):
     by_type: dict = Field(..., description="Owners grouped by type")
     by_status: dict = Field(..., description="Owners grouped by status")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
                 "total_owners": 100,
                 "active_owners": 85,
                 "total_units_owned": 150,
@@ -202,3 +202,4 @@ class OwnerStatistics(BaseSchema):
                 }
             }
         }
+    )
