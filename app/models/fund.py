@@ -109,7 +109,6 @@ class Fund(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
 
     # Metadata
     notes: Optional[str] = Field(default=None, max_length=1000)
-    tags: List[str] = Field(default_factory=list)
 
     # Relationships
     building: "Building" = Relationship(back_populates="funds")
@@ -176,6 +175,9 @@ class FundTransaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     fund: Fund = Relationship(back_populates="transactions")
     cost: Optional["Cost"] = Relationship(back_populates="fund_transactions")
     charge: Optional["Charge"] = Relationship(back_populates="fund_transactions")
+    # building: "Building" = Relationship(back_populates="funds")
+    # transactions: List["Transaction"] = Relationship(back_populates="fund")
+    # charges: List["Charge"] = Relationship(back_populates="fund")
 
     __table_args__ = (
         Index('ix_fund_transactions_date', 'transaction_date'),
@@ -183,6 +185,7 @@ class FundTransaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     )
 
 
-# Type annotations for relationships
-# Fund.model_rebuild()
-# FundTransaction.model_rebuild()
+# Forward references for type hints
+from app.models.building import Building
+from app.models.transaction import Transaction
+from app.models.charge import Charge
