@@ -1,20 +1,37 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-# from app.models.floor import Floor
-# from app.models.fund import Fund
-from app.models.mixins import SoftDeleteMixin, TimestampMixin
+from db import TableBase
 
 
-class Building(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
-    __tablename__ = "buildings"
+class Building(TableBase):
+    """
+       Building model inheriting from TableBase
+    """
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(..., index=True)
-    total_floors: int
+    name: str = Field(
+        ...,
+        max_length=100,
+        index=True
+    )
+    total_floors: int = Field(
+        ...,
+        gt=0
+    )
     description: Optional[str] = None
 
     # Relationships
     floors: List["Floor"] = Relationship(back_populates="building")
     funds: List["Fund"] = Relationship(back_populates="building")
 
-# Building.model_rebuild()
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "Test Building",
+                "address": "123 Test St",
+                "total_floors": 10,
+                "year_built": 2023
+            }
+        }
+
+from app.models.floor import Floor
+from app.models.fund import Fund
