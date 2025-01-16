@@ -2,11 +2,12 @@ from typing import Optional, List
 from datetime import date, datetime
 from decimal import Decimal
 from pydantic import Field, ConfigDict
-from app.schemas.mixins import BaseSchema
+
 from app.models.charge import ChargeType, ChargeStatus, ChargeFrequency
+from app.db import SchemaBase
 
 
-class ChargeBase(BaseSchema):
+class ChargeBase(SchemaBase):
     """Base Charge Schema with common attributes"""
     fund_id: int = Field(..., description="ID of the associated fund")
     name: str = Field(
@@ -91,7 +92,7 @@ class ChargeCreate(ChargeBase):
     pass
 
 
-class ChargeUpdate(BaseSchema):
+class ChargeUpdate(SchemaBase):
     """Schema for updating an existing charge"""
     name: Optional[str] = Field(
         default=None,
@@ -145,7 +146,7 @@ class ChargeResponse(ChargeInDB):
     )
 
 
-class ChargeBulkCreate(BaseSchema):
+class ChargeBulkCreate(SchemaBase):
     """Schema for bulk charge creation"""
     charges: List[ChargeCreate] = Field(
         description="List of charges to create",
@@ -176,7 +177,7 @@ class ChargeBulkCreate(BaseSchema):
     )
 
 
-class ChargeFilter(BaseSchema):
+class ChargeFilter(SchemaBase):
     """Schema for filtering charges"""
     fund_id: Optional[List[int]] = None
     charge_type: Optional[List[ChargeType]] = None
@@ -192,7 +193,7 @@ class ChargeFilter(BaseSchema):
     )
 
 
-class ChargeStatistics(BaseSchema):
+class ChargeStatistics(SchemaBase):
     """Schema for charge statistics"""
     total_charges: int = Field(..., description="Total number of charges")
     active_charges: int = Field(..., description="Number of active charges")

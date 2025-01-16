@@ -4,8 +4,7 @@ from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum
 
-from app.models.mixins import SoftDeleteMixin, TimestampMixin
-from db import TableBase
+from app.db import TableBase
 
 
 # from mixins import TimestampMixin, SoftDeleteMixin
@@ -34,7 +33,9 @@ class TenantStatus(str, Enum):
     BLACKLISTED = "blacklisted"  # Blacklisted tenant
 
 
-class Tenant(TableBase):
+class Tenant(TableBase, table=True):
+    __tablename__ = "tenants"
+
     unit_id: int = Field(foreign_key="units.id")
     tenant_type: TenantType = Field(
         sa_column=Column(SQLEnum(TenantType)),
@@ -65,4 +66,6 @@ class Tenant(TableBase):
     charges: List["Charge"] = Relationship(back_populates="tenant")
 
 
-# Tenant.model_rebuild()
+# Forward references for type hints
+from app.models.unit import Unit
+from app.models.charge import Charge

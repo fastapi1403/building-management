@@ -5,8 +5,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum, Index
 from decimal import Decimal
 
-from app.models.mixins import SoftDeleteMixin, TimestampMixin
-from db import TableBase
+from app.db import TableBase
 
 
 # from mixins import TimestampMixin, SoftDeleteMixin
@@ -71,10 +70,12 @@ class PaymentMethod(str, Enum):
     OTHER = "other"
 
 
-class Fund(TableBase):
+class Fund(TableBase, table=True):
     """
     Model for managing building funds and their transactions
     """
+    __tablename__ = "funds"
+
     # Fund Information
     name: str = Field(..., max_length=100)
     description: str = Field(..., max_length=500)
@@ -136,6 +137,8 @@ class FundTransaction(TableBase):
     """
     Model for tracking fund transactions
     """
+    __tablename__ = "fund_transactions"
+
     fund_id: int = Field(..., foreign_key="funds.id")
 
     status: FundStatus = Field(
@@ -182,6 +185,5 @@ class FundTransaction(TableBase):
 
 # Forward references for type hints
 from app.models.building import Building
-from app.models.transaction import Transaction
 from app.models.charge import Charge
 from app.models.cost import Cost

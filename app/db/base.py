@@ -4,7 +4,7 @@ from sqlmodel import Field, SQLModel
 from pydantic import ConfigDict
 
 
-class Base(SQLModel):
+class TableBase(SQLModel):
     """
     Base class for all models using SQLModel.
     Provides common fields and functionality for audit trails.
@@ -101,17 +101,8 @@ class Base(SQLModel):
         self.updated_at = current_time
 
 
-# Create table=True models base class
-class TableBase(Base, table=True):
-    """
-    Base class for SQLModel table models
-    Inherit from this class for database models
-    """
-    pass
-
-
 # Create table=False models base class
-class SchemaBase(Base, table=False):
+class SchemaBase(TableBase, table=False):
     """
     Base class for SQLModel schema models (Pydantic models)
     Inherit from this class for request/response schemas

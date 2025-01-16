@@ -5,8 +5,7 @@ from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum
 
-from app.models.mixins import SoftDeleteMixin, TimestampMixin
-from db import TableBase
+from app.db import TableBase
 
 
 # from mixins import TimestampMixin, SoftDeleteMixin
@@ -49,10 +48,9 @@ class PaymentMethod(str, Enum):
     OTHER = "other"
 
 
-class Transaction(TableBase):
+class Transaction(TableBase, table=True):
     __tablename__ = "transactions"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
     transaction_type: TransactionType = Field(
         sa_column=Column(SQLEnum(TransactionType)),
     )
@@ -81,4 +79,5 @@ class Transaction(TableBase):
     fund: "Fund" = Relationship(back_populates="transactions")
 
 
-# Transaction.model_rebuild()
+# Forward references for type hints
+from app.models.fund import Fund

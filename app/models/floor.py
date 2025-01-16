@@ -2,11 +2,12 @@ from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 # from app.models.building import Building
 from app.models.unit import Unit
-from app.models.mixins import SoftDeleteMixin, TimestampMixin
-from db import TableBase
+from app.db import TableBase
 
 
-class Floor(TableBase):
+class Floor(TableBase, table=True):
+    __tablename__ = "floors"
+
     building_id: int = Field(foreign_key="buildings.id")
     number: int
     name: str
@@ -18,4 +19,6 @@ class Floor(TableBase):
     building: "Building" = Relationship(back_populates="floors")
     units: List["Unit"] = Relationship(back_populates="floor")
 
-# Floor.model_rebuild()
+# Forward references for type hints
+from app.models.building import Building
+from app.models.unit import Unit

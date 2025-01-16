@@ -1,4 +1,3 @@
-# app/schemas/mixins.py
 from datetime import datetime, UTC
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict

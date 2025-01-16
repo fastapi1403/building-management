@@ -1,9 +1,9 @@
-from typing import Optional, List
-from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
+from typing import Optional, List
 
-from app.models.mixins import SoftDeleteMixin, TimestampMixin
-from db import TableBase
+from sqlmodel import Field, Relationship
+
+from app.db import TableBase
 
 
 # from mixins import TimestampMixin, SoftDeleteMixin
@@ -20,6 +20,7 @@ class UnitType(str, Enum):
     RETAIL = "retail"
     PARKING = "parking"
 
+
 class UnitStatus(str, Enum):
     VACANT = "vacant"
     OCCUPIED = "occupied"
@@ -27,8 +28,9 @@ class UnitStatus(str, Enum):
     RESERVED = "reserved"
 
 
+class Unit(TableBase, table=True):
+    __tablename__ = "units"
 
-class Unit(TableBase):
     floor_id: int = Field(foreign_key="floors.id")
     unit_number: str = Field(..., index=True)
     type: UnitType = Field(default=UnitType.RESIDENTIAL)
@@ -46,4 +48,9 @@ class Unit(TableBase):
     tenant: Optional["Tenant"] = Relationship(back_populates="unit")
     charges: List["Charge"] = Relationship(back_populates="unit")
 
-# Unit.model_rebuild()
+
+# Forward references for type hints
+# from app.models.floor import Floor
+from app.models.charge import Charge
+from app.models.owner import Owner
+from app.models.tenant import Tenant

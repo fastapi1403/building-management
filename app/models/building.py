@@ -1,14 +1,16 @@
 from typing import Optional, List
 
 from pydantic import ConfigDict
-from sqlmodel import SQLModel, Field, Relationship
-from db import TableBase
+from sqlmodel import Field, Relationship
+
+from app.db import TableBase
 
 
-class Building(TableBase):
+class Building(TableBase, table=True):
     """
        Building model inheriting from TableBase
     """
+    __tablename__ = "buildings"
 
     name: str = Field(
         ...,
@@ -26,7 +28,7 @@ class Building(TableBase):
     funds: List["Fund"] = Relationship(back_populates="building")
 
     model_config = ConfigDict(
-        json_schema_extra = {
+        json_schema_extra={
             "example": {
                 "name": "Test Building",
                 "address": "123 Test St",
@@ -36,5 +38,6 @@ class Building(TableBase):
         }
     )
 
-from app.models.floor import Floor
-from app.models.fund import Fund
+
+# from app.models.floor import Floor
+# from app.models.fund import Fund

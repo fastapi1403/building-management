@@ -3,8 +3,7 @@ from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum
 
-from app.models.mixins import SoftDeleteMixin, TimestampMixin
-from db import TableBase
+from app.db import TableBase
 
 
 # from app.models.unit import Unit
@@ -32,6 +31,8 @@ class OwnerStatus(str, Enum):
 
 
 class Owner(TableBase):
+    __tablename__ = "owners"
+
     owner_type: OwnerType = Field(
         sa_column=Column(SQLEnum(OwnerType)),
         default=OwnerType.INDIVIDUAL
@@ -56,4 +57,6 @@ class Owner(TableBase):
     charges: List["Charge"] = Relationship(back_populates="owner")
 
 
-# Owner.model_rebuild()
+# Forward references for type hints
+from app.models.unit import Unit
+from app.models.charge import Charge

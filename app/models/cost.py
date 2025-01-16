@@ -1,18 +1,11 @@
 from datetime import datetime, UTC
-from typing import Optional, List
 from enum import Enum
-from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, String, Enum as SQLEnum, Index
+from typing import Optional, List
 
-from app.models.mixins import SoftDeleteMixin, TimestampMixin
-from db import TableBase
+from sqlalchemy import Column, Enum as SQLEnum, Index
+from sqlmodel import Field, Relationship
 
-
-# from mixins import TimestampMixin, SoftDeleteMixin
-# # Type annotations for relationships
-# from .building import Building
-# from .unit import Unit
-# from .floor import Floor
+from app.db import TableBase
 
 
 class CostType(str, Enum):
@@ -55,10 +48,12 @@ class CostStatus(str, Enum):
     REFUNDED = "refunded"
 
 
-class Cost(TableBase):
+class Cost(TableBase, table=True):
     """
     Model for tracking costs and expenses in the building management system
     """
+    __tablename__ = "costs"
+
     # Basic cost information
     title: str = Field(..., max_length=200)
     description: str = Field(..., max_length=1000)
@@ -146,10 +141,12 @@ class Cost(TableBase):
         self.update_variance()
 
 
-class CostDocument(TableBase):
+class CostDocument(TableBase, table=True):
     """
     Model for storing documents related to costs (invoices, receipts, etc.)
     """
+    __tablename__ = "cost_documents"
+
     cost_id: int = Field(..., foreign_key="costs.id")
 
     # Document information
@@ -168,5 +165,8 @@ class CostDocument(TableBase):
     class Config:
         arbitrary_types_allowed = True
 
-# Cost.model_rebuild()
-# CostDocument.model_rebuild()
+
+# Forward references for type hints
+from app.models.building import Building
+from app.models.floor import Floor
+from app.models.unit import Unit
