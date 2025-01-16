@@ -11,6 +11,7 @@ class Building(TableBase, table=True):
        Building model inheriting from TableBase
     """
     __tablename__ = "buildings"
+    __table_args__ = {'extend_existing': True}
 
     name: str = Field(
         ...,

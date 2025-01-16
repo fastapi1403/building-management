@@ -35,6 +35,7 @@ class TenantStatus(str, Enum):
 
 class Tenant(TableBase, table=True):
     __tablename__ = "tenants"
+    __table_args__ = {'extend_existing': True}
 
     unit_id: int = Field(foreign_key="units.id")
     tenant_type: TenantType = Field(

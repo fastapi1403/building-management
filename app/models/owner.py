@@ -32,6 +32,7 @@ class OwnerStatus(str, Enum):
 
 class Owner(TableBase):
     __tablename__ = "owners"
+    __table_args__ = {'extend_existing': True}
 
     owner_type: OwnerType = Field(
         sa_column=Column(SQLEnum(OwnerType)),

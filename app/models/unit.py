@@ -23,6 +23,7 @@ class UnitStatus(str, Enum):
 
 class Unit(TableBase, table=True):
     __tablename__ = "units"
+    __table_args__ = {'extend_existing': True}
 
     floor_id: int = Field(foreign_key="floors.id")
     unit_number: str = Field(..., index=True)

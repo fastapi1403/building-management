@@ -75,6 +75,7 @@ class Fund(TableBase, table=True):
     Model for managing building funds and their transactions
     """
     __tablename__ = "funds"
+    __table_args__ = {'extend_existing': True}
 
     # Fund Information
     name: str = Field(..., max_length=100)
@@ -138,6 +139,7 @@ class FundTransaction(TableBase):
     Model for tracking fund transactions
     """
     __tablename__ = "fund_transactions"
+    __table_args__ = {'extend_existing': True}
 
     fund_id: int = Field(..., foreign_key="funds.id")
 

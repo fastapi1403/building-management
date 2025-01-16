@@ -52,6 +52,7 @@ class Charge(TableBase, table=True):
     Model for managing charges/fees in the building management system
     """
     __tablename__ = "charges"
+    __table_args__ = {'extend_existing': True}
 
     # Charge details
     title: str = Field(..., max_length=100)
@@ -144,6 +145,7 @@ class Payment(TableBase, table=True):
     Model for tracking payments against charges
     """
     __tablename__ = "payments"
+    __table_args__ = {'extend_existing': True}
 
     charge_id: int = Field(..., foreign_key="charges.id")
     amount: float = Field(..., gt=0)
