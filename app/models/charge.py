@@ -1,21 +1,15 @@
 from datetime import datetime, UTC
-from typing import Optional
 from enum import Enum
-from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, String, Enum as SQLEnum
+from typing import Optional, List
+
+from sqlalchemy import Column, Enum as SQLEnum
+from sqlmodel import Field, Relationship
 
 from app.models.base import TableBase
 
 
-# from mixins import TimestampMixin, SoftDeleteMixin
-# from .unit import Unit
-# from .owner import Owner
-# from .tenant import Tenant
-# from .building import Building
-
-
+# Enum for charge status
 class ChargeStatus(str, Enum):
-    """Enum for charge status"""
     PENDING = "pending"
     PAID = "paid"
     OVERDUE = "overdue"
@@ -24,8 +18,8 @@ class ChargeStatus(str, Enum):
     DISPUTED = "disputed"
 
 
+# Enum for charge types
 class ChargeType(str, Enum):
-    """Enum for charge types"""
     RECURRING = "recurring"
     MAINTENANCE = "maintenance"
     UTILITY = "utility"
@@ -37,8 +31,8 @@ class ChargeType(str, Enum):
     OTHER = "other"
 
 
+# Enum for recurring charge frequency
 class ChargeFrequency(str, Enum):
-    """Enum for recurring charge frequency"""
     ONCE = "once"
     DAILY = "daily"
     WEEKLY = "weekly"
@@ -47,10 +41,8 @@ class ChargeFrequency(str, Enum):
     YEARLY = "yearly"
 
 
+# Model for managing charges/fees in the building management system
 class Charge(TableBase, table=True):
-    """
-    Model for managing charges/fees in the building management system
-    """
     __tablename__ = "charges"
     __table_args__ = {'extend_existing': True}
 
@@ -99,7 +91,7 @@ class Charge(TableBase, table=True):
     owner: Optional["Owner"] = Relationship(back_populates="charges")
     tenant: Optional["Tenant"] = Relationship(back_populates="charges")
     building: "Building" = Relationship(back_populates="charges")
-    payments: list["Payment"] = Relationship(back_populates="charge")
+    payments: List["Payment"] = Relationship(back_populates="charge")
 
     class Config:
         arbitrary_types_allowed = True
@@ -140,10 +132,8 @@ class Charge(TableBase, table=True):
             self.status = ChargeStatus.OVERDUE
 
 
+# Model for tracking payments against charges
 class Payment(TableBase, table=True):
-    """
-    Model for tracking payments against charges
-    """
     __tablename__ = "payments"
     __table_args__ = {'extend_existing': True}
 

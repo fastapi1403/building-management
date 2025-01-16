@@ -1,6 +1,5 @@
 from typing import Optional, List
 
-from pydantic import ConfigDict
 from sqlmodel import Field, Relationship
 
 from app.models.base import TableBase
@@ -8,36 +7,43 @@ from app.models.base import TableBase
 
 class Building(TableBase, table=True):
     """
-       Building model inheriting from TableBase
+    Building model inheriting from TableBase
     """
     __tablename__ = "buildings"
     __table_args__ = {'extend_existing': True}
 
+    # Fields
     name: str = Field(
         ...,
         max_length=100,
-        index=True
+        index=True,
+        description="Name of the building"
     )
     total_floors: int = Field(
         ...,
-        gt=0
+        gt=0,
+        description="Total number of floors in the building"
     )
-    description: Optional[str] = None
+    description: Optional[str] = Field(
+        default=None,
+        description="Description of the building"
+    )
 
     # Relationships
     floors: List["Floor"] = Relationship(back_populates="building")
     funds: List["Fund"] = Relationship(back_populates="building")
 
-    model_config = ConfigDict(
-        json_schema_extra={
+    # Example configuration for OpenAPI schema
+    class Config:
+        schema_extra = {
             "example": {
                 "name": "Test Building",
                 "total_floors": 10,
-                "description": "123 Test St",
+                "description": "A building with 10 floors located at 123 Test St"
             }
         }
-    )
 
 
+# Import related models to avoid circular dependencies
 from app.models.floor import Floor
 from app.models.fund import Fund

@@ -8,8 +8,8 @@ from sqlmodel import Field, Relationship
 from app.models.base import TableBase
 
 
+# Enum for cost categories
 class CostType(str, Enum):
-    """Enum for cost categories"""
     MAINTENANCE = "maintenance"
     REPAIR = "repair"
     UTILITY = "utility"
@@ -25,16 +25,16 @@ class CostType(str, Enum):
     OTHER = "other"
 
 
+# Enum for cost priority levels
 class CostPriority(str, Enum):
-    """Enum for cost priority levels"""
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     URGENT = "urgent"
 
 
+# Enum for cost status
 class CostStatus(str, Enum):
-    """Enum for cost status"""
     PLANNED = "planned"
     APPROVED = "approved"
     IN_PROGRESS = "in_progress"
@@ -48,10 +48,8 @@ class CostStatus(str, Enum):
     REFUNDED = "refunded"
 
 
+# Model for tracking costs and expenses in the building management system
 class Cost(TableBase, table=True):
-    """
-    Model for tracking costs and expenses in the building management system
-    """
     __tablename__ = "costs"
     __table_args__ = {'extend_existing': True}
 
@@ -142,10 +140,8 @@ class Cost(TableBase, table=True):
         self.update_variance()
 
 
+# Model for storing documents related to costs (invoices, receipts, etc.)
 class CostDocument(TableBase, table=True):
-    """
-    Model for storing documents related to costs (invoices, receipts, etc.)
-    """
     __tablename__ = "cost_documents"
     __table_args__ = {'extend_existing': True}
 
