@@ -19,4 +19,4 @@ class Floor(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     building: "Building" = Relationship(back_populates="floors")
     units: List["Unit"] = Relationship(back_populates="floor")
 
-Floor.model_rebuild()
+# Floor.model_rebuild()

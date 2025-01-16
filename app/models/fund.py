@@ -184,5 +184,5 @@ class FundTransaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
 
 
 # Type annotations for relationships
-Fund.model_rebuild()
-FundTransaction.model_rebuild()
+# Fund.model_rebuild()
+# FundTransaction.model_rebuild()

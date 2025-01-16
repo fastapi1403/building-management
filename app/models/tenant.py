@@ -65,4 +65,4 @@ class Tenant(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     charges: List["Charge"] = Relationship(back_populates="tenant")
 
 
-Tenant.model_rebuild()
+# Tenant.model_rebuild()

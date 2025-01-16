@@ -160,5 +160,5 @@ class Payment(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
         arbitrary_types_allowed = True
 
 
-Charge.model_rebuild()
-Payment.model_rebuild()
+# Charge.model_rebuild()
+# Payment.model_rebuild()

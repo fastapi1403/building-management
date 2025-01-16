@@ -2,11 +2,11 @@ from typing import Optional
 from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 from enum import Enum
 from datetime import datetime, UTC
-from app.schemas.mixins import BaseSchema  # Add this import which was missing
-from models.unit import UnitType, UnitStatus
+from app.schemas.mixins import BaseSchema
+from app.models.unit import UnitType, UnitStatus
 
 
-class UnitBase(BaseModel):
+class UnitBase(BaseSchema):
     unit_number: str = Field(
         ...,
         min_length=1,
@@ -22,7 +22,7 @@ class UnitBase(BaseModel):
         default=UnitType.RESIDENTIAL,
         description="Type of the unit (residential, commercial, etc.)"
     )
-    area_sqft: float = Field(
+    area: float = Field(
         ...,
         gt=0,
         le=10000,
@@ -46,15 +46,13 @@ class UnitBase(BaseModel):
         from_attributes=True
     )
 
-    @field_validator('unit_number')
-    @classmethod
+    @field_validator('unit_number', mode='before')
     def validate_unit_number(cls, v: str) -> str:
         if not any(c.isdigit() for c in v):
             raise ValueError("Unit number must contain at least one digit")
         return v.upper()
 
-    @field_validator('area_sqft')
-    @classmethod
+    @field_validator('area', mode='before')
     def validate_area(cls, v: float) -> float:
         return round(v, 2)
 
@@ -153,7 +151,7 @@ class UnitUpdate(BaseModel):
             raise ValueError("Cannot set status to occupied without an owner")
         return self
 
-class UnitResponse(UnitBase, TimestampSchema):
+class UnitResponse(UnitBase):
     id: int
     last_maintenance_date: Optional[datetime] = Field(
         default=None,

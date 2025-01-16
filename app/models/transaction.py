@@ -78,4 +78,4 @@ class Transaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     fund: "Fund" = Relationship(back_populates="transactions")
 
 
-Transaction.model_rebuild()
+# Transaction.model_rebuild()

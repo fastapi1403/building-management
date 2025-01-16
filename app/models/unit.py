@@ -46,4 +46,4 @@ class Unit(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     tenant: Optional["Tenant"] = Relationship(back_populates="unit")
     charges: List["Charge"] = Relationship(back_populates="unit")
 
-Unit.model_rebuild()
+# Unit.model_rebuild()

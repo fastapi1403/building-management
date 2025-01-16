@@ -174,5 +174,5 @@ class CostDocument(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     class Config:
         arbitrary_types_allowed = True
 
-Cost.model_rebuild()
-CostDocument.model_rebuild()
+# Cost.model_rebuild()
+# CostDocument.model_rebuild()

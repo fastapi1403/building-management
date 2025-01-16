@@ -17,4 +17,4 @@ class Building(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     floors: List["Floor"] = Relationship(back_populates="building")
     funds: List["Fund"] = Relationship(back_populates="building")
 
-Building.model_rebuild()
+# Building.model_rebuild()
