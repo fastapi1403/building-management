@@ -1,5 +1,5 @@
 from typing import Optional, List
-from pydantic import Field
+from pydantic import Field, ConfigDict
 from app.schemas.mixins import BaseSchema
 
 
@@ -30,10 +30,11 @@ class FloorBase(BaseSchema):
         description="Detailed description of the floor"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
+                **BaseSchema.model_config["json_schema_extra"]["example"],
                 "number": 1,
                 "name": "First Floor",
                 "building_id": 1,
@@ -41,6 +42,7 @@ class FloorBase(BaseSchema):
                 "description": "Main residential floor",
             }
         }
+    )
 
 
 class FloorCreate(FloorBase):
@@ -86,10 +88,11 @@ class FloorBulkCreate(BaseSchema):
         min_length=1
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
+                **BaseSchema.model_config["json_schema_extra"]["example"],
                 "floors": [
                     {
                         "number": 1,
@@ -102,6 +105,7 @@ class FloorBulkCreate(BaseSchema):
                 ]
             }
         }
+    )
 
 
 class FloorFilter(BaseSchema):
@@ -116,13 +120,15 @@ class FloorStatistics(BaseSchema):
     occupied_units: int = Field(..., description="Total number of occupied units")
     vacant_units: int = Field(..., description="Total number of vacant units")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
+                **BaseSchema.model_config["json_schema_extra"]["example"],
                 "total_floors": 10,
                 "total_units": 80,
                 "occupied_units": 65,
                 "vacant_units": 15,
             }
         }
+    )
