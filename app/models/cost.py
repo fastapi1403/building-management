@@ -103,13 +103,6 @@ class Cost(TableBase, table=True):
     floor: Optional["Floor"] = Relationship(back_populates="costs")
     documents: List["CostDocument"] = Relationship(back_populates="cost")
 
-    # Indexes for better query performance
-    __table_args__ = (
-        Index('ix_costs_cost_type', 'cost_type', 'status'),
-        Index('ix_costs_planned_date', 'planned_date'),
-        Index('ix_costs_building_id', 'building_id'),
-    )
-
     class Config:
         arbitrary_types_allowed = True
 
