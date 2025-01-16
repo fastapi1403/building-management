@@ -5,11 +5,6 @@ from pydantic import BaseModel, Field, ConfigDict
 
 class TimestampMixinSchema(BaseModel):
     """Schema mixin for timestamp fields"""
-    model_config = ConfigDict(
-        from_attributes=True,  # Allow ORM model conversion
-        json_encoders={datetime: lambda dt: dt.isoformat()},  # Format datetime
-    )
-
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
         description="Record creation timestamp"
@@ -27,8 +22,10 @@ class TimestampMixinSchema(BaseModel):
         description="User who last updated the record"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,  # Allow ORM model conversion
+        json_encoders={datetime: lambda dt: dt.isoformat()},  # Format datetime
+        json_schema_extra={
             "example": {
                 "created_at": "2025-01-15T14:08:30Z",
                 "updated_at": "2025-01-15T14:08:30Z",
@@ -36,15 +33,11 @@ class TimestampMixinSchema(BaseModel):
                 "updated_by": "fastapi1403"
             }
         }
+    )
 
 
 class SoftDeleteMixinSchema(BaseModel):
     """Schema mixin for soft delete fields"""
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={datetime: lambda dt: dt.isoformat()}
-    )
-
     deleted_at: Optional[datetime] = Field(
         default=None,
         description="Timestamp when the record was soft deleted"
@@ -58,23 +51,27 @@ class SoftDeleteMixinSchema(BaseModel):
         description="User who soft deleted the record"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: lambda dt: dt.isoformat()},
+        json_schema_extra={
             "example": {
                 "deleted_at": None,
                 "is_deleted": False,
                 "deleted_by": None
             }
         }
-
+    )
 
 # Example of combined base schema
 class BaseSchema(TimestampMixinSchema, SoftDeleteMixinSchema):
     """Base schema with both timestamp and soft delete functionality"""
     id: Optional[int] = Field(default=None, description="Primary key")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: lambda dt: dt.isoformat()},
+        json_schema_extra={
             "example": {
                 "id": 1,
                 "created_at": "2025-01-15T14:08:30Z",
@@ -86,3 +83,4 @@ class BaseSchema(TimestampMixinSchema, SoftDeleteMixinSchema):
                 "deleted_by": None
             }
         }
+    )
