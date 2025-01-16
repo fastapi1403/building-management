@@ -5,7 +5,7 @@ from typing import Optional, List
 from pydantic import Field
 
 from app.schemas.mixins import BaseSchema
-from models.charge import ChargeStatus, ChargeType
+from app.models.charge import ChargeStatus, ChargeType
 
 
 class ChargeBase(BaseSchema):

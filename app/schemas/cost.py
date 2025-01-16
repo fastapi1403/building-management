@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Optional, List
 from pydantic import Field
 from app.schemas.mixins import BaseSchema
-from models.cost import CostType, CostStatus, CostPriority
+from app.models.cost import CostType, CostStatus, CostPriority
 
 
 class CostBase(BaseSchema):

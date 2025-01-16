@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Optional, List
 from pydantic import Field
 from app.schemas.mixins import BaseSchema
-from models.fund import TransactionType, TransactionStatus, PaymentMethod
+from app.models.fund import TransactionType, TransactionStatus, PaymentMethod
 
 
 class TransactionBase(BaseSchema):

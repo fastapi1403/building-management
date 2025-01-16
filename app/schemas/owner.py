@@ -1,7 +1,7 @@
 from typing import Optional, List
 from pydantic import Field, EmailStr
 from app.schemas.mixins import BaseSchema
-from models.owner import OwnerType, OwnerStatus
+from app.models.owner import OwnerType, OwnerStatus
 
 
 class OwnerBase(BaseSchema):

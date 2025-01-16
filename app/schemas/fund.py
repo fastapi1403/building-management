@@ -5,7 +5,7 @@ from typing import Optional, List
 from pydantic import Field
 
 from app.schemas.mixins import BaseSchema
-from models.fund import FundType, FundStatus, TransactionType, TransactionStatus, PaymentMethod
+from app.models.fund import FundType, FundStatus, TransactionType, TransactionStatus, PaymentMethod
 
 
 class FundBase(BaseSchema):

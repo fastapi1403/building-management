@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import Field, EmailStr
 from app.schemas.mixins import BaseSchema
-from models.tenant import TenantType, TenantStatus
+from app.models.tenant import TenantType, TenantStatus
 
 
 class TenantBase(BaseSchema):
