@@ -5,10 +5,12 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum, Index
 from decimal import Decimal
 
-from mixins import TimestampMixin, SoftDeleteMixin
-from building import Building
-from cost import Cost
-from charge import Charge
+from app.models.mixins import SoftDeleteMixin, TimestampMixin
+
+# from mixins import TimestampMixin, SoftDeleteMixin
+# from building import Building
+# from cost import Cost
+# from charge import Charge
 
 
 class FundType(str, Enum):

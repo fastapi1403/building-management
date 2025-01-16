@@ -3,8 +3,10 @@ from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from mixins import TimestampMixin, SoftDeleteMixin
 from sqlalchemy import Column, Enum as SQLEnum
-from app.models.unit import Unit
-from app.models.charge import Charge
+
+from app.models.mixins import SoftDeleteMixin, TimestampMixin
+# from app.models.unit import Unit
+# from app.models.charge import Charge
 
 class OwnerType(str, Enum):
     """Enumeration for owner types"""

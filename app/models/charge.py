@@ -4,11 +4,13 @@ from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum
 
-from mixins import TimestampMixin, SoftDeleteMixin
-from .unit import Unit
-from .owner import Owner
-from .tenant import Tenant
-from .building import Building
+from app.models.mixins import SoftDeleteMixin, TimestampMixin
+
+# from mixins import TimestampMixin, SoftDeleteMixin
+# from .unit import Unit
+# from .owner import Owner
+# from .tenant import Tenant
+# from .building import Building
 
 
 class ChargeStatus(str, Enum):

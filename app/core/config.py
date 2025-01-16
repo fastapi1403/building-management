@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_SERVER: str
     POSTGRES_DB: str
-    DATABASE_URL: str | None = None
 
     @property
     def async_database_url(self) -> str:

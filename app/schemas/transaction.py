@@ -1,220 +1,209 @@
-from datetime import datetime, date
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, validator, constr, condecimal
+from datetime import datetime
 from decimal import Decimal
-from enum import Enum
+from typing import Optional, List
+from pydantic import Field
+from app.schemas.mixins import BaseSchema
+from models.fund import TransactionType, TransactionStatus, PaymentMethod
 
 
-class TransactionStatus(str, Enum):
-    PENDING = "pending"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    REVERSED = "reversed"
-    CANCELLED = "cancelled"
-    REFUNDED = "refunded"
-    DISPUTED = "disputed"
-
-
-class TransactionType(str, Enum):
-    PAYMENT = "payment"
-    REFUND = "refund"
-    DEPOSIT = "deposit"
-    WITHDRAWAL = "withdrawal"
-    TRANSFER = "transfer"
-    ADJUSTMENT = "adjustment"
-    FEE = "fee"
-    INTEREST = "interest"
-
-
-class PaymentMethod(str, Enum):
-    CASH = "cash"
-    BANK_TRANSFER = "bank_transfer"
-    CHEQUE = "cheque"
-    CREDIT_CARD = "credit_card"
-    DEBIT_CARD = "debit_card"
-    UPI = "upi"
-    ONLINE = "online"
-    OTHER = "other"
-
-
-# Base Schema
-class TransactionBase(BaseModel):
-    amount: condecimal(gt=0, max_digits=12, decimal_places=2)
-    currency: constr(max_length=3) = "INR"
-    type: TransactionType
-    payment_method: PaymentMethod
-    description: constr(max_length=500)
-
-    building_id: int
-    unit_id: Optional[int]
-    owner_id: Optional[int]
-    tenant_id: Optional[int]
-    charge_id: Optional[int]
-    cost_id: Optional[int]
-    fund_id: Optional[int]
-
-    payment_reference: Optional[constr(max_length=100)]
-    bank_reference: Optional[constr(max_length=100)]
-    cheque_number: Optional[constr(max_length=50)]
-
-    tags: List[str] = []
-
-
-# Create Schema
-class TransactionCreate(TransactionBase):
-    transaction_number: Optional[str] = None  # Will be generated if not provided
-    status: TransactionStatus = TransactionStatus.PENDING
-    payment_date: datetime = Field(default_factory=lambda: datetime.now())
-    processed_by: str = Field(default="fastapi1403")
-    notes: Optional[str]
-
-    gateway_name: Optional[str]
-    gateway_transaction_id: Optional[str]
-    gateway_response: Optional[Dict[str, Any]]
-
-    @validator('payment_date')
-    def validate_payment_date(cls, v):
-        if v > datetime.now():
-            raise ValueError("Payment date cannot be in the future")
-        return v
-
-
-# Update Schema
-class TransactionUpdate(BaseModel):
-    status: Optional[TransactionStatus]
-    payment_reference: Optional[str]
-    bank_reference: Optional[str]
-    gateway_response: Optional[Dict[str, Any]]
-    notes: Optional[str]
-    approved_by: Optional[str]
-    approved_at: Optional[datetime]
-
-
-# DB Schema
-class TransactionInDB(TransactionBase):
-    id: int
-    transaction_number: str
-    status: TransactionStatus
-    payment_date: datetime
-    processed_by: str
-    approved_by: Optional[str]
-    approved_at: Optional[datetime]
-
-    gateway_name: Optional[str]
-    gateway_transaction_id: Optional[str]
-    gateway_response: Optional[Dict[str, Any]]
-
-    created_at: datetime
-    updated_at: datetime
-    deleted_at: Optional[datetime]
+class TransactionBase(BaseSchema):
+    """Base Transaction Schema with common attributes"""
+    transaction_type: TransactionType = Field(
+        ...,
+        description="Type of the transaction"
+    )
+    amount: Decimal = Field(
+        ...,
+        description="Transaction amount",
+        gt=0,
+        decimal_places=2
+    )
+    status: TransactionStatus = Field(
+        default=TransactionStatus.PENDING,
+        description="Status of the transaction"
+    )
+    payment_method: PaymentMethod = Field(
+        ...,
+        description="Method of payment"
+    )
+    building_id: int = Field(
+        ...,
+        description="ID of the building"
+    )
+    unit_id: Optional[int] = Field(
+        default=None,
+        description="ID of the unit if applicable"
+    )
+    tenant_id: Optional[int] = Field(
+        default=None,
+        description="ID of the tenant"
+    )
+    due_date: datetime = Field(
+        ...,
+        description="Due date for the payment"
+    )
+    payment_date: Optional[datetime] = Field(
+        default=None,
+        description="Date when payment was made"
+    )
+    reference_number: Optional[str] = Field(
+        default=None,
+        description="Reference or transaction number",
+        max_length=50
+    )
+    description: str = Field(
+        ...,
+        description="Transaction description",
+        min_length=3,
+        max_length=200
+    )
+    late_fee: Optional[Decimal] = Field(
+        default=None,
+        description="Late fee amount if applicable",
+        ge=0,
+        decimal_places=2
+    )
+    discount: Optional[Decimal] = Field(
+        default=None,
+        description="Discount amount if applicable",
+        ge=0,
+        decimal_places=2
+    )
+    notes: Optional[str] = Field(
+        default=None,
+        description="Additional notes"
+    )
 
     class Config:
-        orm_mode = True
-
-
-# Response Schema
-class TransactionResponse(TransactionInDB):
-    processing_time: Optional[int]  # in seconds
-    days_since_transaction: int
-    settlement_status: str
-    related_entity_type: str
-    related_entity_id: int
-
-    @validator('processing_time', pre=True)
-    def calculate_processing_time(cls, v, values):
-        created = values.get('created_at')
-        approved = values.get('approved_at')
-        if not approved or not created:
-            return None
-        return int((approved - created).total_seconds())
-
-    @validator('days_since_transaction', pre=True)
-    def calculate_days_since(cls, v, values):
-        payment_date = values.get('payment_date')
-        return (datetime.now() - payment_date).days
-
-    @validator('settlement_status', pre=True)
-    def determine_settlement_status(cls, v, values):
-        status = values.get('status')
-        if status == TransactionStatus.COMPLETED:
-            return "Settled"
-        elif status in [TransactionStatus.FAILED, TransactionStatus.CANCELLED]:
-            return "Failed"
-        return "Pending Settlement"
-
-    @validator('related_entity_type', 'related_entity_id', pre=True)
-    def determine_related_entity(cls, v, values):
-        if values.get('charge_id'):
-            return ("charge", values['charge_id'])
-        elif values.get('cost_id'):
-            return ("cost", values['cost_id'])
-        elif values.get('fund_id'):
-            return ("fund", values['fund_id'])
-        return ("building", values['building_id'])
-
-
-# Split Schema
-class TransactionSplit(BaseModel):
-    amount: condecimal(gt=0, max_digits=12, decimal_places=2)
-    category: str
-    description: str
-    fund_id: Optional[int]
-
-    @validator('amount')
-    def validate_split_amount(cls, v, values):
-        if v <= 0:
-            raise ValueError("Split amount must be greater than zero")
-        return v
-
-
-# Attachment Schema
-class TransactionAttachment(BaseModel):
-    file_name: constr(max_length=255)
-    file_type: constr(max_length=50)
-    file_size: int
-    file_path: str
-    uploaded_by: str = Field(default="fastapi1403")
-    description: Optional[str]
-
-
-# Filter Schema
-class TransactionFilter(BaseModel):
-    status: Optional[List[TransactionStatus]]
-    type: Optional[List[TransactionType]]
-    payment_method: Optional[List[PaymentMethod]]
-    date_from: Optional[date]
-    date_to: Optional[date]
-    min_amount: Optional[condecimal(ge=0)]
-    max_amount: Optional[condecimal(ge=0)]
-    entity_type: Optional[str]
-    entity_id: Optional[int]
-    tags: Optional[List[str]]
-
-
-# Statistics Schema
-class TransactionStatistics(BaseModel):
-    total_transactions: int
-    total_amount: condecimal(max_digits=14, decimal_places=2)
-    successful_transactions: int
-    failed_transactions: int
-    average_processing_time: float
-    transactions_by_type: Dict[TransactionType, Dict[str, Any]]
-    transactions_by_payment_method: Dict[PaymentMethod, Dict[str, Any]]
-    daily_totals: List[Dict[str, Any]]
-    success_rate: float
-
-    class Config:
-        json_encoders = {
-            Decimal: lambda v: float(v),
-            datetime: lambda v: v.isoformat()
+        json_schema_extra = {
+            "example": {
+                **BaseSchema.Config.json_schema_extra["example"],
+                "transaction_type": "rent",
+                "amount": "1500.00",
+                "status": "completed",
+                "payment_method": "bank_transfer",
+                "building_id": 1,
+                "unit_id": 101,
+                "tenant_id": 1,
+                "due_date": "2025-01-15 15:24:20",
+                "payment_date": "2025-01-15 15:24:20",
+                "reference_number": "TRX-2025-001",
+                "invoice_number": "INV-2025-001",
+                "description": "January 2025 Rent Payment",
+                "tags": ["rent", "monthly"]
+            }
         }
 
 
-# Reconciliation Schema
-class TransactionReconciliation(BaseModel):
-    transaction_id: int
-    reconciled: bool
-    reconciliation_date: datetime = Field(default_factory=lambda: datetime.now())
-    reconciled_by: str = Field(default="fastapi1403")
-    notes: Optional[str]
-    differences: List[Dict[str, Any]] = []
+class TransactionCreate(TransactionBase):
+    """Schema for creating a new transaction"""
+    pass
+
+
+class TransactionUpdate(BaseSchema):
+    """Schema for updating an existing transaction"""
+    status: Optional[TransactionStatus] = None
+    payment_method: Optional[PaymentMethod] = None
+    payment_date: Optional[datetime] = None
+    reference_number: Optional[str] = None
+    late_fee: Optional[Decimal] = Field(default=None, ge=0)
+    discount: Optional[Decimal] = Field(default=None, ge=0)
+    notes: Optional[str] = None
+
+
+class TransactionInDB(TransactionBase):
+    """Schema for transaction as stored in database"""
+    id: int = Field(..., description="Unique identifier for the transaction")
+
+
+class TransactionResponse(TransactionInDB):
+    """Schema for transaction response"""
+    total_amount: Decimal = Field(
+        ...,
+        description="Total amount including fees and discounts"
+    )
+    tenant_name: Optional[str] = Field(
+        default=None,
+        description="Name of the tenant"
+    )
+    unit_number: Optional[str] = Field(
+        default=None,
+        description="Unit number"
+    )
+
+
+class TransactionBulkCreate(BaseSchema):
+    """Schema for bulk transaction creation"""
+    transactions: List[TransactionCreate] = Field(
+        description="List of transactions to create",
+        min_length=1
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                **BaseSchema.Config.json_schema_extra["example"],
+                "transactions": [{
+                    "transaction_type": "rent",
+                    "amount": "1500.00",
+                    "status": "completed",
+                    "payment_method": "bank_transfer",
+                    "building_id": 1,
+                    "unit_id": 101,
+                    "tenant_id": 1,
+                    "due_date": "2025-01-15 15:24:20",
+                    "description": "January 2025 Rent Payment",
+                    "tags": ["rent", "monthly"]
+                }]
+            }
+        }
+
+
+class TransactionFilter(BaseSchema):
+    """Schema for filtering transactions"""
+    building_id: Optional[int] = None
+    unit_id: Optional[int] = None
+    tenant_id: Optional[int] = None
+    transaction_type: Optional[List[TransactionType]] = None
+    status: Optional[List[TransactionStatus]] = None
+    payment_method: Optional[List[PaymentMethod]] = None
+    date_from: Optional[datetime] = None
+    date_to: Optional[datetime] = None
+    min_amount: Optional[Decimal] = Field(default=None, gt=0)
+    max_amount: Optional[Decimal] = Field(default=None, gt=0)
+    is_overdue: Optional[bool] = None
+    tags: Optional[List[str]] = None
+
+
+class TransactionStatistics(BaseSchema):
+    """Schema for transaction statistics"""
+    total_transactions: int = Field(..., description="Total number of transactions")
+    total_amount: Decimal = Field(..., description="Total amount of all transactions")
+    pending_amount: Decimal = Field(..., description="Total pending amount")
+    overdue_amount: Decimal = Field(..., description="Total overdue amount")
+    by_type: dict = Field(..., description="Transactions grouped by type")
+    by_status: dict = Field(..., description="Transactions grouped by status")
+    by_payment_method: dict = Field(..., description="Transactions grouped by payment method")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                **BaseSchema.Config.json_schema_extra["example"],
+                "total_transactions": 500,
+                "total_amount": "750000.00",
+                "pending_amount": "25000.00",
+                "overdue_amount": "5000.00",
+                "by_type": {
+                    "rent": {"count": 400, "amount": "600000.00"},
+                    "utility": {"count": 100, "amount": "150000.00"}
+                },
+                "by_status": {
+                    "completed": {"count": 450, "amount": "720000.00"},
+                    "pending": {"count": 50, "amount": "30000.00"}
+                },
+                "by_payment_method": {
+                    "bank_transfer": {"count": 300, "amount": "450000.00"},
+                    "credit_card": {"count": 200, "amount": "300000.00"}
+                }
+            }
+        }

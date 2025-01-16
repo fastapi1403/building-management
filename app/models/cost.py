@@ -4,11 +4,13 @@ from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum, Index
 
-from mixins import TimestampMixin, SoftDeleteMixin
-# Type annotations for relationships
-from .building import Building
-from .unit import Unit
-from .floor import Floor
+from app.models.mixins import SoftDeleteMixin, TimestampMixin
+
+# from mixins import TimestampMixin, SoftDeleteMixin
+# # Type annotations for relationships
+# from .building import Building
+# from .unit import Unit
+# from .floor import Floor
 
 
 class CostType(str, Enum):

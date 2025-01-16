@@ -87,10 +87,11 @@ settings = get_settings()
 3. Let's create the database session manager:
 
 `app/db/session.py`:
+
 ```python
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from app.config import settings
+from core.config import settings
 
 engine = create_async_engine(
     settings.async_database_url,
@@ -103,6 +104,7 @@ AsyncSessionLocal = sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
+
 
 async def get_db():
     async with AsyncSessionLocal() as session:
@@ -143,11 +145,12 @@ class Base:
 5. Let's create the main FastAPI application:
 
 `app/main.py`:
+
 ```python
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from app.config import settings
+from core.config import settings
 from app.api.v1 import (
     buildings,
     floors,
@@ -182,6 +185,7 @@ app.include_router(funds.router, prefix=settings.API_V1_STR, tags=["funds"])
 app.include_router(transactions.router, prefix=settings.API_V1_STR, tags=["transactions"])
 app.include_router(charges.router, prefix=settings.API_V1_STR, tags=["charges"])
 app.include_router(costs.router, prefix=settings.API_V1_STR, tags=["costs"])
+
 
 @app.get("/")
 async def root():

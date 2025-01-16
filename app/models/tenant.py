@@ -3,9 +3,11 @@ from enum import Enum
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum
-from mixins import TimestampMixin, SoftDeleteMixin
-from app.models.unit import Unit
-from app.models.charge import Charge
+
+from app.models.mixins import SoftDeleteMixin, TimestampMixin
+# from mixins import TimestampMixin, SoftDeleteMixin
+# from app.models.unit import Unit
+# from app.models.charge import Charge
 
 class TenantType(str, Enum):
     """Enumeration for tenant types"""

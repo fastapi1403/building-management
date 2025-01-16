@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.templating import Jinja2Templates
-from app.config import settings
+from core.config import settings
 from app.api.v1 import (
     buildings,
     floors,

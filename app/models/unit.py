@@ -1,11 +1,13 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
-from mixins import TimestampMixin, SoftDeleteMixin
-from app.models.owner import Owner
-from app.models.tenant import Tenant
-from app.models.charge import Charge
-from app.models.floor import Floor
+
+from app.models.mixins import SoftDeleteMixin, TimestampMixin
+# from mixins import TimestampMixin, SoftDeleteMixin
+# from app.models.owner import Owner
+# from app.models.tenant import Tenant
+# from app.models.charge import Charge
+# from app.models.floor import Floor
 
 
 class UnitType(str, Enum):

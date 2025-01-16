@@ -1,8 +1,8 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
-from mixins import TimestampMixin, SoftDeleteMixin
-from app.models.building import Building
+# from app.models.building import Building
 from app.models.unit import Unit
+from app.models.mixins import SoftDeleteMixin, TimestampMixin
 
 class Floor(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
     __tablename__ = "floors"
