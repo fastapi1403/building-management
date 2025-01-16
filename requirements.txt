@@ -4,6 +4,7 @@ uvicorn
 sqlmodel
 sqlalchemy
 asyncpg
+psycopg2-binary
 alembic
 jinja2
 python-multipart

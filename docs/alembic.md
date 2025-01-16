@@ -44,6 +44,15 @@ target_metadata = SQLModel.metadata
 # ... rest of the default env.py content ...
 ```
 
+Modify alembic/script.py.mako to use your SQLAlchemy models:
+```python
+from alembic import op
+import sqlalchemy as sa
+import sqlmodel  # Add this line
+${imports if imports else ""}
+
+```
+
 To create a new migration:
 ```bash
 # Create a new migration
