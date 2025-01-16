@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Optional
 from sqlmodel import SQLModel
-from app.db import SchemaBase
+from schemas.base import SchemaBase
+
 
 class BuildingBase(SchemaBase):
     """

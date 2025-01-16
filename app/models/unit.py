@@ -3,14 +3,7 @@ from typing import Optional, List
 
 from sqlmodel import Field, Relationship
 
-from app.db import TableBase
-
-
-# from mixins import TimestampMixin, SoftDeleteMixin
-# from app.models.owner import Owner
-# from app.models.tenant import Tenant
-# from app.models.charge import Charge
-# from app.models.floor import Floor
+from app.models.base import TableBase
 
 
 class UnitType(str, Enum):

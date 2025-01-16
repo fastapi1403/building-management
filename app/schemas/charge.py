@@ -4,7 +4,7 @@ from decimal import Decimal
 from pydantic import Field, ConfigDict
 
 from app.models.charge import ChargeType, ChargeStatus, ChargeFrequency
-from app.db import SchemaBase
+from schemas.base import SchemaBase
 
 
 class ChargeBase(SchemaBase):

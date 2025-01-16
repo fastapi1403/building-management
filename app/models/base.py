@@ -4,7 +4,7 @@ from sqlmodel import Field, SQLModel
 from pydantic import ConfigDict
 
 
-class TableBase(SQLModel):
+class Base(SQLModel):
     """
     Base class for all models using SQLModel.
     Provides common fields and functionality for audit trails.
@@ -102,9 +102,12 @@ class TableBase(SQLModel):
 
 
 # Create table=False models base class
-class SchemaBase(TableBase, table=False):
+class TableBase(Base, table=False):
     """
-    Base class for SQLModel schema models (Pydantic models)
-    Inherit from this class for request/response schemas
+    Base class for SQLModel table models
+    Inherit from this class for database models
     """
     pass
+
+
+

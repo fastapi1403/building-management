@@ -3,7 +3,7 @@ from typing import Optional, List
 from pydantic import ConfigDict
 from sqlmodel import Field, Relationship
 
-from app.db import TableBase
+from app.models.base import TableBase
 
 
 class Building(TableBase, table=True):
@@ -31,13 +31,12 @@ class Building(TableBase, table=True):
         json_schema_extra={
             "example": {
                 "name": "Test Building",
-                "address": "123 Test St",
                 "total_floors": 10,
-                "year_built": 2023
+                "description": "123 Test St",
             }
         }
     )
 
 
-# from app.models.floor import Floor
-# from app.models.fund import Fund
+from app.models.floor import Floor
+from app.models.fund import Fund

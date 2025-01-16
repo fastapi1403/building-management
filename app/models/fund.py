@@ -5,7 +5,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum, Index
 from decimal import Decimal
 
-from app.db import TableBase
+from app.models.base import TableBase
 
 
 # from mixins import TimestampMixin, SoftDeleteMixin

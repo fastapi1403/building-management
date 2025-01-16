@@ -5,7 +5,7 @@ from typing import Optional, List
 from sqlalchemy import Column, Enum as SQLEnum, Index
 from sqlmodel import Field, Relationship
 
-from app.db import TableBase
+from app.models.base import TableBase
 
 
 class CostType(str, Enum):

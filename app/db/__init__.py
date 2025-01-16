@@ -1,4 +1,4 @@
-from app.db.base import *  # noqa
+from models.base import *  # noqa
 
 # Alembic will import this
-__all__ = ["TableBase", "SchemaBase"]
+__all__ = ["TableBase"]
