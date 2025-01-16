@@ -3,11 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from app.db.session import get_db
 from app.crud import building as crud
-from app.schemas.building import Building, BuildingCreate, BuildingUpdate
+from app.schemas.building import BuildingCreate, BuildingUpdate, BuildingResponse
 
 router = APIRouter()
 
-@router.get("/buildings/", response_model=List[Building])
+@router.get("/buildings/", response_model=List[BuildingResponse])
 async def read_buildings(
     skip: int = 0,
     limit: int = 100,
@@ -17,7 +17,7 @@ async def read_buildings(
     return buildings
 
 
-@router.post("/buildings/", response_model=Building)
+@router.post("/buildings/", response_model=BuildingResponse)
 async def create_building(
     building: BuildingCreate,
     db: Session = Depends(get_db)
@@ -25,7 +25,7 @@ async def create_building(
     return await crud.create_building(db, building)
 
 
-@router.get("/buildings/{building_id}", response_model=Building)
+@router.get("/buildings/{building_id}", response_model=BuildingResponse)
 async def read_building(
     building_id: int,
     db: Session = Depends(get_db)
@@ -36,7 +36,7 @@ async def read_building(
     return building
 
 
-@router.put("/buildings/{building_id}", response_model=Building)
+@router.put("/buildings/{building_id}", response_model=BuildingResponse)
 async def update_building(
     building_id: int,
     building: BuildingUpdate,

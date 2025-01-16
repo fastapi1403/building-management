@@ -3,11 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from app.db.session import get_db
 from app.crud import unit as crud
-from app.schemas.unit import Unit, UnitCreate, UnitUpdate
+from app.schemas.unit import UnitResponse, UnitCreate, UnitUpdate
 
 router = APIRouter()
 
-@router.get("/units/", response_model=List[Unit])
+@router.get("/units/", response_model=List[UnitResponse])
 async def read_units(
     skip: int = 0,
     limit: int = 100,
@@ -17,7 +17,7 @@ async def read_units(
     return units
 
 
-@router.post("/units/", response_model=Unit)
+@router.post("/units/", response_model=UnitResponse)
 async def create_unit(
     unit: UnitCreate,
     db: Session = Depends(get_db)
@@ -25,7 +25,7 @@ async def create_unit(
     return await crud.create_unit(db, unit)
 
 
-@router.get("/units/{unit_id}", response_model=Unit)
+@router.get("/units/{unit_id}", response_model=UnitResponse)
 async def read_unit(
     unit_id: int,
     db: Session = Depends(get_db)
@@ -36,7 +36,7 @@ async def read_unit(
     return unit
 
 
-@router.put("/units/{unit_id}", response_model=Unit)
+@router.put("/units/{unit_id}", response_model=UnitResponse)
 async def update_unit(
     unit_id: int,
     unit: UnitUpdate,

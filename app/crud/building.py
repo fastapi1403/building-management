@@ -8,8 +8,8 @@ from app.models.building import Building
 from app.schemas.building import BuildingCreate, BuildingUpdate
 from app.core.logging import logger
 from app.core.exceptions import (
-    BuildingNotFoundException,
-    BuildingAlreadyExistsException,
+    # BuildingNotFoundException,
+    # BuildingAlreadyExistsException,
     DatabaseOperationException
 )
 
