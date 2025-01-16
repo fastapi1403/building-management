@@ -12,6 +12,10 @@ class Base(SQLModel):
 
     model_config = ConfigDict(
         from_attributes=True,
+        arbitrary_types_allowed = True,
+        json_encoders = {
+            datetime: lambda dt: dt.strftime("%Y-%m-%d %H:%M:%S")
+        },
         json_schema_extra={
             "example": {
                 "id": 1,
@@ -95,15 +99,6 @@ class Base(SQLModel):
         self.is_deleted = False
         self.deleted_at = None
         self.updated_at = current_time
-
-    class Config:
-        """
-        SQLModel configuration
-        """
-        arbitrary_types_allowed = True
-        json_encoders = {
-            datetime: lambda dt: dt.strftime("%Y-%m-%d %H:%M:%S")
-        }
 
 
 # Create table=True models base class

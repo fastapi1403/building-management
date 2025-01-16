@@ -4,6 +4,9 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum
 
 from app.models.mixins import SoftDeleteMixin, TimestampMixin
+from db import TableBase
+
+
 # from app.models.unit import Unit
 # from app.models.charge import Charge
 
@@ -28,10 +31,7 @@ class OwnerStatus(str, Enum):
 
 
 
-class Owner(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
-    __tablename__ = "owners"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Owner(TableBase):
     owner_type: OwnerType = Field(
         sa_column=Column(SQLEnum(OwnerType)),
         default=OwnerType.INDIVIDUAL

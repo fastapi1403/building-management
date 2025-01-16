@@ -6,6 +6,9 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Enum as SQLEnum
 
 from app.models.mixins import SoftDeleteMixin, TimestampMixin
+from db import TableBase
+
+
 # from mixins import TimestampMixin, SoftDeleteMixin
 # from app.models.fund import Fund
 
@@ -46,7 +49,7 @@ class PaymentMethod(str, Enum):
     OTHER = "other"
 
 
-class Transaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
+class Transaction(TableBase):
     __tablename__ = "transactions"
 
     id: Optional[int] = Field(default=None, primary_key=True)

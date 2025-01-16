@@ -1,9 +1,10 @@
 from typing import Optional, List
 from pydantic import Field, ConfigDict
 from app.schemas.mixins import BaseSchema
+from db import SchemaBase
 
 
-class BuildingBase(BaseSchema):
+class BuildingBase(SchemaBase):
     """Base Building Schema with common attributes"""
     name: str = Field(
         ...,
@@ -33,12 +34,12 @@ class BuildingBase(BaseSchema):
     )
 
 
-class BuildingCreate(BuildingBase):
+class BuildingCreate(SchemaBase):
     """Schema for creating a new building"""
     pass
 
 
-class BuildingUpdate(BaseSchema):
+class BuildingUpdate(SchemaBase):
     """Schema for updating an existing building"""
     name: Optional[str] = Field(
         default=None,
@@ -49,7 +50,7 @@ class BuildingUpdate(BaseSchema):
     description: Optional[str] = None
 
 
-class BuildingResponse(BuildingBase):
+class BuildingResponse(SchemaBase):
     """Schema for building response with additional information"""
     id: int = Field(..., description="Unique identifier for the building")
     created_at: str

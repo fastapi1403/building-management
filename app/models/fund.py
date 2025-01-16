@@ -6,6 +6,8 @@ from sqlalchemy import Column, Enum as SQLEnum, Index
 from decimal import Decimal
 
 from app.models.mixins import SoftDeleteMixin, TimestampMixin
+from db import TableBase
+
 
 # from mixins import TimestampMixin, SoftDeleteMixin
 # from building import Building
@@ -69,14 +71,10 @@ class PaymentMethod(str, Enum):
     OTHER = "other"
 
 
-class Fund(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
+class Fund(TableBase):
     """
     Model for managing building funds and their transactions
     """
-    __tablename__ = "funds"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-
     # Fund Information
     name: str = Field(..., max_length=100)
     description: str = Field(..., max_length=500)
@@ -134,13 +132,10 @@ class Fund(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
         return self.current_balance <= threshold
 
 
-class FundTransaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
+class FundTransaction(TableBase):
     """
     Model for tracking fund transactions
     """
-    __tablename__ = "fund_transactions"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
     fund_id: int = Field(..., foreign_key="funds.id")
 
     status: FundStatus = Field(

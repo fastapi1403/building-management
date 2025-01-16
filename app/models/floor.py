@@ -3,11 +3,10 @@ from sqlmodel import SQLModel, Field, Relationship
 # from app.models.building import Building
 from app.models.unit import Unit
 from app.models.mixins import SoftDeleteMixin, TimestampMixin
+from db import TableBase
 
-class Floor(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
-    __tablename__ = "floors"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Floor(TableBase):
     building_id: int = Field(foreign_key="buildings.id")
     number: int
     name: str

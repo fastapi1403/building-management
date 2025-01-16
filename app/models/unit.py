@@ -3,6 +3,9 @@ from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
 
 from app.models.mixins import SoftDeleteMixin, TimestampMixin
+from db import TableBase
+
+
 # from mixins import TimestampMixin, SoftDeleteMixin
 # from app.models.owner import Owner
 # from app.models.tenant import Tenant
@@ -25,10 +28,7 @@ class UnitStatus(str, Enum):
 
 
 
-class Unit(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
-    __tablename__ = "units"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Unit(TableBase):
     floor_id: int = Field(foreign_key="floors.id")
     unit_number: str = Field(..., index=True)
     type: UnitType = Field(default=UnitType.RESIDENTIAL)

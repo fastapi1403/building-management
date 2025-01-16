@@ -5,6 +5,8 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String, Enum as SQLEnum, Index
 
 from app.models.mixins import SoftDeleteMixin, TimestampMixin
+from db import TableBase
+
 
 # from mixins import TimestampMixin, SoftDeleteMixin
 # # Type annotations for relationships
@@ -53,14 +55,10 @@ class CostStatus(str, Enum):
     REFUNDED = "refunded"
 
 
-class Cost(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
+class Cost(TableBase):
     """
     Model for tracking costs and expenses in the building management system
     """
-    __tablename__ = "costs"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-
     # Basic cost information
     title: str = Field(..., max_length=200)
     description: str = Field(..., max_length=1000)
@@ -148,13 +146,10 @@ class Cost(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
         self.update_variance()
 
 
-class CostDocument(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
+class CostDocument(TableBase):
     """
     Model for storing documents related to costs (invoices, receipts, etc.)
     """
-    __tablename__ = "cost_documents"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
     cost_id: int = Field(..., foreign_key="costs.id")
 
     # Document information
