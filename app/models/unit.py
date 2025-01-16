@@ -14,6 +14,15 @@ class UnitType(str, Enum):
     RESIDENTIAL = "residential"
     COMMERCIAL = "commercial"
     OFFICE = "office"
+    RETAIL = "retail"
+    PARKING = "parking"
+
+class UnitStatus(str, Enum):
+    VACANT = "vacant"
+    OCCUPIED = "occupied"
+    MAINTENANCE = "maintenance"
+    RESERVED = "reserved"
+
 
 
 class Unit(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
@@ -23,6 +32,7 @@ class Unit(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     floor_id: int = Field(foreign_key="floors.id")
     unit_number: str = Field(..., index=True)
     type: UnitType = Field(default=UnitType.RESIDENTIAL)
+    status: UnitStatus = Field(default=UnitStatus.OCCUPIED)
     area: float
     has_parking: bool = Field(default=False)
     parking_space_number: Optional[str] = None

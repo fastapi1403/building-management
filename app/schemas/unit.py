@@ -1,20 +1,10 @@
 from typing import Optional
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 from enum import Enum
 from datetime import datetime, UTC
+from app.schemas.mixins import BaseSchema  # Add this import which was missing
+from models.unit import UnitType, UnitStatus
 
-class UnitType(str, Enum):
-    RESIDENTIAL = "residential"
-    COMMERCIAL = "commercial"
-    OFFICE = "office"
-    RETAIL = "retail"
-    PARKING = "parking"
-
-class UnitStatus(str, Enum):
-    VACANT = "vacant"
-    OCCUPIED = "occupied"
-    MAINTENANCE = "maintenance"
-    RESERVED = "reserved"
 
 class UnitBase(BaseModel):
     unit_number: str = Field(
@@ -52,18 +42,20 @@ class UnitBase(BaseModel):
         description="ID of the current owner of the unit"
     )
 
+    model_config = ConfigDict(
+        from_attributes=True
+    )
+
     @field_validator('unit_number')
     @classmethod
     def validate_unit_number(cls, v: str) -> str:
-        # Ensure unit number follows the pattern: number + optional letter
         if not any(c.isdigit() for c in v):
             raise ValueError("Unit number must contain at least one digit")
-        return v.upper()  # Standardize to uppercase
+        return v.upper()
 
     @field_validator('area_sqft')
     @classmethod
     def validate_area(cls, v: float) -> float:
-        # Round to 2 decimal places
         return round(v, 2)
 
     @model_validator(mode='after')
@@ -73,8 +65,8 @@ class UnitBase(BaseModel):
         return self
 
 class UnitCreate(UnitBase):
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "unit_number": "1501A",
                 "floor_id": 15,
@@ -113,7 +105,7 @@ class UnitCreate(UnitBase):
                 }
             ]
         }
-
+    )
 
 class UnitUpdate(BaseModel):
     unit_number: Optional[str] = Field(
@@ -127,14 +119,9 @@ class UnitUpdate(BaseModel):
     monthly_maintenance: Optional[float] = Field(None, ge=0)
     current_owner_id: Optional[int] = None
 
-    @model_validator(mode='after')
-    def validate_partial_update(self) -> 'UnitUpdate':
-        if self.status == UnitStatus.OCCUPIED and self.current_owner_id is None:
-            raise ValueError("Cannot set status to occupied without an owner")
-        return self
-
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
                 "status": "occupied",
                 "monthly_maintenance": 2700.00,
@@ -158,7 +145,13 @@ class UnitUpdate(BaseModel):
                 }
             ]
         }
+    )
 
+    @model_validator(mode='after')
+    def validate_partial_update(self) -> 'UnitUpdate':
+        if self.status == UnitStatus.OCCUPIED and self.current_owner_id is None:
+            raise ValueError("Cannot set status to occupied without an owner")
+        return self
 
 class UnitResponse(UnitBase, TimestampSchema):
     id: int
@@ -167,9 +160,9 @@ class UnitResponse(UnitBase, TimestampSchema):
         description="Date of the last maintenance check"
     )
 
-    class Config:
-        from_attributes = True
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
                 "id": 157,
                 "unit_number": "1501A",
@@ -223,7 +216,7 @@ class UnitResponse(UnitBase, TimestampSchema):
                 }
             ]
         }
-
+    )
 
 class UnitDetailResponse(UnitResponse):
     floor_number: int = Field(..., description="Floor number where the unit is located")
@@ -234,9 +227,9 @@ class UnitDetailResponse(UnitResponse):
         description="Percentage of time the unit has been occupied"
     )
 
-    class Config:
-        from_attributes = True
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
                 "id": 157,
                 "unit_number": "1501A",
@@ -302,3 +295,4 @@ class UnitDetailResponse(UnitResponse):
                 }
             ]
         }
+    )
