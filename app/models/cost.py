@@ -104,7 +104,20 @@ class Cost(TableBase, table=True):
     documents: List["CostDocument"] = Relationship(back_populates="cost")
 
     class Config:
-        arbitrary_types_allowed = True
+        json_schema_extra = {
+            "example": {
+                "title": "Plumbing Repair",
+                "description": "Cost for repairing the plumbing system",
+                "amount": 500.0,
+                "cost_type": "repair",
+                "priority": "high",
+                "status": "planned",
+                "planned_date": "2025-02-01T00:00:00Z",
+                "estimated_amount": 500.0,
+                "building_id": 1,
+                "is_recurring": False
+            }
+        }
 
     @property
     def is_overburden(self) -> bool:
@@ -136,7 +149,9 @@ class Cost(TableBase, table=True):
 # Model for storing documents related to costs (invoices, receipts, etc.)
 class CostDocument(TableBase, table=True):
     __tablename__ = "cost_documents"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        {'extend_existing': True},
+    )
 
     cost_id: int = Field(..., foreign_key="costs.id")
 
@@ -154,7 +169,16 @@ class CostDocument(TableBase, table=True):
     cost: Cost = Relationship(back_populates="documents")
 
     class Config:
-        arbitrary_types_allowed = True
+        json_schema_extra = {
+            "example": {
+                "title": "Invoice for Plumbing Repair",
+                "document_type": "invoice",
+                "file_path": "/documents/invoices/plumbing_repair.pdf",
+                "file_size": 1048576,
+                "mime_type": "application/pdf",
+                "description": "Invoice document for the plumbing repair cost"
+            }
+        }
 
 
 # Forward references for type hints

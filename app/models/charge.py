@@ -44,7 +44,9 @@ class ChargeFrequency(str, Enum):
 # Model for managing charges/fees in the building management system
 class Charge(TableBase, table=True):
     __tablename__ = "charges"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        {'extend_existing': True},
+    )
 
     # Charge details
     title: str = Field(..., max_length=100)
@@ -94,7 +96,22 @@ class Charge(TableBase, table=True):
     payments: List["Payment"] = Relationship(back_populates="charge")
 
     class Config:
-        arbitrary_types_allowed = True
+        json_schema_extra = {
+            "example": {
+                "title": "Monthly Maintenance Fee",
+                "description": "Monthly maintenance fee for January",
+                "amount": 100.0,
+                "type": "maintenance",
+                "status": "pending",
+                "due_date": "2025-01-01T00:00:00Z",
+                "frequency": "monthly",
+                "recurring": True,
+                "amount_paid": 0.0,
+                "generated_by": "admin",
+                "tax_rate": 5.0,
+                "is_taxable": True
+            }
+        }
 
     @property
     def tax_amount(self) -> float:
@@ -135,7 +152,9 @@ class Charge(TableBase, table=True):
 # Model for tracking payments against charges
 class Payment(TableBase, table=True):
     __tablename__ = "payments"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        {'extend_existing': True},
+    )
 
     charge_id: int = Field(..., foreign_key="charges.id")
     amount: float = Field(..., gt=0)
@@ -148,7 +167,16 @@ class Payment(TableBase, table=True):
     charge: Charge = Relationship(back_populates="payments")
 
     class Config:
-        arbitrary_types_allowed = True
+        json_schema_extra = {
+            "example": {
+                "charge_id": 1,
+                "amount": 50.0,
+                "payment_date": "2025-01-15T00:00:00Z",
+                "payment_method": "credit_card",
+                "transaction_id": "abc123",
+                "notes": "Payment for January maintenance fee"
+            }
+        }
 
 
 # Forward references for type hints

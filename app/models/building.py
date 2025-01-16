@@ -10,7 +10,9 @@ class Building(TableBase, table=True):
     Building model inheriting from TableBase
     """
     __tablename__ = "buildings"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        {'extend_existing': True},
+    )
 
     # Fields
     name: str = Field(
@@ -35,7 +37,7 @@ class Building(TableBase, table=True):
 
     # Example configuration for OpenAPI schema
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "Test Building",
                 "total_floors": 10,

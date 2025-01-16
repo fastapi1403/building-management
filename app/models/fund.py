@@ -1,21 +1,16 @@
 from datetime import datetime, UTC
-from typing import Optional, List
-from enum import Enum
-from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, Enum as SQLEnum, Index
 from decimal import Decimal
+from enum import Enum
+from typing import Optional, List
+
+from sqlalchemy import Column, Enum as SQLEnum, Index
+from sqlmodel import Field, Relationship
 
 from app.models.base import TableBase
 
 
-# from mixins import TimestampMixin, SoftDeleteMixin
-# from building import Building
-# from cost import Cost
-# from charge import Charge
-
-
+# Enum for fund types
 class FundType(str, Enum):
-    """Enum for fund types"""
     MAINTENANCE = "maintenance"  # Regular maintenance fund
     RESERVE = "reserve"  # Reserve/emergency fund
     OPERATIONAL = "operational"  # Day-to-day operations
@@ -26,8 +21,8 @@ class FundType(str, Enum):
     OTHER = "other"  # Other fund types
 
 
+# Enum for fund status
 class FundStatus(str, Enum):
-    """Enum for fund status"""
     ACTIVE = "active"
     INACTIVE = "inactive"
     DEPLETED = "depleted"
@@ -36,8 +31,8 @@ class FundStatus(str, Enum):
     CLOSED = "closed"
 
 
+# Enumeration for transaction types
 class TransactionType(str, Enum):
-    """Enumeration for transaction types"""
     CONTRIBUTION = "contribution"  # Money added to fund
     WITHDRAWAL = "withdrawal"  # Money taken from fund
     TRANSFER_IN = "transfer_in"  # Transfer from another fund
@@ -48,8 +43,8 @@ class TransactionType(str, Enum):
     FEE = "fee"  # Bank or service fees
 
 
+# Enumeration for transaction statuses
 class TransactionStatus(str, Enum):
-    """Enumeration for transaction statuses"""
     PENDING = "pending"  # Awaiting processing
     COMPLETED = "completed"  # Successfully processed
     FAILED = "failed"  # Transaction failed
@@ -58,8 +53,8 @@ class TransactionStatus(str, Enum):
     PROCESSING = "processing"  # Currently processing
 
 
+# Enumeration for payment methods
 class PaymentMethod(str, Enum):
-    """Enumeration for payment methods"""
     CASH = "cash"
     BANK_TRANSFER = "bank_transfer"
     CHECK = "check"
@@ -70,57 +65,66 @@ class PaymentMethod(str, Enum):
     OTHER = "other"
 
 
+# Model for managing building funds and their transactions
 class Fund(TableBase, table=True):
-    """
-    Model for managing building funds and their transactions
-    """
     __tablename__ = "funds"
     __table_args__ = {'extend_existing': True}
 
     # Fund Information
-    name: str = Field(..., max_length=100)
-    description: str = Field(..., max_length=500)
+    name: str = Field(..., max_length=100, description="Name of the fund")
+    description: str = Field(..., max_length=500, description="Description of the fund")
     fund_type: FundType = Field(
         sa_column=Column(SQLEnum(FundType)),
-        default=FundType.MAINTENANCE
+        default=FundType.MAINTENANCE,
+        description="Type of the fund"
     )
     status: FundStatus = Field(
         sa_column=Column(SQLEnum(FundStatus)),
-        default=FundStatus.ACTIVE
+        default=FundStatus.ACTIVE,
+        description="Status of the fund"
     )
 
     # Financial Details
-    current_balance: Decimal = Field(default=Decimal('0.00'))
-    target_amount: Optional[Decimal] = Field(default=None)
-    minimum_balance: Decimal = Field(default=Decimal('0.00'))
+    current_balance: Decimal = Field(default=Decimal('0.00'), description="Current balance of the fund")
+    target_amount: Optional[Decimal] = Field(default=None, description="Target amount for the fund")
+    minimum_balance: Decimal = Field(default=Decimal('0.00'), description="Minimum required balance for the fund")
 
     # Association
-    building_id: int = Field(..., foreign_key="buildings.id")
+    building_id: int = Field(..., foreign_key="buildings.id", description="ID of the building this fund belongs to")
 
     # Fund Management
-    manager: str = Field(default="fastapi1403", max_length=100)
-    last_audit_date: Optional[datetime] = Field(default=None)
-    next_audit_date: Optional[datetime] = Field(default=None)
+    manager: str = Field(default="fastapi1403", max_length=100, description="Manager of the fund")
+    last_audit_date: Optional[datetime] = Field(default=None, description="Date of the last audit")
+    next_audit_date: Optional[datetime] = Field(default=None, description="Date of the next scheduled audit")
 
     # Rules and Restrictions
-    withdrawal_limit: Optional[Decimal] = Field(default=None)
-    requires_approval: bool = Field(default=True)
-    approval_threshold: Optional[Decimal] = Field(default=None)
+    withdrawal_limit: Optional[Decimal] = Field(default=None, description="Maximum withdrawal limit")
+    requires_approval: bool = Field(default=True, description="Whether withdrawals require approval")
+    approval_threshold: Optional[Decimal] = Field(default=None,
+                                                  description="Threshold above which approval is required")
 
     # Metadata
-    notes: Optional[str] = Field(default=None, max_length=1000)
+    notes: Optional[str] = Field(default=None, max_length=1000, description="Additional notes about the fund")
 
     # Relationships
     building: "Building" = Relationship(back_populates="funds")
     transactions: List["FundTransaction"] = Relationship(back_populates="fund")
 
-    __table_args__ = (
-        Index('ix_funds_building_type', 'building_id', 'fund_type'),
-        Index('ix_funds_status', 'status'),
-    )
-
     class Config:
-        arbitrary_types_allowed = True
+        json_schema_extra = {
+            "example": {
+                "name": "Maintenance Fund",
+                "description": "Fund for regular maintenance expenses",
+                "fund_type": "maintenance",
+                "status": "active",
+                "current_balance": "10000.00",
+                "target_amount": "20000.00",
+                "minimum_balance": "1000.00",
+                "building_id": 1,
+                "manager": "fastapi1403",
+                "requires_approval": True
+            }
+        }
 
     @property
     def available_balance(self) -> Decimal:
@@ -134,55 +138,62 @@ class Fund(TableBase, table=True):
         return self.current_balance <= threshold
 
 
-class FundTransaction(TableBase):
-    """
-    Model for tracking fund transactions
-    """
+# Model for tracking fund transactions
+class FundTransaction(TableBase, table=True):
     __tablename__ = "fund_transactions"
     __table_args__ = {'extend_existing': True}
 
-    fund_id: int = Field(..., foreign_key="funds.id")
-
-    status: FundStatus = Field(
+    fund_id: int = Field(..., foreign_key="funds.id", description="ID of the associated fund")
+    status: TransactionStatus = Field(
         sa_column=Column(SQLEnum(TransactionStatus)),
-        default=TransactionStatus.PENDING
+        default=TransactionStatus.PENDING,
+        description="Status of the transaction"
     )
-    payment_method: FundStatus = Field(
+    payment_method: PaymentMethod = Field(
         sa_column=Column(SQLEnum(PaymentMethod)),
-        default=PaymentMethod.BANK_TRANSFER
+        default=PaymentMethod.BANK_TRANSFER,
+        description="Method used for the transaction"
     )
 
     # Transaction Details
     transaction_type: TransactionType = Field(
-        sa_column=Column(SQLEnum(TransactionType))
+        sa_column=Column(SQLEnum(TransactionType)),
+        description="Type of the transaction"
     )
-    amount: Decimal = Field(...)
-    balance_after: Decimal = Field(...)
-    reference_number: str = Field(..., max_length=50)
+    amount: Decimal = Field(..., description="Amount of the transaction")
+    balance_after: Decimal = Field(..., description="Balance after the transaction")
+    reference_number: str = Field(..., max_length=50, description="Reference number for the transaction")
 
     # Related Information
-    cost_id: Optional[int] = Field(default=None, foreign_key="costs.id")
-    charge_id: Optional[int] = Field(default=None, foreign_key="charges.id")
+    cost_id: Optional[int] = Field(default=None, foreign_key="costs.id",
+                                   description="ID of the associated cost, if any")
+    charge_id: Optional[int] = Field(default=None, foreign_key="charges.id",
+                                     description="ID of the associated charge, if any")
 
     # Transaction Metadata
-    description: str = Field(..., max_length=500)
-    initiated_by: str = Field(default="fastapi1403", max_length=100)
-    approved_by: Optional[str] = Field(default=None, max_length=100)
-    transaction_date: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    notes: Optional[str] = Field(default=None, max_length=1000)
+    description: str = Field(..., max_length=500, description="Description of the transaction")
+    transaction_date: datetime = Field(default_factory=lambda: datetime.now(UTC), description="Date of the transaction")
+    notes: Optional[str] = Field(default=None, max_length=1000, description="Additional notes about the transaction")
 
     # Relationships
     fund: Fund = Relationship(back_populates="transactions")
     cost: Optional["Cost"] = Relationship(back_populates="fund_transactions")
     charge: Optional["Charge"] = Relationship(back_populates="fund_transactions")
-    # building: "Building" = Relationship(back_populates="funds")
-    # transactions: List["Transaction"] = Relationship(back_populates="fund")
-    # charges: List["Charge"] = Relationship(back_populates="fund")
 
-    __table_args__ = (
-        Index('ix_fund_transactions_date', 'transaction_date'),
-        Index('ix_fund_transactions_type', 'transaction_type'),
-    )
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "fund_id": 1,
+                "status": "pending",
+                "payment_method": "bank_transfer",
+                "transaction_type": "contribution",
+                "amount": "500.00",
+                "balance_after": "10500.00",
+                "reference_number": "TXN12345",
+                "description": "Contribution to the maintenance fund",
+                "transaction_date": "2025-01-16T17:06:02Z"
+            }
+        }
 
 
 # Forward references for type hints
