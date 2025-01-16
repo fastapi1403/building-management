@@ -1,6 +1,8 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from app.db.session import get_db
 from app.crud import building as crud
 from app.schemas.building import BuildingCreate, BuildingUpdate, BuildingResponse
@@ -50,12 +52,93 @@ async def update_building(
     return updated_building
 
 
-@router.delete("/buildings/{building_id}")
+@router.delete("/{building_id}", response_model=BuildingResponse)
 async def delete_building(
-    building_id: int,
-    db: Session = Depends(get_db)
-):
-    deleted = await crud.delete_building(db, building_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Building not found")
-    return {"message": "Building deleted successfully"}
+        building_id: int,
+        db: AsyncSession = Depends(get_db)
+) -> Building:
+    """
+    Soft delete a building.
+    """
+    building = await crud.building.get(db=db, id=building_id)
+    if not building:
+        raise HTTPException(
+            status_code=404,
+            detail="Building not found"
+        )
+
+    if building.is_deleted:
+        raise HTTPException(
+            status_code=400,
+            detail="Building is already deleted"
+        )
+
+    return await crud.building.delete(
+        db=db,
+        db_obj=building
+    )
+
+
+@router.post("/{building_id}/restore", response_model=BuildingResponse)
+async def restore_building(
+        building_id: int,
+        db: AsyncSession = Depends(get_db),
+) -> Building:
+    """
+    Restore a soft-deleted building.
+    """
+    building = await crud.building.get(db=db, id=building_id)
+    if not building:
+        raise HTTPException(
+            status_code=404,
+            detail="Building not found"
+        )
+
+    if not building.is_deleted:
+        raise HTTPException(
+            status_code=400,
+            detail="Building is not deleted"
+        )
+
+    return await crud.building.restore(
+        db=db,
+        db_obj=building,
+    )
+
+
+@router.get("/deleted/", response_model=List[BuildingResponse])
+async def get_deleted_buildings(
+        skip: int = 0,
+        limit: int = 100,
+        db: AsyncSession = Depends(get_db),
+) -> List[Building]:
+    """
+    Retrieve all soft-deleted buildings.
+    """
+    return await crud.building.get_deleted(
+        db=db,
+        skip=skip,
+        limit=limit
+    )
+
+
+@router.delete("/{building_id}/permanent")
+async def permanent_delete_building(
+        building_id: int,
+        db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Permanently delete a building.
+    """
+    building = await crud.building.get(db=db, id=building_id)
+    if not building:
+        raise HTTPException(
+            status_code=404,
+            detail="Building not found"
+        )
+
+    await crud.building.hard_delete(db=db, db_obj=building)
+    return {
+        "status": "success",
+        "message": f"Building {building_id} has been permanently deleted"
+    }

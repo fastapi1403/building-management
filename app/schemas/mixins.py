@@ -46,10 +46,6 @@ class SoftDeleteMixinSchema(BaseModel):
         default=False,
         description="Indicates if the record is soft deleted"
     )
-    deleted_by: Optional[str] = Field(
-        default=None,
-        description="User who soft deleted the record"
-    )
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -58,7 +54,6 @@ class SoftDeleteMixinSchema(BaseModel):
             "example": {
                 "deleted_at": None,
                 "is_deleted": False,
-                "deleted_by": None
             }
         }
     )
@@ -76,11 +71,8 @@ class BaseSchema(TimestampMixinSchema, SoftDeleteMixinSchema):
                 "id": 1,
                 "created_at": "2025-01-15T14:08:30Z",
                 "updated_at": "2025-01-15T14:08:30Z",
-                "created_by": "fastapi1403",
-                "updated_by": "fastapi1403",
                 "deleted_at": None,
                 "is_deleted": False,
-                "deleted_by": None
             }
         }
     )
