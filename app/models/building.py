@@ -5,7 +5,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from app.models.mixins import SoftDeleteMixin, TimestampMixin
 
 
-class Building(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Building(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     __tablename__ = "buildings"
 
     id: Optional[int] = Field(default=None, primary_key=True)

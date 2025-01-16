@@ -69,7 +69,7 @@ class PaymentMethod(str, Enum):
     OTHER = "other"
 
 
-class Fund(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Fund(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     """
     Model for managing building funds and their transactions
     """
@@ -135,7 +135,7 @@ class Fund(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
         return self.current_balance <= threshold
 
 
-class FundTransaction(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class FundTransaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     """
     Model for tracking fund transactions
     """

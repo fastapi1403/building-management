@@ -16,7 +16,7 @@ class UnitType(str, Enum):
     OFFICE = "office"
 
 
-class Unit(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Unit(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     __tablename__ = "units"
 
     id: Optional[int] = Field(default=None, primary_key=True)

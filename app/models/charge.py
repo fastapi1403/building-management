@@ -45,7 +45,7 @@ class ChargeFrequency(str, Enum):
     YEARLY = "yearly"
 
 
-class Charge(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Charge(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     """
     Model for managing charges/fees in the building management system
     """
@@ -139,7 +139,7 @@ class Charge(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
             self.status = ChargeStatus.OVERDUE
 
 
-class Payment(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Payment(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     """
     Model for tracking payments against charges
     """

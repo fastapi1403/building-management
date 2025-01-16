@@ -46,7 +46,7 @@ class PaymentMethod(str, Enum):
     OTHER = "other"
 
 
-class Transaction(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Transaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     __tablename__ = "transactions"
 
     id: Optional[int] = Field(default=None, primary_key=True)

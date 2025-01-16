@@ -4,7 +4,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from app.models.unit import Unit
 from app.models.mixins import SoftDeleteMixin, TimestampMixin
 
-class Floor(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Floor(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     __tablename__ = "floors"
 
     id: Optional[int] = Field(default=None, primary_key=True)

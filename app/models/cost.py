@@ -53,7 +53,7 @@ class CostStatus(str, Enum):
     REFUNDED = "refunded"
 
 
-class Cost(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Cost(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     """
     Model for tracking costs and expenses in the building management system
     """
@@ -149,7 +149,7 @@ class Cost(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
         self.update_variance()
 
 
-class CostDocument(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class CostDocument(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     """
     Model for storing documents related to costs (invoices, receipts, etc.)
     """

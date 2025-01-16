@@ -31,7 +31,7 @@ class TenantStatus(str, Enum):
     BLACKLISTED = "blacklisted"  # Blacklisted tenant
 
 
-class Tenant(SQLModel, SoftDeleteMixin, TimestampMixin, table=True):
+class Tenant(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     __tablename__ = "tenants"
 
     id: Optional[int] = Field(default=None, primary_key=True)
