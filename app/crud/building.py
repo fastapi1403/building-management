@@ -251,5 +251,3 @@ async def hard_delete(
     """
     await db.delete(db_obj)
     await db.commit()
-
-building = CRUDBuilding(Building)

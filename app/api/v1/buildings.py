@@ -1,59 +1,84 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import get_db
-from app.crud import building as crud
+from app import crud, models, schemas
 from app.schemas.building import BuildingCreate, BuildingUpdate, BuildingResponse
+from app.models.building import Building
+from db.session import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/buildings", tags=["buildings"])
 
-@router.get("/buildings/", response_model=List[BuildingResponse])
+
+@router.get("/", response_model=List[BuildingResponse])
 async def read_buildings(
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db)
+        skip: int = 0,
+        limit: int = 100,
+        db: AsyncSession = Depends(get_db)
 ):
-    buildings = await crud.get_buildings(db, skip=skip, limit=limit)
+    """
+    Retrieve buildings.
+    """
+    buildings = await crud.building.get_multi(db, skip=skip, limit=limit)
     return buildings
 
 
-@router.post("/buildings/", response_model=BuildingResponse)
+@router.post("/", response_model=BuildingResponse)
 async def create_building(
-    building: BuildingCreate,
-    db: Session = Depends(get_db)
-):
-    return await crud.create_building(db, building)
+        *,
+        db: AsyncSession = Depends(get_db),
+        building_in: BuildingCreate,
+) -> Building:
+    """
+    Create new building.
+    """
+    return await crud.building.create(db=db, obj_in=building_in)
 
 
-@router.get("/buildings/{building_id}", response_model=BuildingResponse)
+@router.get("/{building_id}", response_model=BuildingResponse)
 async def read_building(
-    building_id: int,
-    db: Session = Depends(get_db)
-):
-    building = await crud.get_building(db, building_id)
-    if building is None:
-        raise HTTPException(status_code=404, detail="Building not found")
+        building_id: int,
+        db: AsyncSession = Depends(get_db)
+) -> Building:
+    """
+    Get building by ID.
+    """
+    building = await crud.building.get(db=db, id=building_id)
+    if not building:
+        raise HTTPException(
+            status_code=404,
+            detail="Building not found"
+        )
     return building
 
 
-@router.put("/buildings/{building_id}", response_model=BuildingResponse)
+@router.put("/{building_id}", response_model=BuildingResponse)
 async def update_building(
-    building_id: int,
-    building: BuildingUpdate,
-    db: Session = Depends(get_db)
-):
-    updated_building = await crud.update_building(
-        db, building_id, building
+        *,
+        db: AsyncSession = Depends(get_db),
+        building_id: int,
+        building_in: BuildingUpdate,
+) -> Building:
+    """
+    Update building.
+    """
+    building = await crud.building.get(db=db, id=building_id)
+    if not building:
+        raise HTTPException(
+            status_code=404,
+            detail="Building not found"
+        )
+    building = await crud.building.update(
+        db=db,
+        db_obj=building,
+        obj_in=building_in
     )
-    if updated_building is None:
-        raise HTTPException(status_code=404, detail="Building not found")
-    return updated_building
+    return building
 
 
 @router.delete("/{building_id}", response_model=BuildingResponse)
 async def delete_building(
+        *,
         building_id: int,
         db: AsyncSession = Depends(get_db)
 ) -> Building:
@@ -73,16 +98,14 @@ async def delete_building(
             detail="Building is already deleted"
         )
 
-    return await crud.building.delete(
-        db=db,
-        db_obj=building
-    )
+    return await crud.building.delete(db=db, db_obj=building)
 
 
 @router.post("/{building_id}/restore", response_model=BuildingResponse)
 async def restore_building(
+        *,
         building_id: int,
-        db: AsyncSession = Depends(get_db),
+        db: AsyncSession = Depends(get_db)
 ) -> Building:
     """
     Restore a soft-deleted building.
@@ -100,32 +123,26 @@ async def restore_building(
             detail="Building is not deleted"
         )
 
-    return await crud.building.restore(
-        db=db,
-        db_obj=building,
-    )
+    return await crud.building.restore(db=db, db_obj=building)
 
 
 @router.get("/deleted/", response_model=List[BuildingResponse])
 async def get_deleted_buildings(
         skip: int = 0,
         limit: int = 100,
-        db: AsyncSession = Depends(get_db),
+        db: AsyncSession = Depends(get_db)
 ) -> List[Building]:
     """
     Retrieve all soft-deleted buildings.
     """
-    return await crud.building.get_deleted(
-        db=db,
-        skip=skip,
-        limit=limit
-    )
+    return await crud.building.get_deleted(db=db, skip=skip, limit=limit)
 
 
-@router.delete("/{building_id}/permanent")
+@router.delete("/{building_id}/permanent", response_model=dict)
 async def permanent_delete_building(
+        *,
         building_id: int,
-        db: AsyncSession = Depends(get_db),
+        db: AsyncSession = Depends(get_db)
 ) -> dict:
     """
     Permanently delete a building.
