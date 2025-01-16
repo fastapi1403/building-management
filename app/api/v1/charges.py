@@ -3,11 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from app.db.session import get_db
 from app.crud import charge as crud
-from app.schemas.charge import Charge, ChargeCreate, ChargeUpdate
+from app.schemas.charge import ChargeResponse, ChargeCreate, ChargeUpdate
 
 router = APIRouter()
 
-@router.get("/charges/", response_model=List[Charge])
+@router.get("/charges/", response_model=List[ChargeResponse])
 async def read_charges(
     skip: int = 0,
     limit: int = 100,
@@ -17,7 +17,7 @@ async def read_charges(
     return charges
 
 
-@router.post("/charges/", response_model=Charge)
+@router.post("/charges/", response_model=ChargeResponse)
 async def create_charge(
     charge: ChargeCreate,
     db: Session = Depends(get_db)
@@ -25,7 +25,7 @@ async def create_charge(
     return await crud.create_charge(db, charge)
 
 
-@router.get("/charges/{charge_id}", response_model=Charge)
+@router.get("/charges/{charge_id}", response_model=ChargeResponse)
 async def read_charge(
     charge_id: int,
     db: Session = Depends(get_db)
@@ -36,7 +36,7 @@ async def read_charge(
     return charge
 
 
-@router.put("/charges/{charge_id}", response_model=Charge)
+@router.put("/charges/{charge_id}", response_model=ChargeResponse)
 async def update_charge(
     charge_id: int,
     charge: ChargeUpdate,

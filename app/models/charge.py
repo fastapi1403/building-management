@@ -25,6 +25,7 @@ class ChargeStatus(str, Enum):
 
 class ChargeType(str, Enum):
     """Enum for charge types"""
+    RECURRING = "recurring"
     MAINTENANCE = "maintenance"
     UTILITY = "utility"
     PARKING = "parking"

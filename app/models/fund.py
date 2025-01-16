@@ -189,3 +189,4 @@ class FundTransaction(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
 from app.models.building import Building
 from app.models.transaction import Transaction
 from app.models.charge import Charge
+from app.models.cost import Cost

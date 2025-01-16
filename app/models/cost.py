@@ -104,7 +104,6 @@ class Cost(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
     invoice_number: Optional[str] = Field(default=None, max_length=50)
     purchase_order: Optional[str] = Field(default=None, max_length=50)
     notes: Optional[str] = Field(default=None, max_length=1000)
-    tags: List[str] = Field(default_factory=list)
 
     # Relationships
     building: "Building" = Relationship(back_populates="costs")
@@ -114,7 +113,7 @@ class Cost(SoftDeleteMixin, TimestampMixin, SQLModel, table=True):
 
     # Indexes for better query performance
     __table_args__ = (
-        Index('ix_costs_category_status', 'category', 'status'),
+        Index('ix_costs_cost_type', 'cost_type', 'status'),
         Index('ix_costs_planned_date', 'planned_date'),
         Index('ix_costs_building_id', 'building_id'),
     )

@@ -1,120 +1,148 @@
-from datetime import datetime, UTC
-from decimal import Decimal
 from typing import Optional, List
-
-from pydantic import Field
-
+from datetime import date, datetime
+from decimal import Decimal
+from pydantic import Field, ConfigDict
 from app.schemas.mixins import BaseSchema
-from app.models.charge import ChargeStatus, ChargeType
+from app.models.charge import ChargeType, ChargeStatus, ChargeFrequency
 
 
 class ChargeBase(BaseSchema):
     """Base Charge Schema with common attributes"""
-    title: str = Field(...,
-                       description="Title of the charge",
-                       min_length=3,
-                       max_length=100
-                       )
+    fund_id: int = Field(..., description="ID of the associated fund")
+    name: str = Field(
+        ...,
+        description="Name of the charge",
+        min_length=2,
+        max_length=100
+    )
     description: Optional[str] = Field(
         default=None,
         description="Detailed description of the charge"
     )
-    amount: Decimal = Field(...,
-                            description="Amount to be charged",
-                            gt=0,
-                            decimal_places=2
-                            )
-    charge_type: ChargeType = Field(...,
-                                    description="Type of the charge"
-                                    )
-    due_date: datetime = Field(...,
-                               description="Due date for the charge"
-                               )
+    charge_type: ChargeType = Field(
+        default=ChargeType.RECURRING,
+        description="Type of charge (one-time or recurring)"
+    )
     status: ChargeStatus = Field(
         default=ChargeStatus.PENDING,
         description="Current status of the charge"
     )
-    building_id: int = Field(...,
-                             description="ID of the building this charge belongs to"
-                             )
-    unit_id: Optional[int] = Field(
+    amount: Decimal = Field(
+        ...,
+        description="Amount to be charged",
+        gt=0
+    )
+    frequency: Optional[ChargeFrequency] = Field(
         default=None,
-        description="ID of the unit if charge is unit-specific"
+        description="Frequency of recurring charges"
     )
-    floor_id: Optional[int] = Field(
+    start_date: date = Field(
+        ...,
+        description="Start date of the charge"
+    )
+    end_date: Optional[date] = Field(
         default=None,
-        description="ID of the floor if charge is floor-specific"
+        description="End date of the charge (for recurring charges)"
     )
-    recurring: bool = Field(
-        default=False,
-        description="Whether this is a recurring charge"
-    )
-    recurring_period: Optional[str] = Field(
+    due_day: Optional[int] = Field(
         default=None,
-        description="Period for recurring charges (monthly, quarterly, yearly)"
+        description="Day of the month when charge is due",
+        ge=1,
+        le=31
     )
-    notes: Optional[str] = Field(
+    grace_period: Optional[int] = Field(
         default=None,
-        description="Additional notes or comments"
+        description="Number of days after due date before late fees apply",
+        ge=0
     )
-    tags: List[str] = Field(
-        default_factory=list,
-        description="Tags for categorizing charges"
+    late_fee: Optional[Decimal] = Field(
+        default=None,
+        description="Late fee amount",
+        ge=0
+    )
+    late_fee_type: Optional[str] = Field(
+        default=None,
+        description="Type of late fee (fixed or percentage)"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
-                "title": "Monthly Maintenance Fee",
-                "description": "Regular maintenance charge for January 2025",
-                "amount": "150.00",
-                "charge_type": "maintenance",
-                "due_date": "2025-01-31T00:00:00Z",
-                "status": "pending",
-                "building_id": 1,
-                "unit_id": 101,
-                "recurring": True,
-                "recurring_period": "monthly",
-                "tags": ["maintenance", "monthly"]
+                "fund_id": 1,
+                "name": "Monthly Maintenance",
+                "description": "Regular monthly maintenance charge",
+                "charge_type": "recurring",
+                "status": "active",
+                "amount": "100.00",
+                "frequency": "monthly",
+                "start_date": "2024-01-01",
+                "due_day": 5,
+                "grace_period": 10,
+                "late_fee": "10.00",
+                "late_fee_type": "fixed"
             }
         }
+    )
 
 
 class ChargeCreate(ChargeBase):
     """Schema for creating a new charge"""
-    created_by: str = Field(default="fastapi1403")
-    updated_by: str = Field(default="fastapi1403")
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    pass
 
 
 class ChargeUpdate(BaseSchema):
     """Schema for updating an existing charge"""
-    title: Optional[str] = Field(
+    name: Optional[str] = Field(
         default=None,
-        min_length=3,
+        min_length=2,
         max_length=100
     )
     description: Optional[str] = None
-    amount: Optional[Decimal] = Field(default=None, gt=0)
     charge_type: Optional[ChargeType] = None
-    due_date: Optional[datetime] = None
     status: Optional[ChargeStatus] = None
-    notes: Optional[str] = None
-    tags: Optional[List[str]] = None
-    updated_by: str = Field(default="fastapi1403")
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    amount: Optional[Decimal] = Field(default=None, gt=0)
+    frequency: Optional[ChargeFrequency] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    due_day: Optional[int] = Field(
+        default=None,
+        ge=1,
+        le=31
+    )
+    grace_period: Optional[int] = Field(
+        default=None,
+        ge=0
+    )
+    late_fee: Optional[Decimal] = Field(
+        default=None,
+        ge=0
+    )
+    late_fee_type: Optional[str] = None
 
 
 class ChargeInDB(ChargeBase):
     """Schema for charge as stored in database"""
     id: int = Field(..., description="Unique identifier for the charge")
+    created_at: datetime
+    updated_at: datetime
 
 
 class ChargeResponse(ChargeInDB):
-    """Schema for charge response"""
-    pass
+    """Schema for charge response with additional information"""
+    fund_name: str = Field(..., description="Name of the associated fund")
+    total_units: int = Field(
+        default=0,
+        description="Total number of units this charge applies to"
+    )
+    total_amount: Decimal = Field(
+        default=Decimal('0.00'),
+        description="Total amount to be collected"
+    )
+    collected_amount: Decimal = Field(
+        default=Decimal('0.00'),
+        description="Amount already collected"
+    )
 
 
 class ChargeBulkCreate(BaseSchema):
@@ -124,71 +152,76 @@ class ChargeBulkCreate(BaseSchema):
         min_length=1
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
                 "charges": [
                     {
-                        "title": "Monthly Maintenance Fee",
-                        "description": "Regular maintenance charge for January 2025",
-                        "amount": "150.00",
-                        "charge_type": "maintenance",
-                        "due_date": "2025-01-15 14:24:22",
-                        "status": "pending",
-                        "building_id": 1,
-                        "unit_id": 101,
-                        "recurring": True,
-                        "recurring_period": "monthly",
-                        "tags": ["maintenance", "monthly"],
-                        "created_by": "fastapi1403",
-                        "updated_by": "fastapi1403"
+                        "fund_id": 1,
+                        "name": "Monthly Maintenance",
+                        "description": "Regular monthly maintenance charge",
+                        "charge_type": "recurring",
+                        "status": "active",
+                        "amount": "100.00",
+                        "frequency": "monthly",
+                        "start_date": "2024-01-01",
+                        "due_day": 5,
+                        "grace_period": 10,
+                        "late_fee": "10.00",
+                        "late_fee_type": "fixed"
                     }
                 ]
             }
         }
+    )
+
 
 class ChargeFilter(BaseSchema):
     """Schema for filtering charges"""
-    building_id: Optional[int] = None
-    unit_id: Optional[int] = None
-    floor_id: Optional[int] = None
+    fund_id: Optional[List[int]] = None
     charge_type: Optional[List[ChargeType]] = None
     status: Optional[List[ChargeStatus]] = None
-    date_from: Optional[datetime] = None
-    date_to: Optional[datetime] = None
-    min_amount: Optional[Decimal] = Field(default=None, gt=0)
-    max_amount: Optional[Decimal] = Field(default=None, gt=0)
-    recurring: Optional[bool] = None
-    tags: Optional[List[str]] = None
+    frequency: Optional[List[ChargeFrequency]] = None
+    start_date_from: Optional[date] = None
+    start_date_to: Optional[date] = None
+    min_amount: Optional[Decimal] = Field(default=None, ge=0)
+    max_amount: Optional[Decimal] = Field(default=None, ge=0)
+    search: Optional[str] = Field(
+        default=None,
+        description="Search term for name or description"
+    )
 
 
 class ChargeStatistics(BaseSchema):
     """Schema for charge statistics"""
     total_charges: int = Field(..., description="Total number of charges")
+    active_charges: int = Field(..., description="Number of active charges")
     total_amount: Decimal = Field(..., description="Total amount of all charges")
-    pending_amount: Decimal = Field(..., description="Total amount of pending charges")
-    overdue_amount: Decimal = Field(..., description="Total amount of overdue charges")
-    paid_amount: Decimal = Field(..., description="Total amount of paid charges")
+    collected_amount: Decimal = Field(..., description="Total amount collected")
     by_type: dict = Field(..., description="Charges grouped by type")
     by_status: dict = Field(..., description="Charges grouped by status")
+    by_frequency: dict = Field(..., description="Charges grouped by frequency")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
-                **BaseSchema.Config.json_schema_extra["example"],
-                "total_charges": 150,
-                "total_amount": "25000.00",
-                "pending_amount": "5000.00",
-                "overdue_amount": "1000.00",
-                "paid_amount": "19000.00",
+                "total_charges": 100,
+                "active_charges": 85,
+                "total_amount": "50000.00",
+                "collected_amount": "35000.00",
                 "by_type": {
-                    "maintenance": {"count": 50, "amount": "10000.00"},
-                    "utility": {"count": 100, "amount": "15000.00"}
+                    "recurring": {"count": 80, "amount": "40000.00"},
+                    "one_time": {"count": 20, "amount": "10000.00"}
                 },
                 "by_status": {
-                    "pending": {"count": 20, "amount": "5000.00"},
-                    "paid": {"count": 130, "amount": "20000.00"}
+                    "active": {"count": 85, "amount": "42500.00"},
+                    "inactive": {"count": 15, "amount": "7500.00"}
+                },
+                "by_frequency": {
+                    "monthly": {"count": 60, "amount": "30000.00"},
+                    "quarterly": {"count": 20, "amount": "15000.00"},
+                    "yearly": {"count": 20, "amount": "5000.00"}
                 }
             }
         }
+    )
