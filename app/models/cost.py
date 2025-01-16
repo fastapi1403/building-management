@@ -87,7 +87,6 @@ class Cost(TableBase, table=True):
     building_id: int = Field(..., foreign_key="buildings.id")
     unit_id: Optional[int] = Field(default=None, foreign_key="units.id")
     floor_id: Optional[int] = Field(default=None, foreign_key="floors.id")
-    vendor_id: Optional[int] = Field(default=None, foreign_key="vendors.id")
 
     # Additional metadata
     is_recurring: bool = Field(default=False)

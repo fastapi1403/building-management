@@ -52,10 +52,6 @@ class CostBase(BaseSchema):
         default=None,
         description="ID of the unit if cost is unit-specific"
     )
-    vendor_id: Optional[int] = Field(
-        default=None,
-        description="ID of the vendor if cost is vendor-specific"
-    )
     invoice_number: Optional[str] = Field(
         default=None,
         description="Invoice number if available"
@@ -95,7 +91,6 @@ class CostBase(BaseSchema):
                 "building_id": 1,
                 "floor_id": None,
                 "unit_id": None,
-                "vendor_id": 1,
                 "invoice_number": "INV-2025-001",
                 "payment_date": None,
                 "recurring": True,
@@ -123,7 +118,6 @@ class CostUpdate(BaseSchema):
     status: Optional[CostStatus] = None
     priority: Optional[CostPriority] = None
     due_date: Optional[datetime] = None
-    vendor_id: Optional[int] = None
     invoice_number: Optional[str] = None
     payment_date: Optional[datetime] = None
     notes: Optional[str] = None
@@ -161,7 +155,6 @@ class CostBulkCreate(BaseSchema):
                         "priority": "medium",
                         "due_date": "2025-01-15 14:33:55",
                         "building_id": 1,
-                        "vendor_id": 1,
                         "invoice_number": "INV-2025-001",
                         "recurring": True,
                         "recurring_period": "monthly",
@@ -177,7 +170,6 @@ class CostFilter(BaseSchema):
     building_id: Optional[int] = None
     floor_id: Optional[int] = None
     unit_id: Optional[int] = None
-    vendor_id: Optional[int] = None
     cost_type: Optional[List[CostType]] = None
     status: Optional[List[CostStatus]] = None
     priority: Optional[List[CostPriority]] = None
