@@ -28,7 +28,7 @@ class TenantStatus(str, Enum):
 # Model for representing a tenant in the building management system
 class Tenant(TableBase, table=True):
     __tablename__ = "tenants"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     unit_id: int = Field(foreign_key="units.id", description="ID of the associated unit")
     tenant_type: TenantType = Field(

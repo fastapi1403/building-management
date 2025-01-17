@@ -10,7 +10,7 @@ class Floor(TableBase, table=True):
     Model for representing a floor in a building
     """
     __tablename__ = "floors"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     building_id: int = Field(foreign_key="buildings.id", description="ID of the building this floor belongs to")
     number: int = Field(description="Floor number")

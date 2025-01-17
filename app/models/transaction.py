@@ -49,7 +49,7 @@ class PaymentMethod(str, Enum):
 # Model for representing a transaction in the building management system
 class Transaction(TableBase, table=True):
     __tablename__ = "transactions"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     transaction_type: TransactionType = Field(
         sa_column=Column(SQLEnum(TransactionType)),

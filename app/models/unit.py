@@ -26,7 +26,7 @@ class UnitStatus(str, Enum):
 # Model for representing a unit in the building management system
 class Unit(TableBase, table=True):
     __tablename__ = "units"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     floor_id: int = Field(foreign_key="floors.id", description="ID of the associated floor")
     unit_number: str = Field(..., index=True, description="Unique number of the unit")

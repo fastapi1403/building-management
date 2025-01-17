@@ -30,7 +30,7 @@ class OwnerStatus(str, Enum):
 # Model for representing an owner in the building management system
 class Owner(TableBase, table=True):
     __tablename__ = "owners"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     owner_type: OwnerType = Field(
         sa_column=Column(SQLEnum(OwnerType)),

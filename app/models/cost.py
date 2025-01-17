@@ -51,7 +51,7 @@ class CostStatus(str, Enum):
 # Model for tracking costs and expenses in the building management system
 class Cost(TableBase, table=True):
     __tablename__ = "costs"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     # Basic cost information
     title: str = Field(..., max_length=200)
@@ -148,7 +148,7 @@ class Cost(TableBase, table=True):
 # Model for storing documents related to costs (invoices, receipts, etc.)
 class CostDocument(TableBase, table=True):
     __tablename__ = "cost_documents"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     cost_id: int = Field(..., foreign_key="costs.id")
 

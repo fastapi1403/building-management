@@ -68,7 +68,7 @@ class PaymentMethod(str, Enum):
 # Model for managing building funds and their transactions
 class Fund(TableBase, table=True):
     __tablename__ = "funds"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     # Fund Information
     name: str = Field(..., max_length=100, description="Name of the fund")
@@ -141,7 +141,7 @@ class Fund(TableBase, table=True):
 # Model for tracking fund transactions
 class FundTransaction(TableBase, table=True):
     __tablename__ = "fund_transactions"
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     fund_id: int = Field(..., foreign_key="funds.id", description="ID of the associated fund")
     status: TransactionStatus = Field(
