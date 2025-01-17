@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from zoneinfo import ZoneInfo
 
+from sqlalchemy import text
 from sqlmodel import Field, SQLModel
 from pydantic import ConfigDict
 
@@ -31,18 +32,19 @@ class Base(SQLModel):
 
     # Audit trail fields
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(ZoneInfo("UTC")),
-        sa_column_kwargs={"server_default": "CURRENT_TIMESTAMP"}
-        # nullable=False
-    )
-
-    updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(ZoneInfo("UTC")),
+        default_factory=datetime.now,
         sa_column_kwargs={
-            "server_default": "CURRENT_TIMESTAMP",
-            "onupdate": "CURRENT_TIMESTAMP"
+            "server_default": text("CURRENT_TIMESTAMP"),
+            "nullable": False
         }
-        # nullable=False
+    )
+    updated_at: datetime = Field(
+        default_factory=datetime.now,
+        sa_column_kwargs={
+            "server_default": text("CURRENT_TIMESTAMP"),
+            "onupdate": text("CURRENT_TIMESTAMP"),
+            "nullable": False
+        }
     )
 
     # Soft delete fields
