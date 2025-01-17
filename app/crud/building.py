@@ -236,7 +236,7 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         """
         query = (
             select(Building)
-            .filter(Building.is_deleted.is_(True))  # Ensure proper SQLAlchemy filter expression
+            .where(Building.is_deleted.is_(True))  # Ensure proper SQLAlchemy filter expression
             .offset(skip)
             .limit(limit)
         )
