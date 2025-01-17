@@ -179,6 +179,7 @@ class FundTransaction(TableBase, table=True):
     fund: Fund = Relationship(back_populates="transactions")
     cost: Optional["Cost"] = Relationship(back_populates="fund_transactions")
     charge: Optional["Charge"] = Relationship(back_populates="fund_transactions")
+    transactions: List["FundTransaction"] = Relationship(back_populates="fund")
 
     class Config:
         json_schema_extra = {
