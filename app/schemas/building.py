@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Optional, List
 from sqlmodel import Field
 from app.schemas.base import SchemaBase
@@ -37,7 +38,12 @@ class BuildingUpdate(SchemaBase):
         }
 
 # Base schema for Building in database
-class BuildingInDBBase(SchemaBase):
+class BuildingInDBBase(BuildingBase):
+    id: Optional[int] = Field(None, description="Unique identifier for the record")
+    created_at: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc), description="Date and time when the record was created")
+    updated_at: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc), description="Date and time when the record was last updated")
+    is_deleted: Optional[bool] = Field(default=False, description="Indicates if the record is deleted")
+    deleted_at: Optional[datetime] = Field(None, description="Date and time when the record was deleted")
 
     class Config:
         json_schema_extra = {
@@ -46,8 +52,8 @@ class BuildingInDBBase(SchemaBase):
                 "name": "Sample Building",
                 "total_floors": 10,
                 "description": "Modern residential building with amenities",
-                "created_at": "2025-01-16T15:55:47",
-                "updated_at": "2025-01-17T15:55:47",
+                "created_at": "2025-01-16T15:55:47+00:00",
+                "updated_at": "2025-01-17T15:55:47+00:00",
                 "is_deleted": False,
                 "deleted_at": None,
             }
@@ -70,6 +76,7 @@ class BuildingResponse(Building):
         """
         Calculate the occupancy rate as a percentage
         """
+        # Assuming 'total_units' and 'occupied_units' are attributes of BuildingResponse
         if hasattr(self, 'total_units') and self.total_units > 0:
             return (self.occupied_units / self.total_units) * 100
         return 0.0
