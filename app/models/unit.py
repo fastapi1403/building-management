@@ -45,6 +45,7 @@ class Unit(TableBase, table=True):
     owner: Optional["Owner"] = Relationship(back_populates="units")
     tenant: Optional["Tenant"] = Relationship(back_populates="unit")
     charges: List["Charge"] = Relationship(back_populates="unit")
+    costs: List["Cost"] = Relationship(back_populates="unit")
 
     class Config:
         json_schema_extra = {
@@ -68,3 +69,4 @@ from app.models.charge import Charge  # noqa: E402
 from app.models.owner import Owner  # noqa: E402
 from app.models.floor import Floor  # noqa: E402
 from app.models.tenant import Tenant  # noqa: E402
+from app.models.cost import Cost  # noqa: E402
