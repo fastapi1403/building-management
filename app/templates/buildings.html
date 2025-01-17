@@ -1,47 +1,304 @@
 {% extends "base.html" %}
 
-{% block title %}Buildings - Building Management{% endblock %}
+{% block title %}Buildings Management - Building Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .buildings-container {
+        padding: 1.5rem;
+    }
+
+    .building-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: none;
+        border-radius: 12px;
+    }
+
+    .building-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+
+    .status-active {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-maintenance {
+        background-color: #fff7ed;
+        color: #9a3412;
+    }
+
+    .status-inactive {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+
+    .building-stats {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .action-buttons .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+    }
+
+    .search-box {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 0.75rem 1rem;
+    }
+
+    .filter-dropdown {
+        min-width: 200px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h2 class="mb-4">Buildings</h2>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Number of Floors</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Example data, replace with dynamic content -->
-                    <tr>
-                        <td>1</td>
-                        <td>Building A</td>
-                        <td>10</td>
-                        <td>
-                            <a href="#" class="btn btn-primary btn-sm">View</a>
-                            <a href="#" class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="#" class="btn btn-danger btn-sm">Delete</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Building B</td>
-                        <td>15</td>
-                        <td>
-                            <a href="#" class="btn btn-primary btn-sm">View</a>
-                            <a href="#" class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="#" class="btn btn-danger btn-sm">Delete</a>
-                        </td>
-                    </tr>
-                    <!-- Add more rows as needed -->
-                </tbody>
-            </table>
+<div class="buildings-container">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Buildings Management</h1>
+            <p class="text-muted">Manage and monitor all your buildings</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBuildingModal">
+            <i class="fas fa-plus-circle me-2"></i>Add New Building
+        </button>
+    </div>
+
+    <!-- Filters and Search Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control search-box" placeholder="Search buildings..." id="searchBuilding">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select filter-dropdown" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="maintenance">Under Maintenance</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select filter-dropdown" id="sortBy">
+                        <option value="name">Sort by Name</option>
+                        <option value="units">Sort by Units</option>
+                        <option value="occupancy">Sort by Occupancy</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buildings Grid -->
+    <div class="row g-4">
+        {% for building in buildings %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card building-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">{{ building.name }}</h5>
+{#                        <span class="status-badge status-{{ building.status.lower() }}">#}
+                        <span class="status-badge status-active">
+{#                            {{ building.status }}#}
+                            Active
+                        </span>
+                    </div>
+
+                    <div class="building-stats mb-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-building me-2"></i>
+                                    <span>{{ building.total_floors }} Floors</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-door-open me-2"></i>
+{#                                    <span>{{ building.total_units }} Units</span>#}
+                                    <span>{{ 28 }} Units</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-check me-2"></i>
+{#                                    <span>{{ building.occupancy_rate }}% Occupied</span>#}
+                                    <span>100% Occupied</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-check me-2"></i>
+{#                                    <span>Since {{ building.established_date.strftime('%Y') }}</span>#}
+                                    <span>2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-3" style="height: 6px;">
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+{#                             style="width: {{ building.occupancy_rate }}%"#}
+{#                             aria-valuenow="{{ building.occupancy_rate }}"#}
+                             style="width: 50%"
+                             aria-valuenow="30"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center action-buttons">
+{#                        <a href="{{ url_for('building_details', building_id=building.id) }}"#}
+                        <a href=""
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>Details
+                        </a>
+                        <div class="btn-group">
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    onclick="editBuilding('{{ building.id }}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button"
+                                    class="btn btn-outline-danger"
+                                    onclick="deleteBuilding('{{ building.id }}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Add Building Modal -->
+    <div class="modal fade" id="addBuildingModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Building</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addBuildingForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Building Name</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status" required>
+                                    <option value="active">Active</option>
+                                    <option value="maintenance">Under Maintenance</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Total Floors</label>
+                                <input type="number" class="form-control" name="total_floors" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Total Units</label>
+                                <input type="number" class="form-control" name="total_units" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="2" required></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveBuilding()">Save Building</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Search functionality
+document.getElementById('searchBuilding').addEventListener('keyup', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const buildingCards = document.querySelectorAll('.building-card');
+
+    buildingCards.forEach(card => {
+        const buildingName = card.querySelector('.card-title').textContent.toLowerCase();
+        if (buildingName.includes(searchTerm)) {
+            card.closest('.col-md-6').style.display = '';
+        } else {
+            card.closest('.col-md-6').style.display = 'none';
+        }
+    });
+});
+
+// Status filter
+document.getElementById('statusFilter').addEventListener('change', function(e) {
+    const status = e.target.value.toLowerCase();
+    const buildingCards = document.querySelectorAll('.building-card');
+
+    buildingCards.forEach(card => {
+        const buildingStatus = card.querySelector('.status-badge').textContent.trim().toLowerCase();
+        if (status === '' || buildingStatus === status) {
+            card.closest('.col-md-6').style.display = '';
+        } else {
+            card.closest('.col-md-6').style.display = 'none';
+        }
+    });
+});
+
+// Building operations
+function editBuilding(buildingId) {
+    // Implement edit functionality
+    console.log('Editing building:', buildingId);
+}
+
+function deleteBuilding(buildingId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Implement delete functionality
+            console.log('Deleting building:', buildingId);
+        }
+    });
+}
+
+function saveBuilding() {
+    // Implement save functionality
+    const form = document.getElementById('addBuildingForm');
+    const formData = new FormData(form);
+
+    // Add your API call here
+    console.log('Saving building:', Object.fromEntries(formData));
+
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addBuildingModal'));
+    modal.hide();
+}
+</script>
 {% endblock %}
