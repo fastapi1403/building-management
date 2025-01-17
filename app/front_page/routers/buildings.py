@@ -4,12 +4,11 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
-from app.crud.building import CRUDBuilding
 from app.db.session import get_db
+from crud import crud_building
 
 router = APIRouter(prefix="/dashboard")
 templates = Jinja2Templates(directory="app/templates")
-crud_building = CRUDBuilding()
 
 
 @router.get("/buildings")
