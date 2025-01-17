@@ -27,7 +27,7 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         Returns:
             Created building instance
         """
-        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now(timezone.utc)
         db_obj = Building(
             name=obj_in.name,
             total_floors=obj_in.total_floors,
@@ -63,7 +63,7 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         Returns:
             Updated building instance
         """
-        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now(timezone.utc)
         obj_data = obj_in.model_dump(exclude_unset=True) if isinstance(obj_in, BuildingUpdate) else obj_in
         obj_data.update({
             "updated_at": current_time,
@@ -159,7 +159,7 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         Returns:
             Updated building instance with deletion flags
         """
-        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now(timezone.utc)
         update_data = {
             "is_deleted": True,
             "deleted_by": deleted_by,
@@ -194,7 +194,7 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         Returns:
             Updated building instance with deletion flags removed
         """
-        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now(timezone.utc)
         update_data = {
             "is_deleted": False,
             "deleted_by": None,
