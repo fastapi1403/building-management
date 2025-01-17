@@ -30,6 +30,7 @@ class Unit(TableBase, table=True):
 
     floor_id: int = Field(foreign_key="floors.id", description="ID of the associated floor")
     unit_number: str = Field(..., index=True, description="Unique number of the unit")
+    owner_id: int = Field(foreign_key="owners.id", description="ID of the owner of this unit")
     type: UnitType = Field(default=UnitType.RESIDENTIAL, description="Type of the unit")
     status: UnitStatus = Field(default=UnitStatus.OCCUPIED, description="Status of the unit")
     area: float = Field(description="Area of the unit in square meters")
@@ -62,7 +63,8 @@ class Unit(TableBase, table=True):
         }
 
 
-# Forward references for type hints
-from app.models.charge import Charge
-from app.models.owner import Owner
-from app.models.tenant import Tenant
+# Import at the bottom to avoid circular imports
+from app.models.charge import Charge  # noqa: E402
+from app.models.owner import Owner  # noqa: E402
+from app.models.floor import Floor  # noqa: E402
+from app.models.tenant import Tenant  # noqa: E402
