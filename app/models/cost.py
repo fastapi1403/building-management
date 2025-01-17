@@ -148,9 +148,7 @@ class Cost(TableBase, table=True):
 # Model for storing documents related to costs (invoices, receipts, etc.)
 class CostDocument(TableBase, table=True):
     __tablename__ = "cost_documents"
-    __table_args__ = (
-        {'extend_existing': True},
-    )
+    __table_args__ = {'extend_existing': True}
 
     cost_id: int = Field(..., foreign_key="costs.id")
 

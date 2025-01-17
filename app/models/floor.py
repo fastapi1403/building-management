@@ -1,6 +1,9 @@
 from typing import Optional, List
-from sqlmodel import SQLModel, Field, Relationship
+
+from sqlmodel import Field, Relationship
+
 from app.models.base import TableBase
+
 
 class Floor(TableBase, table=True):
     """
@@ -30,6 +33,7 @@ class Floor(TableBase, table=True):
             }
         }
 
-# Forward references for type hints
-from app.models.building import Building
-from app.models.unit import Unit
+
+# Move these imports to the bottom to avoid circular imports
+from app.models.building import Building  # noqa: E402
+from app.models.unit import Unit  # noqa: E402
