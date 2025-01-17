@@ -32,6 +32,7 @@ class Building(TableBase, table=True):
     # Relationships
     floors: List["Floor"] = Relationship(back_populates="building")
     funds: List["Fund"] = Relationship(back_populates="building")
+    charges: List["Charge"] = Relationship(back_populates="building")
 
     # Example configuration for OpenAPI schema
     class Config:
@@ -47,3 +48,4 @@ class Building(TableBase, table=True):
 # Import at the bottom to avoid circular imports
 from app.models.floor import Floor  # noqa: E402
 from app.models.fund import Fund  # noqa: E402
+from app.models.charge import Charge  # noqa: E402
