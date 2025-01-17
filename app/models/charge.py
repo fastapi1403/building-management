@@ -92,6 +92,7 @@ class Charge(TableBase, table=True):
     tenant: Optional["Tenant"] = Relationship(back_populates="charges")
     building: "Building" = Relationship(back_populates="charges")
     payments: List["Payment"] = Relationship(back_populates="charge")
+    fund_transactions: List["FundTransaction"] = Relationship(back_populates="charge")
 
     class Config:
         json_schema_extra = {
@@ -175,8 +176,9 @@ class Payment(TableBase, table=True):
         }
 
 
-# Forward references for type hints
-from app.models.owner import Owner
-from app.models.tenant import Tenant
-from app.models.building import Building
-from app.models.unit import Unit
+# Import at the bottom to avoid circular imports
+from app.models.building import Building  # noqa: E402
+from app.models.owner import Owner  # noqa: E402
+from app.models.tenant import Tenant  # noqa: E402
+from app.models.unit import Unit  # noqa: E402
+from app.models.fund import FundTransaction  # noqa: E402
