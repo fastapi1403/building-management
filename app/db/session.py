@@ -4,8 +4,10 @@ from core.config import settings
 
 engine = create_async_engine(
     settings.async_database_url,
-    pool_pre_ping=True,
     echo=True,
+    future=True,
+    pool_pre_ping=True,
+    connect_args={"server_settings": {"timezone": "UTC"}}
 )
 
 AsyncSessionLocal = sessionmaker(

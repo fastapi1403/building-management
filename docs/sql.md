@@ -1,0 +1,14 @@
+Drop all tables:
+```sql
+DROP TABLE buildings CASCADE;
+DROP TABLE charges CASCADE;
+DROP TABLE cost_documents CASCADE;
+DROP TABLE costs CASCADE;
+DROP TABLE floors CASCADE;
+DROP TABLE fund_transactions CASCADE;
+DROP TABLE funds CASCADE;
+DROP TABLE owners CASCADE;
+DROP TABLE payments CASCADE;
+DROP TABLE tenants CASCADE;
+DROP TABLE units CASCADE;
+```

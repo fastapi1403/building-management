@@ -12,3 +12,4 @@ python-dotenv
 pydantic-settings
 email-validator
 loguru
+pytz
