@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional, Union
+from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,10 +27,16 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         Returns:
             Created building instance
         """
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         db_obj = Building(
             name=obj_in.name,
             total_floors=obj_in.total_floors,
             description=obj_in.description,
+            created_at=current_time,
+            created_by=created_by,
+            updated_at=current_time,
+            updated_by=created_by,
+            is_deleted=False
         )
         db.add(db_obj)
         await db.commit()
@@ -41,7 +48,8 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
             db: AsyncSession,
             *,
             db_obj: Building,
-            obj_in: Union[BuildingUpdate, Dict[str, Any]]
+            obj_in: Union[BuildingUpdate, Dict[str, Any]],
+            updated_by: str = "fastapi1403"
     ) -> Building:
         """
         Update a building.
@@ -55,10 +63,12 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         Returns:
             Updated building instance
         """
-        obj_data = obj_in.model_dump(exclude_unset=True) if isinstance(
-            obj_in, BuildingUpdate
-        ) else obj_in
-
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        obj_data = obj_in.model_dump(exclude_unset=True) if isinstance(obj_in, BuildingUpdate) else obj_in
+        obj_data.update({
+            "updated_at": current_time,
+            "updated_by": updated_by
+        })
         return await super().update(db, db_obj=db_obj, obj_in=obj_data)
 
     async def get_multi(
@@ -82,10 +92,8 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
             List of building instances
         """
         query = select(Building)
-
         if status:
             query = query.filter(Building.status == status)
-
         query = query.offset(skip).limit(limit)
         result = await db.execute(query)
         return result.scalars().all()
@@ -123,7 +131,6 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         Returns:
             Dictionary containing building statistics
         """
-        # Total buildings
         total_query = select(Building).filter(Building.is_deleted == False)
         total_result = await db.execute(total_query)
         total_buildings = len(total_result.scalars().all())
@@ -134,120 +141,121 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
             "occupied_units": sum(b.occupied_units for b in (await self.get_multi(db)))
         }
 
+    async def delete(
+            self,
+            db: AsyncSession,
+            *,
+            db_obj: Building,
+            deleted_by: str = "fastapi1403"
+    ) -> Building:
+        """
+        Soft delete a building by setting is_deleted flag and recording deletion metadata.
 
-async def delete(
-        self,
-        db: AsyncSession,
-        *,
-        db_obj: Building,
-        deleted_by: str = "fastapi1403",
-        deleted_at: str = "2025-01-16 12:05:00"
-) -> Building:
-    """
-    Soft delete a building by setting is_deleted flag and recording deletion metadata.
+        Args:
+            db: Database session
+            db_obj: Building instance to delete
+            deleted_by: Username of person performing the deletion
 
-    Args:
-        db: Database session
-        db_obj: Building instance to delete
-        deleted_by: Username of person performing the deletion
-        deleted_at: Timestamp of deletion in UTC
+        Returns:
+            Updated building instance with deletion flags
+        """
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        update_data = {
+            "is_deleted": True,
+            "deleted_by": deleted_by,
+            "deleted_at": current_time,
+            "status": "inactive",
+            "updated_at": current_time,
+            "updated_by": deleted_by
+        }
 
-    Returns:
-        Updated building instance with deletion flags
-    """
-    update_data = {
-        "is_deleted": True,
-        "deleted_by": deleted_by,
-        "deleted_at": deleted_at,
-        "status": "inactive"  # Automatically set status to inactive when deleted
-    }
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
 
-    for field, value in update_data.items():
-        setattr(db_obj, field, value)
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
 
-    await db.commit()
-    await db.refresh(db_obj)
-    return db_obj
+    async def restore(
+            self,
+            db: AsyncSession,
+            *,
+            db_obj: Building,
+            restored_by: str = "fastapi1403"
+    ) -> Building:
+        """
+        Restore a soft-deleted building.
 
+        Args:
+            db: Database session
+            db_obj: Building instance to restore
+            restored_by: Username of person performing the restoration
 
-async def restore(
-        self,
-        db: AsyncSession,
-        *,
-        db_obj: Building,
-        restored_by: str = "fastapi1403",
-        restored_at: str = "2025-01-16 12:05:00"
-) -> Building:
-    """
-    Restore a soft-deleted building.
+        Returns:
+            Updated building instance with deletion flags removed
+        """
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        update_data = {
+            "is_deleted": False,
+            "deleted_by": None,
+            "deleted_at": None,
+            "status": "active",
+            "updated_by": restored_by,
+            "updated_at": current_time
+        }
 
-    Args:
-        db: Database session
-        db_obj: Building instance to restore
-        restored_by: Username of person performing the restoration
-        restored_at: Timestamp of restoration in UTC
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
 
-    Returns:
-        Updated building instance with deletion flags removed
-    """
-    update_data = {
-        "is_deleted": False,
-        "deleted_by": None,
-        "deleted_at": None,
-        "status": "active",  # Restore to active status
-        "updated_by": restored_by,
-        "updated_at": restored_at
-    }
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
 
-    for field, value in update_data.items():
-        setattr(db_obj, field, value)
+    from sqlalchemy import and_
 
-    await db.commit()
-    await db.refresh(db_obj)
-    return db_obj
+    from typing import List
+    from sqlalchemy import select
 
+    async def get_deleted(
+            self,
+            db: AsyncSession,
+            *,
+            skip: int = 0,
+            limit: int = 100
+    ) -> List[Building]:
+        """
+        Get list of soft-deleted buildings.
 
-async def get_deleted(
-        self,
-        db: AsyncSession,
-        *,
-        skip: int = 0,
-        limit: int = 100
-) -> List[Building]:
-    """
-    Get list of soft-deleted buildings.
+        Args:
+            db: Database session
+            skip: Number of records to skip
+            limit: Maximum number of records to return
 
-    Args:
-        db: Database session
-        skip: Number of records to skip
-        limit: Maximum number of records to return
+        Returns:
+            List of deleted building instances
+        """
+        query = (
+            select(Building)
+            .filter(Building.is_deleted.is_(True))  # Ensure proper SQLAlchemy filter expression
+            .offset(skip)
+            .limit(limit)
+        )
+        result = await db.execute(query)
+        return list(result.scalars().all())  # Explicitly convert to list
 
-    Returns:
-        List of deleted building instances
-    """
-    query = (
-        select(Building)
-        .filter(Building.is_deleted == True)
-        .offset(skip)
-        .limit(limit)
-    )
-    result = await db.execute(query)
-    return result.scalars().all()
+    async def hard_delete(
+            self,
+            db: AsyncSession,
+            *,
+            db_obj: Building
+    ) -> None:
+        """
+        Permanently delete a building from the database.
+        WARNING: This operation cannot be undone.
 
-
-async def hard_delete(
-        self,
-        db: AsyncSession,
-        *,
-        db_obj: Building
-) -> None:
-    """
-    Permanently delete a building from the database.
-    WARNING: This operation cannot be undone.
-
-    Args:
-        db: Database session
-        db_obj: Building instance to permanently delete
-    """
-    await db.delete(db_obj)
-    await db.commit()
+        Args:
+            db: Database session
+            db_obj: Building instance to permanently delete
+        """
+        await db.delete(db_obj)
+        await db.commit()

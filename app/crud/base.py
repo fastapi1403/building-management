@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -57,7 +57,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Create new record.
         """
         obj_in_data = obj_in.model_dump()
-        current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
         # Add audit fields
         obj_in_data.update({
@@ -94,7 +94,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         # Add audit fields
         update_data.update({
-            "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
             "updated_by": updated_by
         })
 
@@ -116,7 +116,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         Soft delete record.
         """
-        current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
         setattr(db_obj, "is_deleted", True)
         setattr(db_obj, "deleted_at", current_time)
@@ -138,7 +138,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         Restore soft-deleted record.
         """
-        current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
         setattr(db_obj, "is_deleted", False)
         setattr(db_obj, "deleted_at", None)
