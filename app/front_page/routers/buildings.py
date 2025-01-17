@@ -11,14 +11,14 @@ router = APIRouter(prefix="/dashboard")
 templates = Jinja2Templates(directory="app/templates")
 
 
-@router.get("/buildings")
+@router.get("/buildings", name="buildings")
 async def buildings_page(
         request: Request,
         db: Session = Depends(get_db)
 ):
     buildings = await crud_building.get_multi(db=db)
     return templates.TemplateResponse(
-        "dashboard/buildings.html",
+        "buildings.html",
         {
             "request": request,
             "buildings": buildings,

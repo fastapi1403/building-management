@@ -1,28 +1,245 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Building Management{% endblock %}
+{% block title %}Home - Building Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(rgba(33, 37, 41, 0.7), rgba(33, 37, 41, 0.7)),
+                    url('https://source.unsplash.com/1600x900/?modern-building');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 120px 0;
+        margin-top: -56px;
+    }
+
+    /* Features */
+    .feature-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 12px;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background-color: var(--bs-primary);
+        color: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Stats Section */
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--bs-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    /* Welcome Card */
+    .welcome-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        background-color: var(--bs-primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="jumbotron text-center">
-    <h1 class="display-4">Welcome to Building Management</h1>
-    <p class="lead">Efficiently manage your buildings and facilities with ease.</p>
-    <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}" role="button">Go to Dashboard</a>
-</div>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">Welcome to Building Management System</h1>
+                <p class="lead mb-4">Efficiently manage your properties with our comprehensive building management solution</p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4 me-sm-3">Go to Dashboard</a>
+                    <a href="#features" class="btn btn-outline-light btn-lg px-4">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div class="container">
-    <div class="row text-center">
-        <div class="col-lg-4">
-            <h2>Feature 1</h2>
-            <p>Details about the first feature that helps in building management.</p>
+<!-- Welcome Card for Logged In User -->
+<div class="container mt-5">
+    <div class="welcome-card mb-5">
+        <div class="d-flex align-items-center mb-4">
+            <div class="user-avatar me-3">
+                <i class="fas fa-user"></i>
+            </div>
+            <div>
+                <h4 class="mb-1">Welcome back, {{ username }}</h4>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-clock me-2"></i>{{ current_time }} UTC
+                </p>
+            </div>
         </div>
-        <div class="col-lg-4">
-            <h2>Feature 2</h2>
-            <p>Details about the second feature that enhances user experience.</p>
-        </div>
-        <div class="col-lg-4">
-            <h2>Feature 3</h2>
-            <p>Details about the third feature that provides valuable insights.</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-building text-primary me-2"></i>
+                    <span>Total Buildings: 12</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-tasks text-success me-2"></i>
+                    <span>Pending Tasks: 5</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-bell text-warning me-2"></i>
+                    <span>New Notifications: 3</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Features Section -->
+<section id="features" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Key Features</h2>
+            <p class="text-muted">Discover what makes our building management system unique</p>
+        </div>
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mx-auto">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                        <h4>Real-time Analytics</h4>
+                        <p class="text-muted">Monitor building performance and occupancy rates with detailed analytics</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mx-auto">
+                            <i class="fas fa-tools fa-2x"></i>
+                        </div>
+                        <h4>Maintenance Management</h4>
+                        <p class="text-muted">Track and manage maintenance requests efficiently</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mx-auto">
+                            <i class="fas fa-file-invoice-dollar fa-2x"></i>
+                        </div>
+                        <h4>Financial Tracking</h4>
+                        <p class="text-muted">Manage expenses and generate financial reports easily</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number">500+</div>
+                    <div class="text-muted">Buildings Managed</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number">98%</div>
+                    <div class="text-muted">Customer Satisfaction</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number">24/7</div>
+                    <div class="text-muted">Support Available</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number">50k+</div>
+                    <div class="text-muted">Users Active</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to get started?</h2>
+        <p class="lead mb-4">Join thousands of property managers who trust our system</p>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg px-4">
+            Access Dashboard
+            <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
 {% endblock %}
