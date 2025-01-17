@@ -59,6 +59,19 @@
     .filter-dropdown {
         min-width: 200px;
     }
+
+    .is-invalid {
+    border-color: #dc3545;
+    }
+
+    .is-valid {
+        border-color: #198754;
+    }
+
+    .form-loading {
+        opacity: 0.7;
+        pointer-events: none;
+    }
 </style>
 {% endblock %}
 
@@ -188,6 +201,7 @@
     <!-- Add Building Modal -->
     <div class="modal fade" id="addBuildingModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
+            <form id="buildingForm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add New Building</h5>
@@ -198,27 +212,15 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Building Name</label>
-                                <input type="text" class="form-control" name="name" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" name="status" required>
-                                    <option value="active">Active</option>
-                                    <option value="maintenance">Under Maintenance</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
+                                <input type="text" class="form-control" name="name" id="buildingName" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Total Floors</label>
-                                <input type="number" class="form-control" name="total_floors" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Total Units</label>
-                                <input type="number" class="form-control" name="total_units" required>
+                                <input type="number" class="form-control" name="total_floors" id="buildingFloors" required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Address</label>
-                                <textarea class="form-control" name="address" rows="2" required></textarea>
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description" rows="2" id="buildingDescription"></textarea>
                             </div>
                         </div>
                     </form>
@@ -228,12 +230,16 @@
                     <button type="button" class="btn btn-primary" onclick="saveBuilding()">Save Building</button>
                 </div>
             </div>
+            </form>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
 // Search functionality
 document.getElementById('searchBuilding').addEventListener('keyup', function(e) {
@@ -288,17 +294,154 @@ function deleteBuilding(buildingId) {
     });
 }
 
-function saveBuilding() {
-    // Implement save functionality
-    const form = document.getElementById('addBuildingForm');
-    const formData = new FormData(form);
+async function saveBuilding() {
+    // Get form data
+    const buildingData = {
+        name: document.getElementById('buildingName').value,
+        total_floors: parseInt(document.getElementById('buildingFloors').value),
+        description: document.getElementById('buildingDescription').value,
+    };
 
-    // Add your API call here
-    console.log('Saving building:', Object.fromEntries(formData));
+    // Form validation
+    if (!validateBuildingData(buildingData)) {
+        return false;
+    }
 
-    // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addBuildingModal'));
+    try {
+        // Get building ID if it exists (for update)
+        const buildingId = document.getElementById('buildingId')?.value;
+        const url = buildingId ?
+            `{{ url_for("api_v1_update_building", building_id=${buildingId) }}` :
+            '{{ url_for("api_v1_create_building") }}';
+        const method = buildingId ? 'PUT' : 'POST';
+
+        // Send request to server
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken() // Get CSRF token from cookie
+            },
+            body: JSON.stringify(buildingData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        // Show success message
+        Swal.fire({
+            title: 'Success!',
+            text: buildingId ? 'Building updated successfully!' : 'Building created successfully!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to buildings list
+                window.location.href = '/buildings';
+            }
+        });
+
+        // Clear form
+        resetForm();
+
+        // Refresh building list if we're on the buildings page
+        if (typeof loadBuildings === 'function') {
+            loadBuildings();
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'There was an error saving the building. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+
     modal.hide();
 }
+
+// Validation function
+function validateBuildingData(data) {
+    // Required fields
+    const requiredFields = ['name', 'total_floors'];
+
+    for (const field of requiredFields) {
+        if (!data[field]) {
+            Swal.fire({
+                title: 'Validation Error',
+                text: `${field.replace('_', ' ').toUpperCase()} is required!`,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+    }
+
+    // Numeric validations
+    if (data.total_floors < 1) {
+        Swal.fire({
+            title: 'Validation Error',
+            text: 'Number of floors must be at least 1',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+        return false;
+    }
+
+    return true;
+}
+
+// Helper function to get CSRF token
+function getCsrfToken() {
+    const name = 'csrftoken';
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Helper function to reset form
+function resetForm() {
+    document.getElementById('buildingForm').reset();
+    // Reset any custom form elements (select2, datepicker, etc.)
+    if ($.fn.select2) {
+        $('.select2').val('').trigger('change');
+    }
+}
+
+// Event listener for form submission
+document.getElementById('buildingForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    saveBuilding();
+});
+
+// Form validation on input
+document.querySelectorAll('#buildingForm input, #buildingForm select').forEach(element => {
+    element.addEventListener('input', function(e) {
+        // Remove validation classes
+        this.classList.remove('is-invalid');
+        this.classList.remove('is-valid');
+
+        // Add appropriate class based on validity
+        if (this.checkValidity()) {
+            this.classList.add('is-valid');
+        } else {
+            this.classList.add('is-invalid');
+        }
+    });
+});
 </script>
 {% endblock %}

@@ -21,7 +21,7 @@ async def read_buildings(
     buildings = await crud.building.get_multi(db, skip=skip, limit=limit)
     return buildings
 
-@router.post("/", response_model=BuildingResponse)
+@router.post("/", response_model=BuildingResponse, name="api_v1_create_building")
 async def create_building(
         *,
         db: AsyncSession = Depends(get_db),
@@ -32,7 +32,7 @@ async def create_building(
     """
     return await crud.building.create(db=db, obj_in=building_in)
 
-@router.get("/{building_id}", response_model=BuildingResponse)
+@router.get("/{building_id}", response_model=BuildingResponse, name="api_v1_read_building")
 async def read_building(
         building_id: int,
         db: AsyncSession = Depends(get_db)
@@ -48,7 +48,7 @@ async def read_building(
         )
     return building
 
-@router.put("/{building_id}", response_model=BuildingResponse)
+@router.put("/{building_id}", response_model=BuildingResponse, name="api_v1_update_building")
 async def update_building(
         *,
         db: AsyncSession = Depends(get_db),
@@ -71,7 +71,7 @@ async def update_building(
     )
     return building
 
-@router.delete("/{building_id}", response_model=BuildingResponse)
+@router.delete("/{building_id}", response_model=BuildingResponse, name="api_v1_delete_building")
 async def delete_building(
         *,
         building_id: int,
@@ -95,7 +95,7 @@ async def delete_building(
 
     return await crud.building.delete(db=db, db_obj=building)
 
-@router.post("/{building_id}/restore", response_model=BuildingResponse)
+@router.post("/{building_id}/restore", response_model=BuildingResponse, name="api_v1_restore_building")
 async def restore_building(
         *,
         building_id: int,
