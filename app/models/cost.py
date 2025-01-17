@@ -101,6 +101,7 @@ class Cost(TableBase, table=True):
     unit: Optional["Unit"] = Relationship(back_populates="costs")
     floor: Optional["Floor"] = Relationship(back_populates="costs")
     documents: List["CostDocument"] = Relationship(back_populates="cost")
+    transactions: List["FundTransaction"] = Relationship(back_populates="cost")
 
     class Config:
         json_schema_extra = {
@@ -178,7 +179,8 @@ class CostDocument(TableBase, table=True):
         }
 
 
-# Forward references for type hints
-from app.models.building import Building
-from app.models.floor import Floor
-from app.models.unit import Unit
+# Import at the bottom to avoid circular imports
+from app.models.building import Building  # noqa: E402
+from app.models.floor import Floor  # noqa: E402
+from app.models.unit import Unit  # noqa: E402
+from app.models.fund import FundTransaction  # noqa: E402
