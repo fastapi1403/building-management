@@ -101,7 +101,7 @@ class Cost(TableBase, table=True):
     unit: Optional["Unit"] = Relationship(back_populates="costs")
     floor: Optional["Floor"] = Relationship(back_populates="costs")
     documents: List["CostDocument"] = Relationship(back_populates="cost")
-    transactions: List["FundTransaction"] = Relationship(back_populates="cost")
+    fund_transactions: List["FundTransaction"] = Relationship(back_populates="cost")
 
     class Config:
         json_schema_extra = {
