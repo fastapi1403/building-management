@@ -108,7 +108,7 @@ class Fund(TableBase, table=True):
 
     # Relationships
     building: "Building" = Relationship(back_populates="funds")
-    transactions: List["FundTransaction"] = Relationship(back_populates="fund")
+    transactions: List["Transaction"] = Relationship(back_populates="fund")
 
     class Config:
         json_schema_extra = {
@@ -200,3 +200,4 @@ class FundTransaction(TableBase, table=True):
 from app.models.building import Building
 from app.models.charge import Charge
 from app.models.cost import Cost
+from app.models.transaction import Transaction
