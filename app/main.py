@@ -16,6 +16,11 @@ from app.api.v1 import (
     charges,
     # costs,
 )
+from app.front_page.routers import (
+    dashboard as front_page_dashboard,
+    buildings as front_page_buildings,
+    home as front_page_home,
+)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -55,8 +60,10 @@ app.include_router(units.router, prefix=settings.API_V1_STR, tags=["units"])
 # app.include_router(tenants.router, prefix=settings.API_V1_STR, tags=["tenants"])
 # app.include_router(funds.router, prefix=settings.API_V1_STR, tags=["funds"])
 # app.include_router(transactions.router, prefix=settings.API_V1_STR, tags=["transactions"])
-app.include_router(charges.router, prefix=settings.API_V1_STR, tags=["charges"])
-# app.include_router(costs.router, prefix=settings.API_V1_STR, tags=["costs"])
+app.include_router(front_page_dashboard.router, prefix="", tags=["dashboards"])
+app.include_router(front_page_buildings.router, prefix="", tags=["dashboards"])
+app.include_router(front_page_home.router, prefix="", tags=["dashboards"])
+
 
 # Add health check endpoint
 @app.get("/health")

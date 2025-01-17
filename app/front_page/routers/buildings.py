@@ -5,9 +5,9 @@ from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
 from app.crud.building import CRUDBuilding
-from app.db.session import get_session
+from app.db.session import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/dashboard")
 templates = Jinja2Templates(directory="app/templates")
 crud_building = CRUDBuilding()
 
@@ -15,7 +15,7 @@ crud_building = CRUDBuilding()
 @router.get("/buildings")
 async def buildings_page(
         request: Request,
-        db: Session = Depends(get_session)
+        db: Session = Depends(get_db)
 ):
     buildings = await crud_building.get_multi(db=db)
     return templates.TemplateResponse(
