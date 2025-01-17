@@ -8,7 +8,7 @@ from app.db.session import get_db
 from crud import crud_building
 
 router = APIRouter(prefix="/dashboard")
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/buildings")
@@ -18,7 +18,7 @@ async def buildings_page(
 ):
     buildings = await crud_building.get_multi(db=db)
     return templates.TemplateResponse(
-        "buildings.html",
+        "dashboard/buildings.html",
         {
             "request": request,
             "buildings": buildings,
