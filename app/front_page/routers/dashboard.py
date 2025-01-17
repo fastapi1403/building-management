@@ -8,7 +8,7 @@ from app.db.session import get_db
 from crud import crud_building
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/dashboard")
@@ -30,6 +30,5 @@ async def dashboard_page(
             "buildings": buildings,
             "stats": building_stats,
             "current_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "username": "fastapi1403"
         }
     )
