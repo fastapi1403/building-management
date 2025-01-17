@@ -237,6 +237,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -311,8 +312,8 @@ async function saveBuilding() {
         // Get building ID if it exists (for update)
         const buildingId = document.getElementById('buildingId')?.value;
         const url = buildingId ?
-            `{{ url_for("api_v1_update_building", building_id=${buildingId) }}` :
-            '{{ url_for("api_v1_create_building") }}';
+            `{{ url_for('api_v1_update_building', building_id='${buildingId}') }}` :
+            '{{ url_for('api_v1_create_building') }}';
         const method = buildingId ? 'PUT' : 'POST';
 
         // Send request to server
@@ -320,7 +321,7 @@ async function saveBuilding() {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken() // Get CSRF token from cookie
+                'X-CSRFToken': getCsrfToken()
             },
             body: JSON.stringify(buildingData)
         });
@@ -330,6 +331,12 @@ async function saveBuilding() {
         }
 
         const result = await response.json();
+
+        // Hide the modal properly using Bootstrap's Modal API
+        const buildingModal = bootstrap.Modal.getInstance(document.getElementById('addBuildingModal'));
+        if (buildingModal) {
+            buildingModal.hide();
+        }
 
         // Show success message
         Swal.fire({
@@ -361,10 +368,7 @@ async function saveBuilding() {
             confirmButtonText: 'OK'
         });
     }
-
-    modal.hide();
 }
-
 // Validation function
 function validateBuildingData(data) {
     // Required fields
