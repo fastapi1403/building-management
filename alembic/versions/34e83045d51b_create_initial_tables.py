@@ -1,8 +1,8 @@
 """create initial tables
 
-Revision ID: 833db60553b3
+Revision ID: 34e83045d51b
 Revises: 
-Create Date: 2025-01-17 09:53:37.127056
+Create Date: 2025-01-17 11:23:35.038145
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = '833db60553b3'
+revision: str = '34e83045d51b'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -232,35 +232,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_cost_documents_is_deleted'), 'cost_documents', ['is_deleted'], unique=False)
-    op.create_table('transactions',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.Column('is_deleted', sa.Boolean(), nullable=False),
-    sa.Column('deleted_at', sa.DateTime(), nullable=True),
-    sa.Column('transaction_type', sa.Enum('RENT', 'DEPOSIT', 'MAINTENANCE', 'UTILITY', 'PARKING', 'FINE', 'REFUND', 'ADJUSTMENT', 'OTHER', name='transactiontype'), nullable=True),
-    sa.Column('status', sa.Enum('PENDING', 'COMPLETED', 'FAILED', 'CANCELLED', 'REFUNDED', 'PARTIAL', 'OVERDUE', 'DISPUTED', name='transactionstatus'), nullable=True),
-    sa.Column('payment_method', sa.Enum('CASH', 'BANK_TRANSFER', 'CHECK', 'CREDIT_CARD', 'DEBIT_CARD', 'MOBILE_PAYMENT', 'ONLINE_PAYMENT', 'OTHER', name='paymentmethod'), nullable=True),
-    sa.Column('building_id', sa.Integer(), nullable=False),
-    sa.Column('unit_id', sa.Integer(), nullable=False),
-    sa.Column('tenant_id', sa.Integer(), nullable=False),
-    sa.Column('fund_id', sa.Integer(), nullable=False),
-    sa.Column('type', sa.Enum('RENT', 'DEPOSIT', 'MAINTENANCE', 'UTILITY', 'PARKING', 'FINE', 'REFUND', 'ADJUSTMENT', 'OTHER', name='transactiontype'), nullable=False),
-    sa.Column('amount', sa.Float(), nullable=False),
-    sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('reference_number', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('due_date', sa.DateTime(), nullable=False),
-    sa.Column('payment_date', sa.DateTime(), nullable=True),
-    sa.Column('late_fee', sa.Numeric(), nullable=True),
-    sa.Column('discount', sa.Numeric(), nullable=True),
-    sa.Column('notes', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.ForeignKeyConstraint(['building_id'], ['buildings.id'], ),
-    sa.ForeignKeyConstraint(['fund_id'], ['funds.id'], ),
-    sa.ForeignKeyConstraint(['tenant_id'], ['tenants.id'], ),
-    sa.ForeignKeyConstraint(['unit_id'], ['units.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_transactions_is_deleted'), 'transactions', ['is_deleted'], unique=False)
     op.create_table('fund_transactions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -310,8 +281,6 @@ def downgrade() -> None:
     op.drop_table('payments')
     op.drop_index(op.f('ix_fund_transactions_is_deleted'), table_name='fund_transactions')
     op.drop_table('fund_transactions')
-    op.drop_index(op.f('ix_transactions_is_deleted'), table_name='transactions')
-    op.drop_table('transactions')
     op.drop_index(op.f('ix_cost_documents_is_deleted'), table_name='cost_documents')
     op.drop_table('cost_documents')
     op.drop_index(op.f('ix_charges_is_deleted'), table_name='charges')

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from sqlmodel import Field, SQLModel
 from pydantic import ConfigDict
@@ -14,13 +14,13 @@ class Base(SQLModel):
         from_attributes=True,
         arbitrary_types_allowed = True,
         json_encoders = {
-            datetime: lambda dt: dt.strftime("%Y-%m-%d %H:%M:%S")
+            datetime: lambda dt: dt.isoformat()
         },
         json_schema_extra={
             "example": {
                 "id": 1,
-                "created_at": "2025-01-16 14:14:34",
-                "updated_at": "2025-01-16 14:14:34",
+                "created_at": "2025-01-16T14:14:34+00:00",
+                "updated_at": "2025-01-16T14:14:34+00:00",
             }
         }
     )
@@ -29,18 +29,12 @@ class Base(SQLModel):
 
     # Audit trail fields
     created_at: datetime = Field(
-        default_factory=lambda: datetime.strptime(
-            "2025-01-16 14:14:34",
-            "%Y-%m-%d %H:%M:%S"
-        ),
+        default_factory=lambda: datetime.now(timezone.utc),
         nullable=False
     )
 
     updated_at: datetime = Field(
-        default_factory=lambda: datetime.strptime(
-            "2025-01-16 14:14:34",
-            "%Y-%m-%d %H:%M:%S"
-        ),
+        default_factory=lambda: datetime.now(timezone.utc),
         nullable=False
     )
 
@@ -61,10 +55,7 @@ class Base(SQLModel):
         Update model instance with provided values
         Updates audit trail automatically
         """
-        current_time = datetime.strptime(
-            "2025-01-16 14:14:34",
-            "%Y-%m-%d %H:%M:%S"
-        )
+        current_time = datetime.now(timezone.utc)
 
         for key, value in kwargs.items():
             if hasattr(self, key):
@@ -77,10 +68,7 @@ class Base(SQLModel):
         Soft delete the record
         Sets is_deleted flag and updates audit trail
         """
-        current_time = datetime.strptime(
-            "2025-01-16 14:14:34",
-            "%Y-%m-%d %H:%M:%S"
-        )
+        current_time = datetime.now(timezone.utc)
 
         self.is_deleted = True
         self.deleted_at = current_time
@@ -91,10 +79,7 @@ class Base(SQLModel):
         Restore a soft-deleted record
         Clears deletion flags and updates audit trail
         """
-        current_time = datetime.strptime(
-            "2025-01-16 14:14:34",
-            "%Y-%m-%d %H:%M:%S"
-        )
+        current_time = datetime.now(timezone.utc)
 
         self.is_deleted = False
         self.deleted_at = None
