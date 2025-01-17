@@ -79,7 +79,6 @@ class Transaction(TableBase, table=True):
     notes: Optional[str] = Field(default=None, description="Additional notes about the transaction")
 
     # Relationships
-    fund: "Fund" = Relationship(back_populates="transactions")
 
     class Config:
         json_schema_extra = {
