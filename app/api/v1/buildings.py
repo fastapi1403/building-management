@@ -9,7 +9,6 @@ from db.session import get_db
 
 router = APIRouter(prefix="/buildings", tags=["buildings"])
 
-
 @router.get("/", response_model=List[BuildingResponse])
 async def read_buildings(
         skip: int = 0,
@@ -22,7 +21,6 @@ async def read_buildings(
     buildings = await crud.building.get_multi(db, skip=skip, limit=limit)
     return buildings
 
-
 @router.post("/", response_model=BuildingResponse)
 async def create_building(
         *,
@@ -33,7 +31,6 @@ async def create_building(
     Create new building.
     """
     return await crud.building.create(db=db, obj_in=building_in)
-
 
 @router.get("/{building_id}", response_model=BuildingResponse)
 async def read_building(
@@ -50,7 +47,6 @@ async def read_building(
             detail="Building not found"
         )
     return building
-
 
 @router.put("/{building_id}", response_model=BuildingResponse)
 async def update_building(
@@ -74,7 +70,6 @@ async def update_building(
         obj_in=building_in
     )
     return building
-
 
 @router.delete("/{building_id}", response_model=BuildingResponse)
 async def delete_building(
@@ -100,7 +95,6 @@ async def delete_building(
 
     return await crud.building.delete(db=db, db_obj=building)
 
-
 @router.post("/{building_id}/restore", response_model=BuildingResponse)
 async def restore_building(
         *,
@@ -125,7 +119,6 @@ async def restore_building(
 
     return await crud.building.restore(db=db, db_obj=building)
 
-
 @router.get("/deleted/", response_model=List[BuildingResponse])
 async def get_deleted_buildings(
         skip: int = 0,
@@ -136,7 +129,6 @@ async def get_deleted_buildings(
     Retrieve all soft-deleted buildings.
     """
     return await crud.building.get_deleted(db=db, skip=skip, limit=limit)
-
 
 @router.delete("/{building_id}/permanent", response_model=dict)
 async def permanent_delete_building(
