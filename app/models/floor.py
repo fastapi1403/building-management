@@ -21,6 +21,7 @@ class Floor(TableBase, table=True):
     # Relationships
     building: "Building" = Relationship(back_populates="floors")
     units: List["Unit"] = Relationship(back_populates="floor")
+    costs: List["Cost"] = Relationship(back_populates="floor")
 
     class Config:
         json_schema_extra = {
@@ -37,3 +38,4 @@ class Floor(TableBase, table=True):
 # Move these imports to the bottom to avoid circular imports
 from app.models.building import Building  # noqa: E402
 from app.models.unit import Unit  # noqa: E402
+from app.models.cost import Cost  # noqa: E402
