@@ -25,3 +25,15 @@ async def buildings_page(
             "current_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
     )
+
+
+@router.get("/buildings/{building_id}", name="building_detail")
+async def building_detail(request: Request, building_id: int):
+    # Fetch and return building details
+    return templates.TemplateResponse(
+        "building_detail.html",
+        {
+            "request": request,
+            "building": building
+        }
+    )
