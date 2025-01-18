@@ -266,9 +266,99 @@ document.getElementById('statusFilter').addEventListener('change', function(e) {
 });
 
 // Building operations
-function editBuilding(buildingId) {
-    // Implement edit functionality
-    console.log('Editing building:', buildingId);
+async function editBuilding(buildingId) {
+    try {
+        // Show loading state
+        Swal.fire({
+            title: 'Loading...',
+            text: 'Fetching building details',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Fetch building details from the server
+        const response = await fetch(`{{ url_for("api_v1_read_building", building_id="${buildingId}") }}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const building = await response.json();
+
+        // Close loading dialog
+        Swal.close();
+
+        // Get the modal element and its components
+        const modal = document.getElementById('addBuildingModal');
+        const modalTitle = modal.querySelector('.modal-title');
+        modalTitle.textContent = 'Edit Building';
+
+        // Populate form fields
+        document.getElementById('buildingName').value = building.name || '';
+        document.getElementById('buildingFloors').value = building.total_floors || '';
+        document.getElementById('buildingDescription').value = building.description || '';
+
+        {#// Add audit information#}
+        {#const auditInfo = {#}
+        {#    created_by: building.created_by || 'fastapi1403',#}
+        {#    created_at: building.created_at || '2025-01-18 05:30:25',#}
+        {#    last_updated: '2025-01-18 05:30:25',#}
+        {#    updated_by: 'fastapi1403'#}
+        {# };#}
+        {##}
+        {#// Store audit info in a data attribute#}
+        {#modal.dataset.auditInfo = JSON.stringify(auditInfo);#}
+
+        // Show the modal
+        const buildingModal = new bootstrap.Modal(modal);
+        buildingModal.show();
+
+        // Add form validation listeners
+        const form = document.getElementById('buildingForm');
+        const inputs = form.querySelectorAll('input, textarea');
+
+        inputs.forEach(input => {
+            // Remove existing validation classes
+            input.classList.remove('is-invalid', 'is-valid');
+
+            // Add validation listeners
+            input.addEventListener('input', function() {
+                if (this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // Update form submission handler
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            console.log('saveBuilding(buildingId) --> buildingId', )
+            await saveBuilding(buildingId);
+        };
+
+    } catch (error) {
+        console.error('Error fetching building details:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Failed to load building details. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#dc3545'
+        });
+    }
 }
 
 async function deleteBuilding(buildingId) {
@@ -351,7 +441,7 @@ async function deleteBuilding(buildingId) {
     }
 }
 
-async function saveBuilding() {
+async function saveBuilding(buildingId=null) {
     // Get form data
     const buildingData = {
         name: document.getElementById('buildingName').value,
@@ -366,12 +456,14 @@ async function saveBuilding() {
 
     try {
         // Get building ID if it exists (for update)
-        const buildingId = document.getElementById('buildingId')?.value;
+        {#const buildingId = document.getElementById('buildingId')?.value;#}
         const url = buildingId ?
             `{{ url_for('api_v1_update_building', building_id='${buildingId}') }}` :
             '{{ url_for('api_v1_create_building') }}';
         const method = buildingId ? 'PUT' : 'POST';
-
+console.log('buildingId --> ', buildingId)
+console.log('url --> ', url)
+console.log('method --> ', method)
         // Send request to server
         const response = await fetch(url, {
             method: method,
@@ -403,7 +495,7 @@ async function saveBuilding() {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect to buildings list
-                window.location.href = '/buildings';
+                window.location.href = '{{ url_for('buildings') }}';
             }
         });
 
@@ -482,11 +574,11 @@ function resetForm() {
     }
 }
 
-// Event listener for form submission
-document.getElementById('buildingForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    saveBuilding();
-});
+{#// Event listener for form submission#}
+{#document.getElementById('buildingForm')?.addEventListener('submit', function(e) {#}
+{#    e.preventDefault();#}
+{#    saveBuilding();#}
+{# });#}
 
 // Form validation on input
 document.querySelectorAll('#buildingForm input, #buildingForm select').forEach(element => {

@@ -9,7 +9,7 @@ from db.session import get_db
 
 router = APIRouter(prefix="/buildings", tags=["buildings"])
 
-@router.get("/", response_model=List[BuildingResponse])
+@router.get("/", response_model=List[BuildingResponse], name="api_v1_read_buildings")
 async def read_buildings(
         skip: int = 0,
         limit: int = 100,
