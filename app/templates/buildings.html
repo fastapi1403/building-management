@@ -235,6 +235,7 @@
 {% endblock %}
 
 {% block extra_js %}
+    {{ super() }}
 <script>
 // Search functionality
 document.getElementById('searchBuilding').addEventListener('keyup', function(e) {

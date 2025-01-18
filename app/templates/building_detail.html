@@ -230,26 +230,40 @@
         {% endif %}
     </div>
 
-    <!-- Action Buttons -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-end gap-2">
+<!-- Action Buttons -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+            {% if not building.is_deleted %}
                 <button type="button" class="btn btn-outline-secondary" onclick="editBuilding('{{ building.id }}')">
                     <i class="fas fa-edit me-1"></i> <span data-i18n="buildings.edit"></span>
                 </button>
                 <button type="button" class="btn btn-outline-danger" onclick="deleteBuilding('{{ building.id }}')">
                     <i class="fas fa-trash me-1"></i> <span data-i18n="buildings.delete"></span>
                 </button>
-                <a href="{{ url_for('buildings') }}" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left me-1"></i> <span data-i18n="buildings.backToList"></span>
-                </a>
-            </div>
+            {% else %}
+                <!-- Disabled buttons for deleted building -->
+                <button type="button" class="btn btn-outline-secondary" disabled title="Cannot edit deleted building">
+                    <i class="fas fa-edit me-1"></i> <span data-i18n="buildings.edit"></span>
+                </button>
+                <button type="button" class="btn btn-outline-danger" disabled title="Building already deleted">
+                    <i class="fas fa-trash me-1"></i> <span data-i18n="buildings.delete"></span>
+                </button>
+                <!-- Optional: Add restore button -->
+                <button type="button" class="btn btn-outline-success" onclick="restoreBuilding('{{ building.id }}')">
+                    <i class="fas fa-undo me-1"></i> <span data-i18n="buildings.restore"></span>
+                </button>
+            {% endif %}
+            <a href="{{ url_for('buildings') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-1"></i> <span data-i18n="buildings.backToList"></span>
+            </a>
         </div>
     </div>
-</div>
+</div></div>
 {% endblock %}
 
 {% block extra_js %}
+{{ super() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize translations
@@ -275,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (result.isConfirmed) {
             try {
-                 const response = await fetch(`{{ url_for('api_v1_delete_building', building_id='${buildingId}') }}`, {
+                const response = await fetch(`/api/v1/buildings/${buildingId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -292,7 +306,53 @@ document.addEventListener('DOMContentLoaded', function() {
                     timer: 2000
                 });
 
-                window.location.href = "{{ url_for('buildings') }}";
+                // Refresh the page to show updated status
+                window.location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: langManager.translate('common.error'),
+                    text: error.message,
+                    icon: 'error'
+                });
+            }
+        }
+    };
+
+    // Restore building function
+    window.restoreBuilding = async function(buildingId) {
+        const result = await Swal.fire({
+            title: langManager.translate('buildings.restore'),
+            text: langManager.translate('buildings.restoreConfirmation'),
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: langManager.translate('buildings.restoreConfirmButton'),
+            cancelButtonText: langManager.translate('common.cancel')
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/api/v1/buildings/${buildingId}/restore`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                });
+
+                if (!response.ok) throw new Error(langManager.translate('buildings.restoreFail'));
+
+                await Swal.fire({
+                    title: langManager.translate('common.success'),
+                    text: langManager.translate('buildings.restoreSuccess'),
+                    icon: 'success',
+                    timer: 2000
+                });
+
+                // Refresh the page to show updated status
+                window.location.reload();
             } catch (error) {
                 console.error('Error:', error);
                 Swal.fire({

@@ -192,10 +192,7 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         current_time = datetime.now()
         update_data = {
             "is_deleted": False,
-            "deleted_by": None,
             "deleted_at": None,
-            "status": "active",
-            "updated_by": restored_by,
             "updated_at": current_time
         }
 

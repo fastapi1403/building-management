@@ -104,6 +104,13 @@ const en = {
             totalExpenses: "Total Expenses"
         },
         backToList: "Back to Buildings",
-        maintenanceHistory: "Maintenance History"
+        maintenanceHistory: "Maintenance History",
+        restore: "Restore Building",
+        restoreConfirmation: "Are you sure you want to restore this building?",
+        restoreConfirmButton: "Yes, restore it!",
+        restoreSuccess: "The building has been successfully restored.",
+        restoreFail: "Failed to restore building",
+        cannotEditDeleted: "Cannot edit deleted building",
+        alreadyDeleted: "Building already deleted"
     }
 };

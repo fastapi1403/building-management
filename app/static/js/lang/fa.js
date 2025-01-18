@@ -104,6 +104,13 @@ const fa = {
             totalExpenses: "هزینه‌های کل"
         },
         backToList: "بازگشت به لیست ساختمان‌ها",
-        maintenanceHistory: "تاریخچه نگهداری"
+        maintenanceHistory: "تاریخچه نگهداری",
+        restore: "بازگردانی ساختمان",
+        restoreConfirmation: "آیا از بازگردانی این ساختمان اطمینان دارید؟",
+        restoreConfirmButton: "بله، بازگردانی شود!",
+        restoreSuccess: "ساختمان با موفقیت بازگردانی شد.",
+        restoreFail: "بازگردانی ساختمان ناموفق بود",
+        cannotEditDeleted: "ویرایش ساختمان حذف شده امکان‌پذیر نیست",
+        alreadyDeleted: "ساختمان قبلاً حذف شده است"
     }
 };
