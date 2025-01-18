@@ -97,17 +97,14 @@
                 </div>
                 <div class="col-md-3">
                     <select class="form-select filter-dropdown" id="statusFilter">
-                        <option value="">All Statuses</option>
-                        <option value="active">Active</option>
-                        <option value="maintenance">Under Maintenance</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="1">Active</option>
+                        <option value="0">Deleted</option>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <select class="form-select filter-dropdown" id="sortBy">
                         <option value="name">Sort by Name</option>
-                        <option value="units">Sort by Units</option>
-                        <option value="occupancy">Sort by Occupancy</option>
+                        <option value="units">Sort by Floors</option>
                     </select>
                 </div>
             </div>
@@ -123,9 +120,9 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">{{ building.name }}</h5>
 {#                        <span class="status-badge status-{{ building.status.lower() }}">#}
-                        <span class="status-badge status-active">
+                        <span class="status-badge {% if building.is_deleted %}status-inactive{% else %}status-active{% endif %}">
 {#                            {{ building.status }}#}
-                            Active
+                            {% if building.is_deleted %}Deleted{% else %}Active{% endif %}
                         </span>
                     </div>
 
@@ -237,10 +234,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
 // Search functionality
 document.getElementById('searchBuilding').addEventListener('keyup', function(e) {
@@ -278,21 +271,84 @@ function editBuilding(buildingId) {
     console.log('Editing building:', buildingId);
 }
 
-function deleteBuilding(buildingId) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "This action cannot be undone!",
+async function deleteBuilding(buildingId) {
+    // Show confirmation dialog
+    const result = await Swal.fire({
+        title: 'Delete Building',
+        text: 'Are you sure you want to delete this building? This action cannot be undone.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Implement delete functionality
-            console.log('Deleting building:', buildingId);
-        }
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
     });
+
+    // If user confirms deletion
+    if (result.isConfirmed) {
+        try {
+            // Show loading state
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait while we delete the building.',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Send delete request to server
+            const response = await fetch(`{{ url_for('api_v1_delete_building', building_id='${buildingId}') }}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken(),
+                    'Accept': 'application/json'
+                }
+            });
+
+            // Check if request was successful
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to delete building');
+            }
+
+            // Show success message
+            await Swal.fire({
+                title: 'Deleted!',
+                text: 'The building has been successfully deleted.',
+                icon: 'success',
+                confirmButtonColor: '#198754',
+                timer: 2000,
+                timerProgressBar: true
+            });
+
+            // Log the deletion with timestamp and user
+            console.log(`Building ${buildingId} deleted by ${currentUser} at ${currentTime}`);
+
+            // Remove the building card from DOM or refresh the page
+            const buildingElement = document.querySelector(`[data-building-id="${buildingId}"]`);
+            if (buildingElement) {
+                buildingElement.remove();
+            } else {
+                window.location.reload(); // Fallback to page reload if element not found
+            }
+
+        } catch (error) {
+            console.error('Error deleting building:', error);
+
+            // Show error message
+            Swal.fire({
+                title: 'Error!',
+                text: error.message || 'There was an error deleting the building. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+            });
+        }
+    }
 }
 
 async function saveBuilding() {
