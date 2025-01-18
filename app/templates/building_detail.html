@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`/api/v1/buildings/${buildingId}`, {
+                 const response = await fetch(`{{ url_for('api_v1_delete_building', building_id='${buildingId}') }}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
