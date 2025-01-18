@@ -297,8 +297,8 @@ async function saveBuilding() {
 
         // Determine URL and method based on whether we're editing or creating
         const url = buildingId ?
-            `{{ url_for("api_v1_update_building", building_id="${buildingId}") }}` :
-            '{{ url_for("api_v1_create_building") }}';
+            `/api/v1/buildings/${buildingId}` :
+            '/api/v1/buildings';
         const method = buildingId ? 'PUT' : 'POST';
 
         // Send request to server
@@ -335,17 +335,16 @@ async function saveBuilding() {
             timerProgressBar: true
         });
 
-        {#// Log the action#}
-        {#console.log(`Building ${isEditing ? 'updated' : 'created'} by fastapi1403 at 2025-01-18 06:13:13`);#}
-
-        // Update UI or refresh page
         if (isEditing) {
-            // Update the existing building card in the UI
+            // Update existing building card
             updateBuildingCard(result);
         } else {
-            // For new buildings, refresh the page to show the new building
-            window.location.reload();
+            // Add new building card
+            addNewBuildingCard(result);
         }
+
+        // Reset the form
+        resetForm();
 
     } catch (error) {
         console.error('Error:', error);
@@ -358,28 +357,110 @@ async function saveBuilding() {
     }
 }
 
-// Helper function to update the building card in the UI
+// Function to add a new building card to the UI
+function addNewBuildingCard(building) {
+    const buildingsContainer = document.querySelector('.row.g-4');
+    const newBuildingHtml = `
+        <div class="col-md-6 col-lg-4" data-building-id="${building.id}">
+            <div class="card building-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">${building.name}</h5>
+                        <span class="status-badge ${building.is_deleted ? 'status-inactive' : 'status-active'}">
+                            ${building.is_deleted ? 'Deleted' : 'Active'}
+                        </span>
+                    </div>
+
+                    <div class="building-stats mb-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-building me-2"></i>
+                                    <span>${building.total_floors} Floors</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-door-open me-2"></i>
+                                    <span>28 Units</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-check me-2"></i>
+                                    <span>100% Occupied</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-check me-2"></i>
+                                    <span>2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-3" style="height: 6px;">
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+                             style="width: 50%"
+                             aria-valuenow="50"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center action-buttons">
+                        <a href="" class="btn btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>Details
+                        </a>
+                        <div class="btn-group">
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    onclick="editBuilding('${building.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button"
+                                    class="btn btn-outline-danger"
+                                    onclick="deleteBuilding('${building.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add the new building card to the beginning of the container
+    buildingsContainer.insertAdjacentHTML('afterbegin', newBuildingHtml);
+}
+
+// Function to update existing building card
 function updateBuildingCard(building) {
-    const card = document.querySelector(`[data-building-id="${building.id}"]`);
-    if (card) {
+    const buildingCard = document.querySelector(`[data-building-id="${building.id}"]`);
+    if (buildingCard) {
         // Update building name
-        card.querySelector('.card-title').textContent = building.name;
+        buildingCard.querySelector('.card-title').textContent = building.name;
 
         // Update floors count
-        card.querySelector('.fa-building').nextElementSibling.textContent =
-            `${building.total_floors} Floors`;
-
-        // Update status badge if status has changed
-        const statusBadge = card.querySelector('.status-badge');
-        statusBadge.className = `status-badge ${building.is_deleted ? 'status-inactive' : 'status-active'}`;
-        statusBadge.textContent = building.is_deleted ? 'Deleted' : 'Active';
-
-        // Update progress bar if occupancy rate is available
-        if (building.occupancy_rate !== undefined) {
-            const progressBar = card.querySelector('.progress-bar');
-            progressBar.style.width = `${building.occupancy_rate}%`;
-            progressBar.setAttribute('aria-valuenow', building.occupancy_rate);
+        const floorsElement = buildingCard.querySelector('.fa-building').nextElementSibling;
+        if (floorsElement) {
+            floorsElement.textContent = `${building.total_floors} Floors`;
         }
+
+        // Update status badge
+        const statusBadge = buildingCard.querySelector('.status-badge');
+        if (statusBadge) {
+            statusBadge.className = `status-badge ${building.is_deleted ? 'status-inactive' : 'status-active'}`;
+            statusBadge.textContent = building.is_deleted ? 'Deleted' : 'Active';
+        }
+
+        // Add animation to show the update
+        buildingCard.classList.add('building-updated');
+        setTimeout(() => {
+            buildingCard.classList.remove('building-updated');
+        }, 1000);
     }
 }
 
