@@ -36,9 +36,9 @@ async function saveBuilding() {
         name: document.getElementById('buildingName').value,
         total_floors: parseInt(document.getElementById('buildingFloors').value),
         description: document.getElementById('buildingDescription').value,
-        created_at: isEditing ? null : '2025-01-18 07:52:04',
+        created_at: isEditing ? null : '2025-01-18 16:58:40',
         created_by: isEditing ? null : 'fastapi1403',
-        updated_at: '2025-01-18 07:52:04',
+        updated_at: '2025-01-18 16:58:40',
         updated_by: 'fastapi1403'
     };
 
@@ -60,6 +60,28 @@ async function saveBuilding() {
             }
         });
 
+        // Make API call to save/update building
+        const url = isEditing
+            ? `/api/v1/buildings/${buildingId}`
+            : '/api/v1/buildings';
+
+        const response = await fetch(url, {
+            method: isEditing ? 'PUT' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(buildingData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || langManager.translate('buildings.messages.saveError'));
+        }
+
+        const savedBuilding = await response.json();
+
         // Success message with translations
         await Swal.fire({
             title: langManager.translate('common.success'),
@@ -69,6 +91,17 @@ async function saveBuilding() {
             timer: 2000,
             timerProgressBar: true
         });
+
+        // Update UI
+        if (isEditing) {
+            updateBuildingCard(savedBuilding);
+        } else {
+            addNewBuildingCard(savedBuilding);
+        }
+
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addBuildingModal'));
+        modal.hide();
 
     } catch (error) {
         console.error('Error:', error);
@@ -100,19 +133,19 @@ function addNewBuildingCard(building) {
                             <div class="col-6">
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-building me-2"></i>
-                                    <span>${building.total_floors} Floors</span>
+                                    <span>${building.total_floors} <span data-i18n="buildings.floors"></span>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-door-open me-2"></i>
-                                    <span>28 Units</span>
+                                    <span>28 <span data-i18n="buildings.units"></span></span>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-user-check me-2"></i>
-                                    <span>100% Occupied</span>
+                                    <span>100% <span data-i18n="buildings.occupied"></span></span>
                                 </div>
                             </div>
                             <div class="col-6">
@@ -138,7 +171,7 @@ function addNewBuildingCard(building) {
                         <a href="" class="btn btn-outline-primary">
                             <i class="fas fa-eye me-1"></i>Details
                         </a>
-                        <div class="btn-group">
+                        <div class="">
                             <button type="button"
                                     class="btn btn-outline-secondary"
                                     onclick="editBuilding('${building.id}')">
