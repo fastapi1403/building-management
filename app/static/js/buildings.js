@@ -28,6 +28,61 @@ document.getElementById('statusFilter').addEventListener('change', function(e) {
     });
 });
 
+// Function to update existing building card
+function updateBuildingCard(building) {
+    const buildingCard = document.querySelector(`[data-building-id="${building.id}"]`);
+    if (buildingCard) {
+        // Update building name
+        buildingCard.querySelector('.card-title').textContent = building.name;
+
+        // Update floors
+        const floorsElement = buildingCard.querySelector('.fa-building').nextElementSibling;
+        if (floorsElement) {
+            floorsElement.textContent = `${building.total_floors} Floors`;
+        }
+
+        // Update status badge
+        const statusBadge = buildingCard.querySelector('.status-badge');
+        if (statusBadge) {
+            statusBadge.className = `status-badge ${building.is_deleted ? 'status-inactive' : 'status-active'}`;
+            statusBadge.textContent = building.is_deleted ? 'Deleted' : 'Active';
+        }
+
+        // Update description if it exists
+        const descriptionElement = buildingCard.querySelector('.building-description');
+        if (descriptionElement && building.description) {
+            descriptionElement.textContent = building.description;
+        }
+
+        // Add animation to show the card was updated
+        buildingCard.classList.add('building-updated');
+        setTimeout(() => {
+            buildingCard.classList.remove('building-updated');
+        }, 1000);
+
+        // Update dynamic data
+        const updateInfo = buildingCard.querySelector('.update-info');
+        if (updateInfo) {
+            updateInfo.textContent = `Updated: ${building.updated_at}`;
+        }
+
+        // Add CSS animation to highlight the update
+        buildingCard.style.transition = 'background-color 0.5s ease';
+        buildingCard.style.backgroundColor = '#e8f5e9';
+        setTimeout(() => {
+            buildingCard.style.backgroundColor = '';
+        }, 1500);
+
+        // Translate any new content
+        langManager.translatePage();
+    } else {
+        // If card doesn't exist, reload the page
+        console.log('Building card not found, reloading page...');
+        window.location.reload();
+    }
+}
+
+// Update saveBuilding function to handle the response better
 async function saveBuilding() {
     const buildingId = document.getElementById('buildingId')?.value;
     const isEditing = !!buildingId;
@@ -97,7 +152,9 @@ async function saveBuilding() {
 
         // Close modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('addBuildingModal'));
-        modal.hide();
+        if (modal) {
+            modal.hide();
+        }
 
     } catch (error) {
         console.error('Error:', error);
@@ -189,26 +246,6 @@ function addNewBuildingCard(building) {
     buildingsContainer.insertAdjacentHTML('afterbegin', newBuildingHtml);
 }
 
-// Function to update existing building card
-function updateBuildingCard(building) {
-    const buildingCard = document.querySelector(`[data-building-id="${building.id}"]`);
-    if (buildingCard) {
-        buildingCard.querySelector('.card-title').textContent = building.name;
-        const floorsElement = buildingCard.querySelector('.fa-building').nextElementSibling;
-        if (floorsElement) {
-            floorsElement.textContent = `${building.total_floors} Floors`;
-        }
-        const statusBadge = buildingCard.querySelector('.status-badge');
-        if (statusBadge) {
-            statusBadge.className = `status-badge ${building.is_deleted ? 'status-inactive' : 'status-active'}`;
-            statusBadge.textContent = building.is_deleted ? 'Deleted' : 'Active';
-        }
-        buildingCard.classList.add('building-updated');
-        setTimeout(() => {
-            buildingCard.classList.remove('building-updated');
-        }, 1000);
-    }
-}
 
 // Helper function to reset form and validation states
 function resetForm() {
