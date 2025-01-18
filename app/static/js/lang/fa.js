@@ -78,7 +78,6 @@ const fa = {
         units: "واحد",
         occupied: "اشغال شده",
         since: "از سال",
-        details: "جزئیات",
         validation: {
             nameRequired: "نام ساختمان الزامی است!",
             floorsRequired: "تعداد طبقات الزامی است!",
@@ -91,6 +90,20 @@ const fa = {
             updateSuccess: "ساختمان با موفقیت به‌روزرسانی شد!",
             loadError: "خطا در بارگذاری اطلاعات ساختمان. لطفا دوباره تلاش کنید.",
             saveError: "خطا در ذخیره‌سازی ساختمان. لطفا دوباره تلاش کنید."
-        }
+        },
+        detailTitle: "جزئیات ساختمان",
+        details: {
+            details: "جزئیات",
+            basicInfo: "اطلاعات پایه",
+            quickStats: "آمار سریع",
+            financialSummary: "خلاصه مالی",
+            maintenanceStatus: "وضعیت نگهداری",
+            createdAt: "تاریخ ایجاد",
+            lastUpdated: "آخرین بروزرسانی",
+            totalIncome: "درآمد کل",
+            totalExpenses: "هزینه‌های کل"
+        },
+        backToList: "بازگشت به لیست ساختمان‌ها",
+        maintenanceHistory: "تاریخچه نگهداری"
     }
 };

@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}<span data-i18n="buildings.detailTitle"></span>{% endblock %}
+
+{% block extra_css %}
+<style>
+    .building-detail-container {
+        padding: 1.5rem;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+
+    .status-active {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-maintenance {
+        background-color: #fff7ed;
+        color: #9a3412;
+    }
+
+    .status-inactive {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+
+    .detail-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-stat {
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: #f8fafc;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .timeline-item {
+        padding: 1rem;
+        border-left: 2px solid #e5e7eb;
+        margin-left: 1rem;
+        position: relative;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -0.5rem;
+        top: 1.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 2px solid #3b82f6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="building-detail-container">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2">{{ building.name }}</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('buildings') }}" data-i18n="buildings.title"></a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page" data-i18n="buildings.detailTitle"></li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <span class="status-badge {% if building.is_deleted %}status-inactive{% else %}status-active{% endif %}">
+                        {% if building.is_deleted %}<span data-i18n="buildings.status.deleted"></span>{% else %}<span data-i18n="buildings.status.active"></span>{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Building Overview -->
+    <div class="row g-4 mb-4">
+        <!-- Basic Information -->
+        <div class="col-md-8">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="buildings.details.basicInfo"></h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted" data-i18n="buildings.name"></label>
+                            <p class="mb-3">{{ building.name }}</p>
+
+                            <label class="text-muted" data-i18n="buildings.floors"></label>
+                            <p class="mb-3">{{ building.total_floors }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted" data-i18n="buildings.details.createdAt"></label>
+{#                            <p class="mb-3">{{ building.created_at.strftime('%Y-%m-%d') }}</p>#}
+                            <p class="mb-3">2025</p>
+
+                            <label class="text-muted" data-i18n="buildings.details.lastUpdated"></label>
+                            <p>{{ building.updated_at.strftime('%Y-%m-%d') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="col-md-4">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="buildings.details.quickStats"></h5>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                    <i class="fas fa-door-open"></i>
+                                </div>
+                                <div class="stat-value">{{ 28 }}</div>
+                                <div class="stat-label" data-i18n="buildings.units"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="stat-value">100%</div>
+                                <div class="stat-label" data-i18n="buildings.occupied"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Information -->
+    <div class="row g-4">
+        <!-- Financial Summary -->
+        <div class="col-md-6">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="buildings.details.financialSummary"></h5>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-value text-success">{{ building.total_funds }}</div>
+                                <div class="stat-label" data-i18n="buildings.details.totalIncome"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-value text-danger">{{ building.total_costs }}</div>
+                                <div class="stat-label" data-i18n="buildings.details.totalExpenses"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Status -->
+        <div class="col-md-6">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="buildings.details.maintenanceStatus"></h5>
+                    <div class="timeline">
+                        {% for maintenance in building.maintenance_history[:3] %}
+                        <div class="timeline-item">
+                            <p class="mb-1 fw-bold">{{ maintenance.title }}</p>
+                            <p class="text-muted small mb-0">{{ maintenance.description }}</p>
+                            <span class="text-muted smaller">{{ maintenance.date.strftime('%Y-%m-%d') }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary" onclick="editBuilding('{{ building.id }}')">
+                    <i class="fas fa-edit me-1"></i> <span data-i18n="buildings.edit"></span>
+                </button>
+                <button type="button" class="btn btn-outline-danger" onclick="deleteBuilding('{{ building.id }}')">
+                    <i class="fas fa-trash me-1"></i> <span data-i18n="buildings.delete"></span>
+                </button>
+                <a href="{{ url_for('buildings') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-1"></i> <span data-i18n="buildings.backToList"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize translations
+    langManager.translatePage();
+
+    // Edit building function
+    window.editBuilding = function(buildingId) {
+        window.location.href = `{{ url_for('buildings') }}#edit-${buildingId}`;
+    };
+
+    // Delete building function
+    window.deleteBuilding = async function(buildingId) {
+        const result = await Swal.fire({
+            title: langManager.translate('buildings.delete'),
+            text: langManager.translate('buildings.deleteConfirmation'),
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: langManager.translate('buildings.deleteConfirmButton'),
+            cancelButtonText: langManager.translate('common.cancel')
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/api/v1/buildings/${buildingId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                });
+
+                if (!response.ok) throw new Error(langManager.translate('buildings.deleteFail'));
+
+                await Swal.fire({
+                    title: langManager.translate('common.success'),
+                    text: langManager.translate('buildings.deleteSuccess'),
+                    icon: 'success',
+                    timer: 2000
+                });
+
+                window.location.href = "{{ url_for('buildings') }}";
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: langManager.translate('common.error'),
+                    text: error.message,
+                    icon: 'error'
+                });
+            }
+        }
+    };
+});
+</script>
+{% endblock %}

@@ -36,7 +36,7 @@ async def building_detail(
     try:
         # Get the building from database
         building = await crud_building.get(db=db, id=building_id)
-
+        print(building)
         if not building:
             raise HTTPException(
                 status_code=404,

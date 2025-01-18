@@ -78,7 +78,6 @@ const en = {
         units: "Units",
         occupied: "Occupied",
         since: "Since",
-        details: "Details",
         validation: {
             nameRequired: "Building name is required!",
             floorsRequired: "Number of floors is required!",
@@ -91,6 +90,20 @@ const en = {
             updateSuccess: "Building updated successfully!",
             loadError: "Failed to load building details. Please try again.",
             saveError: "There was an error saving the building. Please try again."
-        }
+        },
+        detailTitle: "Building Details",
+        details: {
+            details: "Details",
+            basicInfo: "Basic Information",
+            quickStats: "Quick Statistics",
+            financialSummary: "Financial Summary",
+            maintenanceStatus: "Maintenance Status",
+            createdAt: "Created At",
+            lastUpdated: "Last Updated",
+            totalIncome: "Total Income",
+            totalExpenses: "Total Expenses"
+        },
+        backToList: "Back to Buildings",
+        maintenanceHistory: "Maintenance History"
     }
 };
