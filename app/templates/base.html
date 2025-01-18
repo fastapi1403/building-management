@@ -306,6 +306,9 @@
 // Language selector functionality
 document.addEventListener('DOMContentLoaded', function() {
     // Set initial language state
+    // Initialize translations
+    langManager.translatePage();
+
     const currentLang = langManager.getCurrentLanguage();
     updateLanguageUI(currentLang);
 
@@ -335,6 +338,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.lang = language;
         document.documentElement.dir = language === 'fa' ? 'rtl' : 'ltr';
     }
+
+
 });
 
 // Helper function to get CSRF token
@@ -353,7 +358,6 @@ function getCsrfToken() {
     }
     return cookieValue;
 }
-
 
     </script>
     {% block extra_js %}{% endblock %}

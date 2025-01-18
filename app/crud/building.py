@@ -52,7 +52,6 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
             *,
             db_obj: Building,
             obj_in: Union[BuildingUpdate, Dict[str, Any]],
-            updated_by: str = "fastapi1403"
     ) -> Building:
         """
         Update a building.

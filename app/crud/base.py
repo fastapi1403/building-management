@@ -77,7 +77,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             *,
             db_obj: ModelType,
             obj_in: Union[UpdateSchemaType, Dict[str, Any]],
-            updated_by: str = "fastapi1403"  # Default to current user
     ) -> ModelType:
         """
         Update existing record.
@@ -92,7 +91,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         # Add audit fields
         update_data.update({
             "updated_at": datetime.now(),
-            "updated_by": updated_by
         })
 
         for field in obj_data:

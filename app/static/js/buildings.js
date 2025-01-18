@@ -36,10 +36,6 @@ async function saveBuilding() {
         name: document.getElementById('buildingName').value,
         total_floors: parseInt(document.getElementById('buildingFloors').value),
         description: document.getElementById('buildingDescription').value,
-        created_at: isEditing ? null : '2025-01-18 16:58:40',
-        created_by: isEditing ? null : 'fastapi1403',
-        updated_at: '2025-01-18 16:58:40',
-        updated_by: 'fastapi1403'
     };
 
     // Form validation with translations
@@ -309,8 +305,6 @@ document.addEventListener('DOMContentLoaded', function() {
         resetForm();
     });
 
-    // Initialize translations
-    langManager.translatePage();
 
     // Form validation on input
     document.querySelectorAll('#buildingForm input, #buildingForm select').forEach(element => {
@@ -417,4 +411,54 @@ function validateBuildingData(data) {
     }
 
     return true;
+}
+
+// Building Detail Page Functions
+function restoreBuilding(buildingId) {
+    return Swal.fire({
+        title: langManager.translate('buildings.restore'),
+        text: langManager.translate('buildings.restoreConfirmation'),
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: langManager.translate('buildings.restoreConfirmButton'),
+        cancelButtonText: langManager.translate('common.cancel')
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/api/v1/buildings/${buildingId}/restore`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                });
+
+                if (!response.ok) throw new Error(langManager.translate('buildings.restoreFail'));
+
+                await Swal.fire({
+                    title: langManager.translate('common.success'),
+                    text: langManager.translate('buildings.restoreSuccess'),
+                    icon: 'success',
+                    timer: 2000
+                });
+
+                // Refresh the page to show updated status
+                window.location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: langManager.translate('common.error'),
+                    text: error.message,
+                    icon: 'error'
+                });
+            }
+        }
+    });
+}
+
+// Modified editBuilding for detail page
+function editBuildingDetail(buildingId) {
+    window.location.href = `/buildings#edit-${buildingId}`;
 }
