@@ -13,11 +13,12 @@
     <link href="{{ url_for('static', path='css/vendor/bootstrap-5.3.2/bootstrap.min.css') }}" rel="stylesheet">
 {#    <link href="{{ url_for('static', path='css/vendor/fontawesome-6.4.2/all.min.css') }}" rel="stylesheet">#}
 {#    <link href="{{ url_for('static', path='css/vendor/mdi-font-6.5.95/materialdesignicons.min.css') }}" rel="stylesheet">#}
-    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/fontawesome.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/brands.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/sharp-thin.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/duotone-thin.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/sharp-duotone-thin.css') }}" rel="stylesheet" />
+{#    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/fontawesome.min.css') }}" rel="stylesheet" />#}
+{#    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/brands.min.css') }}" rel="stylesheet" />#}
+{#    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/sharp-thin.min.css') }}" rel="stylesheet" />#}
+{#    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/duotone-thin.min.css') }}" rel="stylesheet" />#}
+{#    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/sharp-duotone-thin.min.css') }}" rel="stylesheet" />#}
+    <link href="{{ url_for('static', path='css/vendor/fontawesome/css/all.min.css') }}" rel="stylesheet" />
 
     <!-- Custom CSS -->
     <style>
@@ -152,25 +153,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container-fluid">
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-        <i class="fas fa-globe me-1"></i> Language
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end">
-        <li>
-            <button class="dropdown-item" onclick="changeLanguage('en')">
-                <img src="{{ url_for('static', path='img/flags/en.png') }}" alt="English" width="20" class="me-2">
-                English
-            </button>
-        </li>
-        <li>
-            <button class="dropdown-item" onclick="changeLanguage('fa')">
-                <img src="{{ url_for('static', path='img/flags/fa.png') }}" alt="Persian" width="20" class="me-2">
-                فارسی
-            </button>
-        </li>
-    </ul>
-</li>            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
                 <i class="fas fa-building me-2"></i>
                 Building Management
             </a>
@@ -189,25 +172,26 @@
                             <i class="fas fa-chart-line me-1"></i> Dashboard
                         </a>
                     </li>
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-        <i class="fas fa-globe me-1"></i> Language
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end">
-        <li>
-            <button class="dropdown-item language-selector" data-language="fa">
-                <i class="fas fa-check me-2 {% raw %}{{ 'visible' if request.cookies.get('preferredLanguage', 'fa') == 'fa' else 'invisible' }}{% endraw %}"></i>
-                فارسی
-            </button>
-        </li>
-        <li>
-            <button class="dropdown-item language-selector" data-language="en">
-                <i class="fas fa-check me-2 {% raw %}{{ 'visible' if request.cookies.get('preferredLanguage') == 'en' else 'invisible' }}{% endraw %}"></i>
-                English
-            </button>
-        </li>
-    </ul>
-</li>
+                    <!-- Language Selector -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-globe me-1"></i> Language
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <button class="dropdown-item language-selector" data-language="fa">
+                                    <i class="fas fa-check me-2 {{ 'visible' if request.cookies.get('preferredLanguage', 'fa') == 'fa' else 'invisible' }}"></i>
+                                    فارسی
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item language-selector" data-language="en">
+                                    <i class="fas fa-check me-2 {{ 'visible' if request.cookies.get('preferredLanguage') == 'en' else 'invisible' }}"></i>
+                                    English
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle me-1"></i> Hassan
@@ -332,20 +316,37 @@
         });
 
 // Language selector functionality
-document.querySelectorAll('.language-selector').forEach(button => {
-    button.addEventListener('click', function() {
-        const language = this.dataset.language;
-        langManager.setLanguage(language);
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial language state
+    const currentLang = langManager.getCurrentLanguage();
+    updateLanguageUI(currentLang);
 
+    // Add click handlers to language selector buttons
+    document.querySelectorAll('.language-selector').forEach(button => {
+        button.addEventListener('click', function() {
+            const language = this.dataset.language;
+            if (langManager.setLanguage(language)) {
+                updateLanguageUI(language);
+                // Reload the page to apply changes
+                window.location.reload();
+            }
+        });
+    });
+
+    function updateLanguageUI(language) {
         // Update check marks
         document.querySelectorAll('.language-selector i').forEach(icon => {
             icon.classList.add('invisible');
         });
-        this.querySelector('i').classList.remove('invisible');
+        const selectedLang = document.querySelector(`.language-selector[data-language="${language}"] i`);
+        if (selectedLang) {
+            selectedLang.classList.remove('invisible');
+        }
 
-        // Reload the page to apply changes
-        window.location.reload();
-    });
+        // Update HTML lang and dir attributes
+        document.documentElement.lang = language;
+        document.documentElement.dir = language === 'fa' ? 'rtl' : 'ltr';
+    }
 });
     </script>
     {% block extra_js %}{% endblock %}
