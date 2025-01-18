@@ -40,10 +40,11 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
             updated_by=created_by,
             is_deleted=False
         )
-        db.add(db_obj)
-        await db.commit()
-        await db.refresh(db_obj)
-        return db_obj
+        # db.add(db_obj)
+        # await db.commit()
+        # await db.refresh(db_obj)
+        # return db_obj
+        return await super().create(db, obj_in=db_obj)
 
     async def update(
             self,
@@ -65,12 +66,7 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
         Returns:
             Updated building instance
         """
-        current_time = datetime.now()
         obj_data = obj_in.model_dump(exclude_unset=True) if isinstance(obj_in, BuildingUpdate) else obj_in
-        obj_data.update({
-            "updated_at": current_time,
-            "updated_by": updated_by
-        })
         return await super().update(db, db_obj=db_obj, obj_in=obj_data)
 
     async def get_multi(

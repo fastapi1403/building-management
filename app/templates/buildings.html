@@ -206,6 +206,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="addBuildingForm">
+                        <input type="hidden" id="buildingId" name="buildingId">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Building Name</label>
@@ -265,8 +266,148 @@ document.getElementById('statusFilter').addEventListener('change', function(e) {
     });
 });
 
-// Building operations
-async function editBuilding(buildingId) {
+async function saveBuilding() {
+    // Get form data
+    const buildingId = document.getElementById('buildingId')?.value;
+    const isEditing = !!buildingId;
+
+    const buildingData = {
+        name: document.getElementById('buildingName').value,
+        total_floors: parseInt(document.getElementById('buildingFloors').value),
+        description: document.getElementById('buildingDescription').value,
+    };
+
+    // Form validation
+    if (!validateBuildingData(buildingData)) {
+        return false;
+    }
+
+    try {
+        // Show loading state
+        Swal.fire({
+            title: isEditing ? 'Updating...' : 'Saving...',
+            text: isEditing ? 'Updating building details...' : 'Creating new building...',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Determine URL and method based on whether we're editing or creating
+        const url = buildingId ?
+            `{{ url_for("api_v1_update_building", building_id="${buildingId}") }}` :
+            '{{ url_for("api_v1_create_building") }}';
+        const method = buildingId ? 'PUT' : 'POST';
+
+        // Send request to server
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(buildingData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || `Failed to ${isEditing ? 'update' : 'create'} building`);
+        }
+
+        const result = await response.json();
+
+        // Hide the modal
+        const buildingModal = bootstrap.Modal.getInstance(document.getElementById('addBuildingModal'));
+        if (buildingModal) {
+            buildingModal.hide();
+        }
+
+        // Show success message
+        await Swal.fire({
+            title: 'Success!',
+            text: isEditing ? 'Building updated successfully!' : 'Building created successfully!',
+            icon: 'success',
+            confirmButtonColor: '#198754',
+            timer: 2000,
+            timerProgressBar: true
+        });
+
+        {#// Log the action#}
+        {#console.log(`Building ${isEditing ? 'updated' : 'created'} by fastapi1403 at 2025-01-18 06:13:13`);#}
+
+        // Update UI or refresh page
+        if (isEditing) {
+            // Update the existing building card in the UI
+            updateBuildingCard(result);
+        } else {
+            // For new buildings, refresh the page to show the new building
+            window.location.reload();
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: error.message || `There was an error ${isEditing ? 'updating' : 'saving'} the building. Please try again.`,
+            icon: 'error',
+            confirmButtonColor: '#dc3545'
+        });
+    }
+}
+
+// Helper function to update the building card in the UI
+function updateBuildingCard(building) {
+    const card = document.querySelector(`[data-building-id="${building.id}"]`);
+    if (card) {
+        // Update building name
+        card.querySelector('.card-title').textContent = building.name;
+
+        // Update floors count
+        card.querySelector('.fa-building').nextElementSibling.textContent =
+            `${building.total_floors} Floors`;
+
+        // Update status badge if status has changed
+        const statusBadge = card.querySelector('.status-badge');
+        statusBadge.className = `status-badge ${building.is_deleted ? 'status-inactive' : 'status-active'}`;
+        statusBadge.textContent = building.is_deleted ? 'Deleted' : 'Active';
+
+        // Update progress bar if occupancy rate is available
+        if (building.occupancy_rate !== undefined) {
+            const progressBar = card.querySelector('.progress-bar');
+            progressBar.style.width = `${building.occupancy_rate}%`;
+            progressBar.setAttribute('aria-valuenow', building.occupancy_rate);
+        }
+    }
+}
+
+// Helper function to reset form and validation states
+function resetForm() {
+    const form = document.getElementById('buildingForm');
+    form.reset();
+
+    // Clear building ID when adding new building
+    const buildingIdInput = document.getElementById('buildingId');
+    if (buildingIdInput) {
+        buildingIdInput.value = '';
+    }
+
+    // Reset validation states
+    form.querySelectorAll('.is-valid, .is-invalid').forEach(element => {
+        element.classList.remove('is-valid', 'is-invalid');
+    });
+
+    // Reset modal title
+    const modalTitle = document.querySelector('#addBuildingModal .modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = 'Add New Building';
+    }
+}
+
+// Modified editBuilding function to prepare the form for editing
+function editBuilding(buildingId) {
     try {
         // Show loading state
         Swal.fire({
@@ -280,87 +421,75 @@ async function editBuilding(buildingId) {
             }
         });
 
-        // Fetch building details from the server
-        const response = await fetch(`{{ url_for("api_v1_read_building", building_id="${buildingId}") }}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            }
-        });
+        // Fetch building details
+        fetch(`/api/v1/buildings/${buildingId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch building details');
+                return response.json();
+            })
+            .then(building => {
+                // Update modal title
+                const modalTitle = document.querySelector('#addBuildingModal .modal-title');
+                modalTitle.textContent = 'Edit Building';
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const building = await response.json();
-
-        // Close loading dialog
-        Swal.close();
-
-        // Get the modal element and its components
-        const modal = document.getElementById('addBuildingModal');
-        const modalTitle = modal.querySelector('.modal-title');
-        modalTitle.textContent = 'Edit Building';
-
-        // Populate form fields
-        document.getElementById('buildingName').value = building.name || '';
-        document.getElementById('buildingFloors').value = building.total_floors || '';
-        document.getElementById('buildingDescription').value = building.description || '';
-
-        {#// Add audit information#}
-        {#const auditInfo = {#}
-        {#    created_by: building.created_by || 'fastapi1403',#}
-        {#    created_at: building.created_at || '2025-01-18 05:30:25',#}
-        {#    last_updated: '2025-01-18 05:30:25',#}
-        {#    updated_by: 'fastapi1403'#}
-        {# };#}
-        {##}
-        {#// Store audit info in a data attribute#}
-        {#modal.dataset.auditInfo = JSON.stringify(auditInfo);#}
-
-        // Show the modal
-        const buildingModal = new bootstrap.Modal(modal);
-        buildingModal.show();
-
-        // Add form validation listeners
-        const form = document.getElementById('buildingForm');
-        const inputs = form.querySelectorAll('input, textarea');
-
-        inputs.forEach(input => {
-            // Remove existing validation classes
-            input.classList.remove('is-invalid', 'is-valid');
-
-            // Add validation listeners
-            input.addEventListener('input', function() {
-                if (this.checkValidity()) {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                } else {
-                    this.classList.remove('is-valid');
-                    this.classList.add('is-invalid');
+                // Set building ID
+                const buildingIdInput = document.getElementById('buildingId');
+                if (!buildingIdInput) {
+                    // Create hidden input if it doesn't exist
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.id = 'buildingId';
+                    document.getElementById('buildingForm').appendChild(input);
                 }
+                document.getElementById('buildingId').value = buildingId;
+
+                // Populate form fields
+                document.getElementById('buildingName').value = building.name || '';
+                document.getElementById('buildingFloors').value = building.total_floors || '';
+                document.getElementById('buildingDescription').value = building.description || '';
+
+                // Close loading dialog and show modal
+                Swal.close();
+                const modal = new bootstrap.Modal(document.getElementById('addBuildingModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to load building details. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
             });
-        });
-
-        // Update form submission handler
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            console.log('saveBuilding(buildingId) --> buildingId', )
-            await saveBuilding(buildingId);
-        };
-
     } catch (error) {
-        console.error('Error fetching building details:', error);
+        console.error('Error:', error);
         Swal.fire({
             title: 'Error!',
-            text: 'Failed to load building details. Please try again.',
+            text: 'An unexpected error occurred. Please try again.',
             icon: 'error',
             confirmButtonColor: '#dc3545'
         });
     }
 }
 
+// Add event listeners when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form validation
+    const form = document.getElementById('buildingForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveBuilding();
+    });
+
+    // Add modal hidden event listener to reset form
+    const modal = document.getElementById('addBuildingModal');
+    modal.addEventListener('hidden.bs.modal', function() {
+        resetForm();
+    });
+});
+
+// Building operations
 async function deleteBuilding(buildingId) {
     // Show confirmation dialog
     const result = await Swal.fire({
@@ -416,8 +545,8 @@ async function deleteBuilding(buildingId) {
                 timerProgressBar: true
             });
 
-            // Log the deletion with timestamp and user
-            console.log(`Building ${buildingId} deleted by ${currentUser} at ${currentTime}`);
+            {#// Log the deletion with timestamp and user#}
+            {#console.log(`Building ${buildingId} deleted by ${currentUser} at ${currentTime}`);#}
 
             // Remove the building card from DOM or refresh the page
             const buildingElement = document.querySelector(`[data-building-id="${buildingId}"]`);
@@ -441,82 +570,6 @@ async function deleteBuilding(buildingId) {
     }
 }
 
-async function saveBuilding(buildingId=null) {
-    // Get form data
-    const buildingData = {
-        name: document.getElementById('buildingName').value,
-        total_floors: parseInt(document.getElementById('buildingFloors').value),
-        description: document.getElementById('buildingDescription').value,
-    };
-
-    // Form validation
-    if (!validateBuildingData(buildingData)) {
-        return false;
-    }
-
-    try {
-        // Get building ID if it exists (for update)
-        {#const buildingId = document.getElementById('buildingId')?.value;#}
-        const url = buildingId ?
-            `{{ url_for('api_v1_update_building', building_id='${buildingId}') }}` :
-            '{{ url_for('api_v1_create_building') }}';
-        const method = buildingId ? 'PUT' : 'POST';
-console.log('buildingId --> ', buildingId)
-console.log('url --> ', url)
-console.log('method --> ', method)
-        // Send request to server
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
-            body: JSON.stringify(buildingData)
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        // Hide the modal properly using Bootstrap's Modal API
-        const buildingModal = bootstrap.Modal.getInstance(document.getElementById('addBuildingModal'));
-        if (buildingModal) {
-            buildingModal.hide();
-        }
-
-        // Show success message
-        Swal.fire({
-            title: 'Success!',
-            text: buildingId ? 'Building updated successfully!' : 'Building created successfully!',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Redirect to buildings list
-                window.location.href = '{{ url_for('buildings') }}';
-            }
-        });
-
-        // Clear form
-        resetForm();
-
-        // Refresh building list if we're on the buildings page
-        if (typeof loadBuildings === 'function') {
-            loadBuildings();
-        }
-
-    } catch (error) {
-        console.error('Error:', error);
-        Swal.fire({
-            title: 'Error!',
-            text: 'There was an error saving the building. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-}
 // Validation function
 function validateBuildingData(data) {
     // Required fields

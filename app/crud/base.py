@@ -51,20 +51,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             db: AsyncSession,
             *,
             obj_in: CreateSchemaType,
-            created_by: str = "fastapi1403"  # Default to current user
     ) -> ModelType:
         """
         Create new record.
         """
         obj_in_data = obj_in.model_dump()
-        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now()
 
         # Add audit fields
         obj_in_data.update({
             "created_at": current_time,
-            "created_by": created_by,
             "updated_at": current_time,
-            "updated_by": created_by,
             "is_deleted": False
         })
 
@@ -94,7 +91,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         # Add audit fields
         update_data.update({
-            "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": datetime.now(),
             "updated_by": updated_by
         })
 
