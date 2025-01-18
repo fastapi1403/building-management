@@ -1,32 +1,32 @@
 // Search functionality
-document.getElementById('searchBuilding').addEventListener('keyup', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const buildingCards = document.querySelectorAll('.building-card');
-
-    buildingCards.forEach(card => {
-        const buildingName = card.querySelector('.card-title').textContent.toLowerCase();
-        if (buildingName.includes(searchTerm)) {
-            card.closest('.col-md-6').style.display = '';
-        } else {
-            card.closest('.col-md-6').style.display = 'none';
-        }
-    });
-});
-
-// Status filter
-document.getElementById('statusFilter').addEventListener('change', function(e) {
-    const status = e.target.value.toLowerCase();
-    const buildingCards = document.querySelectorAll('.building-card');
-
-    buildingCards.forEach(card => {
-        const buildingStatus = card.querySelector('.status-badge').textContent.trim().toLowerCase();
-        if (status === '' || buildingStatus === status) {
-            card.closest('.col-md-6').style.display = '';
-        } else {
-            card.closest('.col-md-6').style.display = 'none';
-        }
-    });
-});
+// document.getElementById('searchBuilding').addEventListener('keyup', function(e) {
+//     const searchTerm = e.target.value.toLowerCase();
+//     const buildingCards = document.querySelectorAll('.building-card');
+//
+//     buildingCards.forEach(card => {
+//         const buildingName = card.querySelector('.card-title').textContent.toLowerCase();
+//         if (buildingName.includes(searchTerm)) {
+//             card.closest('.col-md-6').style.display = '';
+//         } else {
+//             card.closest('.col-md-6').style.display = 'none';
+//         }
+//     });
+// });
+//
+// // Status filter
+// document.getElementById('statusFilter').addEventListener('change', function(e) {
+//     const status = e.target.value.toLowerCase();
+//     const buildingCards = document.querySelectorAll('.building-card');
+//
+//     buildingCards.forEach(card => {
+//         const buildingStatus = card.querySelector('.status-badge').textContent.trim().toLowerCase();
+//         if (status === '' || buildingStatus === status) {
+//             card.closest('.col-md-6').style.display = '';
+//         } else {
+//             card.closest('.col-md-6').style.display = 'none';
+//         }
+//     });
+// });
 
 // Function to update existing building card
 function updateBuildingCard(building) {
@@ -520,77 +520,74 @@ function editBuildingDetail(buildingId) {
 
 // Initialize the page functionality based on existing elements
 function initializePage() {
-    // Search functionality - only initialize if search element exists
-    const searchBuilding = document.getElementById('searchBuilding');
-    if (searchBuilding) {
-        searchBuilding.addEventListener('keyup', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const buildingCards = document.querySelectorAll('.building-card');
+    // Only initialize features if we're on the buildings list page
+    // Check if we're on the buildings list page by looking for a unique element
+    const isBuildingsListPage = !!document.querySelector('.buildings-container');
 
-            buildingCards.forEach(card => {
-                const buildingName = card.querySelector('.card-title').textContent.toLowerCase();
-                if (buildingName.includes(searchTerm)) {
-                    card.closest('.col-md-6').style.display = '';
-                } else {
-                    card.closest('.col-md-6').style.display = 'none';
-                }
+    if (isBuildingsListPage) {
+        // Search functionality - only initialize if search element exists
+        const searchBuilding = document.getElementById('searchBuilding');
+        if (searchBuilding) {
+            searchBuilding.addEventListener('keyup', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const buildingCards = document.querySelectorAll('.building-card');
+
+                buildingCards.forEach(card => {
+                    const buildingName = card.querySelector('.card-title').textContent.toLowerCase();
+                    if (buildingName.includes(searchTerm)) {
+                        card.closest('.col-md-6').style.display = '';
+                    } else {
+                        card.closest('.col-md-6').style.display = 'none';
+                    }
+                });
             });
-        });
-    }
+        }
 
-    // Status filter - only initialize if filter element exists
-    const statusFilter = document.getElementById('statusFilter');
-    if (statusFilter) {
-        statusFilter.addEventListener('change', function(e) {
-            const status = e.target.value.toLowerCase();
-            const buildingCards = document.querySelectorAll('.building-card');
+        // Status filter - only initialize if filter element exists
+        const statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) {
+            statusFilter.addEventListener('change', function(e) {
+                const status = e.target.value.toLowerCase();
+                const buildingCards = document.querySelectorAll('.building-card');
 
-            buildingCards.forEach(card => {
-                const buildingStatus = card.querySelector('.status-badge').textContent.trim().toLowerCase();
-                if (status === '' || buildingStatus === status) {
-                    card.closest('.col-md-6').style.display = '';
-                } else {
-                    card.closest('.col-md-6').style.display = 'none';
-                }
+                buildingCards.forEach(card => {
+                    const buildingStatus = card.querySelector('.status-badge').textContent.trim().toLowerCase();
+                    if (status === '' || buildingStatus === status) {
+                        card.closest('.col-md-6').style.display = '';
+                    } else {
+                        card.closest('.col-md-6').style.display = 'none';
+                    }
+                });
             });
-        });
-    }
+        }
 
-    // Form initialization - only if form exists
-    const buildingForm = document.getElementById('buildingForm');
-    if (buildingForm) {
-        buildingForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveBuilding();
-        });
-
-        // Form validation on input
-        buildingForm.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('input', function(e) {
-                this.classList.remove('is-invalid', 'is-valid');
-                this.classList.add(this.checkValidity() ? 'is-valid' : 'is-invalid');
+        // Form initialization - only if form exists
+        const buildingForm = document.getElementById('buildingForm');
+        if (buildingForm) {
+            buildingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveBuilding();
             });
-        });
+
+            // Form validation on input
+            buildingForm.querySelectorAll('input, select').forEach(element => {
+                element.addEventListener('input', function(e) {
+                    this.classList.remove('is-invalid', 'is-valid');
+                    this.classList.add(this.checkValidity() ? 'is-valid' : 'is-invalid');
+                });
+            });
+        }
+
+        // Modal initialization - only if modal exists
+        const addBuildingModal = document.getElementById('addBuildingModal');
+        if (addBuildingModal) {
+            addBuildingModal.addEventListener('hidden.bs.modal', function() {
+                resetForm();
+            });
+        }
     }
 
-    // Modal initialization - only if modal exists
-    const addBuildingModal = document.getElementById('addBuildingModal');
-    if (addBuildingModal) {
-        addBuildingModal.addEventListener('hidden.bs.modal', function() {
-            resetForm();
-        });
-    }
-
-    // Initialize translations
-    if (typeof langManager !== 'undefined') {
-        langManager.translatePage();
-    }
 }
 
 // Call initialization when DOM is ready
-document.addEventListener('DOMContentLoaded', initializePage);
-
-// Define all your functions first (saveBuilding, editBuilding, updateBuildingCard, etc.)
-
-// Initialize page when DOM is ready
 document.addEventListener('DOMContentLoaded', initializePage);

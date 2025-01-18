@@ -305,10 +305,12 @@
 
 // Language selector functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Set initial language state
     // Initialize translations
-    langManager.translatePage();
+    if (typeof langManager !== 'undefined') {
+        langManager.translatePage();
+    }
 
+    // Set initial language state
     const currentLang = langManager.getCurrentLanguage();
     updateLanguageUI(currentLang);
 
