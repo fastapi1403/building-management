@@ -1,5 +1,25 @@
 // app/static/js/lang/en.js
 const en = {
+    base: {
+        description: "Professional Building Management System - Efficiently manage your properties",
+        title: "Building Management System",
+        language: "Language",
+        english: "English",
+        persian: "Persian",
+        building_management: "Building Management",
+        home: "Home",
+        dashboard: "Dashboard",
+        user_profile: "Hassan",
+        profile: "Profile",
+        settings: "Settings",
+        logout: "Logout",
+        buildings: "Buildings",
+        tenants: "Tenants",
+        maintenance: "Maintenance",
+        reports: "Reports",
+        footer_text: "© 2025 Building Management System. All rights reserved.",
+        current_utc_time: "Current Time:"
+    },
     common: {
         add: "Add",
         edit: "Edit",

@@ -1,5 +1,25 @@
 // app/static/js/lang/fa.js
 const fa = {
+    base: {
+        description: "سیستم مدیریت ساختمان حرفه ای - املاک خود را به صورت کارآمد مدیریت کنید",
+        title: "سیستم مدیریت ساختمان",
+        language: "زبان",
+        english: "انگلیسی",
+        persian: "فارسی",
+        building_management: "مدیریت ساختمان",
+        home: "خانه",
+        dashboard: "داشبورد",
+        user_profile: "حسن",
+        profile: "پروفایل",
+        settings: "تنظیمات",
+        logout: "خروج",
+        buildings: "ساختمان‌ها",
+        tenants: "مستاجران",
+        maintenance: "نگهداری",
+        reports: "گزارش‌ها",
+        footer_text: "© 2025 سیستم مدیریت ساختمان. کلیه حقوق محفوظ است.",
+        current_utc_time: "زمان فعلی:"
+    },
     common: {
         add: "افزودن",
         edit: "ویرایش",
