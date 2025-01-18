@@ -268,11 +268,11 @@ function resetForm() {
 }
 
 // Modified editBuilding function to prepare the form for editing
-function editBuilding(buildingId) {
+async function editBuilding(buildingId) {
     try {
-        Swal.fire({
-            title: 'Loading...',
-            text: 'Fetching building details',
+        await Swal.fire({
+            title: langManager.translate('common.loading'),
+            text: langManager.translate('buildings.messages.loading'),
             allowOutsideClick: false,
             allowEscapeKey: false,
             showConfirmButton: false,
@@ -281,46 +281,88 @@ function editBuilding(buildingId) {
             }
         });
 
-        fetch(`/api/v1/buildings/${buildingId}`)
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to fetch building details');
-                return response.json();
-            })
-            .then(building => {
-                const modalTitle = document.querySelector('#addBuildingModal .modal-title');
-                modalTitle.textContent = 'Edit Building';
+        const response = await fetch(`/api/v1/buildings/${buildingId}`);
+        if (!response.ok) {
+            throw new Error(langManager.translate('buildings.messages.fetchError'));
+        }
 
-                const buildingIdInput = document.getElementById('buildingId');
-                if (!buildingIdInput) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.id = 'buildingId';
-                    document.getElementById('buildingForm').appendChild(input);
-                }
-                document.getElementById('buildingId').value = buildingId;
+        const building = await response.json();
 
-                document.getElementById('buildingName').value = building.name || '';
-                document.getElementById('buildingFloors').value = building.total_floors || '';
-                document.getElementById('buildingDescription').value = building.description || '';
+        // Ensure modal exists in DOM
+        let modal = document.getElementById('addBuildingModal');
+        if (!modal) {
+            // If modal doesn't exist, create it
+            const modalHTML = `
+                <div class="modal fade" id="addBuildingModal" tabindex="-1" aria-labelledby="addBuildingModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addBuildingModalLabel">${langManager.translate('buildings.edit')}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="buildingForm">
+                                    <input type="hidden" id="buildingId">
+                                    <div class="mb-3">
+                                        <label for="buildingName" class="form-label" data-i18n="buildings.name"></label>
+                                        <input type="text" class="form-control" id="buildingName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="buildingFloors" class="form-label" data-i18n="buildings.floors"></label>
+                                        <input type="number" class="form-control" id="buildingFloors" required min="1">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="buildingDescription" class="form-label" data-i18n="buildings.description"></label>
+                                        <textarea class="form-control" id="buildingDescription" rows="3"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel"></button>
+                                <button type="button" class="btn btn-primary" onclick="saveBuilding()" data-i18n="common.save"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            modal = document.getElementById('addBuildingModal');
+        }
 
-                Swal.close();
-                const modal = new bootstrap.Modal(document.getElementById('addBuildingModal'));
-                modal.show();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Failed to load building details. Please try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#dc3545'
-                });
-            });
+        // Now we can safely access modal elements
+        const modalTitle = modal.querySelector('.modal-title');
+        if (modalTitle) {
+            modalTitle.textContent = langManager.translate('buildings.edit');
+        }
+
+        // Set form values
+        const buildingIdInput = document.getElementById('buildingId');
+        if (!buildingIdInput) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.id = 'buildingId';
+            document.getElementById('buildingForm').appendChild(input);
+        }
+        document.getElementById('buildingId').value = buildingId;
+        document.getElementById('buildingName').value = building.name || '';
+        document.getElementById('buildingFloors').value = building.total_floors || '';
+        document.getElementById('buildingDescription').value = building.description || '';
+
+        // Close loading dialog
+        await Swal.close();
+
+        // Show modal
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+
+        // Initialize translations for new modal content
+        langManager.translatePage();
+
     } catch (error) {
         console.error('Error:', error);
         Swal.fire({
-            title: 'Error!',
-            text: 'An unexpected error occurred. Please try again.',
+            title: langManager.translate('common.error'),
+            text: error.message || langManager.translate('buildings.messages.editError'),
             icon: 'error',
             confirmButtonColor: '#dc3545'
         });
@@ -329,26 +371,31 @@ function editBuilding(buildingId) {
 
 // Add event listeners when document is ready
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize form validation
+    // Initialize form validation for any existing forms
     const form = document.getElementById('buildingForm');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        saveBuilding();
-    });
-
-    // Add modal hidden event listener to reset form
-    const modal = document.getElementById('addBuildingModal');
-    modal.addEventListener('hidden.bs.modal', function() {
-        resetForm();
-    });
-
-
-    // Form validation on input
-    document.querySelectorAll('#buildingForm input, #buildingForm select').forEach(element => {
-        element.addEventListener('input', function(e) {
-            this.classList.remove('is-invalid', 'is-valid');
-            this.classList.add(this.checkValidity() ? 'is-valid' : 'is-invalid');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveBuilding();
         });
+    }
+
+    // Add modal hidden event listener
+    document.addEventListener('hidden.bs.modal', function(e) {
+        if (e.target.id === 'addBuildingModal') {
+            resetForm();
+        }
+    });
+
+    // Initialize translations
+    langManager.translatePage();
+
+    // Form validation on input for dynamic forms
+    document.addEventListener('input', function(e) {
+        if (e.target.closest('#buildingForm')) {
+            e.target.classList.remove('is-invalid', 'is-valid');
+            e.target.classList.add(e.target.checkValidity() ? 'is-valid' : 'is-invalid');
+        }
     });
 });
 
