@@ -106,7 +106,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             db: AsyncSession,
             *,
             db_obj: ModelType,
-            deleted_by: str = "fastapi1403"  # Default to current user
     ) -> ModelType:
         """
         Soft delete record.
@@ -115,9 +114,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         setattr(db_obj, "is_deleted", True)
         setattr(db_obj, "deleted_at", current_time)
-        setattr(db_obj, "deleted_by", deleted_by)
         setattr(db_obj, "updated_at", current_time)
-        setattr(db_obj, "updated_by", deleted_by)
 
         await db.commit()
         await db.refresh(db_obj)
@@ -137,9 +134,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         setattr(db_obj, "is_deleted", False)
         setattr(db_obj, "deleted_at", None)
-        setattr(db_obj, "deleted_by", None)
         setattr(db_obj, "updated_at", current_time)
-        setattr(db_obj, "updated_by", restored_by)
 
         await db.commit()
         await db.refresh(db_obj)

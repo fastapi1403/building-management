@@ -142,7 +142,6 @@ class CRUDBuilding(CRUDBase[Building, BuildingCreate, BuildingUpdate]):
             db: AsyncSession,
             *,
             db_obj: Building,
-            deleted_by: str = "fastapi1403"
     ) -> Building:
         """
         Soft delete a building by setting is_deleted flag and recording deletion metadata.

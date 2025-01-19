@@ -142,18 +142,14 @@
                         <i class="fas fa-eye me-1"></i> <span data-i18n="floors.view">View</span>
                     </a>
                     {% if not floor.is_deleted %}
-                    <div class="btn-group">
+                    <div class="">
                         <button class="btn btn-outline-secondary" onclick="editFloor('{{ floor.id }}')">
-                            <i class="fas fa-edit me-1"></i> <span data-i18n="floors.edit">Edit</span>
+                            <i class="fas fa-edit me-1"></i>
                         </button>
                         <button class="btn btn-outline-danger" onclick="deleteFloor('{{ floor.id }}')">
-                            <i class="fas fa-trash me-1"></i> <span data-i18n="floors.delete">Delete</span>
+                            <i class="fas fa-trash me-1"></i>
                         </button>
                     </div>
-                    {% else %}
-                    <button class="btn btn-outline-success" onclick="restoreFloor('{{ floor.id }}')">
-                        <i class="fas fa-undo me-1"></i> <span data-i18n="floors.restore">Restore</span>
-                    </button>
                     {% endif %}
                 </div>
             </div>

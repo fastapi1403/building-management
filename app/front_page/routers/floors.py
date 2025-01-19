@@ -19,7 +19,7 @@ async def floors_page(
 ):
     floors = await crud_floor.get_multi(db=db)
     return templates.TemplateResponse(
-        "floors.html",  # You'll need to create this template
+        "floors.html",
         {
             "request": request,
             "floors": floors,
@@ -35,25 +35,31 @@ async def floor_details(
         db: AsyncSession = Depends(get_db)
 ):
     try:
-        # Get floor data
+        # Await the floor data before passing to template
         floor = await crud_floor.get(db=db, id=floor_id)
 
         if not floor:
             raise HTTPException(status_code=404, detail="Floor not found")
 
-        # Additional data can be added here similar to building details
-        # For example:
-        # maintenance_records = await crud_floor.maintenance.get_floor_history(db=db, floor_id=floor_id)
-        # occupancy_data = await crud_floor.occupancy.get_floor_status(db=db, floor_id=floor_id)
+        # Get additional data if needed
+        # maintenance_history = await crud_floor.maintenance.get_floor_history(db=db, floor_id=floor_id)
 
+        # Calculate financial summary
+        # total_funds = await crud_floor.fund.get_floor_total(db=db, floor_id=floor_id)
+        # total_costs = await crud_floor.cost.get_floor_total(db=db, floor_id=floor_id)
+
+        # Prepare the context with all required data
         context = {
-            "request": request,
+            "request": request,  # Required by Starlette
             "floor": floor,
+            # "maintenance_history": maintenance_history[:3] if maintenance_history else [],
+            # "total_funds": total_funds,
+            # "total_costs": total_costs,
             "current_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
 
         return templates.TemplateResponse(
-            "floor_detail.html",  # You'll need to create this template
+            "floor_detail.html",
             context
         )
 
