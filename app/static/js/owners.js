@@ -44,6 +44,7 @@ function updateOwnerCard(owner) {
 
 // Save owner function to handle the save/update process
 async function saveOwner() {
+    console.log('saveOwner')
     const ownerId = document.getElementById('ownerId')?.value;
     const isEditing = !!ownerId;
 
