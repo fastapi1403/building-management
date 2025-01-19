@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}<span data-i18n="floors.detailTitle"></span>{% endblock %}
+
+{% block extra_css %}
+<style>
+    .floor-detail-container {
+        padding: 1.5rem;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+
+    .status-active {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-maintenance {
+        background-color: #fff7ed;
+        color: #9a3412;
+    }
+
+    .status-inactive {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+
+    .detail-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-stat {
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: #f8fafc;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .timeline-item {
+        padding: 1rem;
+        border-left: 2px solid #e5e7eb;
+        margin-left: 1rem;
+        position: relative;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -0.5rem;
+        top: 1.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 2px solid #3b82f6;
+    }
+
+    .unit-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .unit-card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+    }
+
+    .unit-card:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="floor-detail-container">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2">{{ floor.name }}</h1>
+                    <p class="text-muted">Floor {{ floor.number }} - {{ floor.building.name }}</p>
+                </div>
+                <div>
+                    <span class="status-badge {% if floor.is_deleted %}status-inactive{% else %}status-active{% endif %}">
+                        {% if floor.is_deleted %}<span data-i18n="floors.status.deleted"></span>{% else %}<span data-i18n="floors.status.active"></span>{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floor Overview -->
+    <div class="row g-4 mb-4">
+        <!-- Basic Information -->
+        <div class="col-md-8">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="floors.details.basicInfo"></h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted" data-i18n="floors.name"></label>
+                            <p class="mb-3">{{ floor.name }}</p>
+
+                            <label class="text-muted" data-i18n="floors.number"></label>
+                            <p class="mb-3">{{ floor.number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted" data-i18n="floors.details.createdAt"></label>
+                            <p class="mb-3">
+                                {% if floor.created_at %}
+                                    {{ floor.created_at.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
+
+                            <label class="text-muted" data-i18n="floors.details.lastUpdated"></label>
+                            <p>
+                                {% if floor.updated_at %}
+                                    {{ floor.updated_at.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="col-md-4">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="floors.details.quickStats"></h5>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                    <i class="fas fa-door-open"></i>
+                                </div>
+                                <div class="stat-value">{{ floor.total_units }}</div>
+                                <div class="stat-label" data-i18n="floors.units"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="stat-value">{{ floor.occupancy_rate }}%</div>
+                                <div class="stat-label" data-i18n="floors.occupied"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Units and Maintenance -->
+    <div class="row g-4">
+        <!-- Units Section -->
+        <div class="col-md-8">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0" data-i18n="floors.details.units"></h5>
+                        {% if not floor.is_deleted %}
+                        <button class="btn btn-primary btn-sm" onclick="addUnit('{{ floor.id }}')">
+                            <i class="fas fa-plus me-1"></i> <span data-i18n="floors.addUnit"></span>
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="unit-grid">
+                        {% for unit in floor.units %}
+                        <div class="unit-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="mb-0">Unit {{ unit.number }}</h6>
+                                <span class="badge {% if unit.is_occupied %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if unit.is_occupied %}Occupied{% else %}Vacant{% endif %}
+                                </span>
+                            </div>
+                            <p class="text-muted mb-2">{{ unit.type }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    {% if unit.tenant %}
+                                    {{ unit.tenant.name }}
+                                    {% else %}
+                                    No tenant
+                                    {% endif %}
+                                </small>
+                                {% if not floor.is_deleted %}
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="editUnit('{{ unit.id }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteUnit('{{ unit.id }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance History -->
+        <div class="col-md-4">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0" data-i18n="floors.details.maintenance"></h5>
+                        {% if not floor.is_deleted %}
+                        <button class="btn btn-primary btn-sm" onclick="addMaintenance('{{ floor.id }}')">
+                            <i class="fas fa-plus me-1"></i> <span data-i18n="floors.addMaintenance"></span>
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    {% if maintenance_history %}
+                        {% for maintenance in maintenance_history %}
+                        <div class="timeline-item">
+                            <p class="mb-1 fw-bold">{{ maintenance.title }}</p>
+                            <p class="text-muted small mb-0">{{ maintenance.description }}</p>
+                            <span class="text-muted smaller">
+                                {% if maintenance.date %}
+                                    {{ maintenance.date.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted" data-i18n="floors.details.noMaintenanceHistory"></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-end gap-2">
+                {% if not floor.is_deleted %}
+                    <button type="button" class="btn btn-outline-secondary" onclick="editFloor('{{ floor.id }}')">
+                        <i class="fas fa-edit me-1"></i> <span data-i18n="floors.edit"></span>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" onclick="deleteFloor('{{ floor.id }}')">
+                        <i class="fas fa-trash me-1"></i> <span data-i18n="floors.delete"></span>
+                    </button>
+                    <!-- Hard Delete Button -->
+                    <button type="button" class="btn btn-outline-danger" onclick="hardDeleteFloor('{{ floor.id }}')">
+                        <i class="fas fa-trash me-1"></i> <span data-i18n="floors.hardDelete"></span>
+                    </button>
+                {% else %}
+                    <!-- Disabled buttons for deleted floor -->
+                    <button type="button" class="btn btn-outline-secondary" disabled title="Cannot edit deleted floor">
+                        <i class="fas fa-edit me-1"></i> <span data-i18n="floors.edit"></span>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" disabled title="Floor already deleted">
+                        <i class="fas fa-trash me-1"></i> <span data-i18n="floors.delete"></span>
+                    </button>
+                    <!-- Optional: Add restore button -->
+                    <button type="button" class="btn btn-outline-success" onclick="restoreFloor('{{ floor.id }}')">
+                        <i class="fas fa-undo me-1"></i> <span data-i18n="floors.restore"></span>
+                    </button>
+                {% endif %}
+                <a href="{{ url_for('floors') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-1"></i> <span data-i18n="floors.backToList"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='js/floors.js') }}"></script>
+{% endblock %}

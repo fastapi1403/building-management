@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Floors - Building Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .floor-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .floor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+
+    .status-active {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-inactive {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+
+    .status-maintenance {
+        background-color: #fff3e0;
+        color: #ef6c00;
+    }
+
+    .filter-section {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+    }
+
+    .filter-dropdown {
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2" data-i18n="floors.title">Floors</h1>
+    <button class="btn btn-primary" onclick="createFloor()">
+        <i class="fas fa-plus me-2"></i> <span data-i18n="floors.addNew">Add New Floor</span>
+    </button>
+</div>
+
+<!-- Filters -->
+<div class="filter-section mb-4">
+    <div class="container-fluid px-0">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <input type="text"
+                       class="form-control"
+                       id="searchInput"
+                       placeholder="Search floors..."
+                       data-i18n="floors.searchPlaceholder">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select filter-dropdown" id="statusFilter">
+                    <option value="1">Active</option>
+                    <option value="0">Deleted</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select filter-dropdown" id="sortBy">
+                    <option value="name">Sort by Name</option>
+                    <option value="units">Sort by Units</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floors Grid -->
+<div class="row g-4">
+    {% for floor in floors %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card floor-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">{{ floor.name }}</h5>
+                    <span class="status-badge {% if floor.is_deleted %}status-inactive{% else %}status-active{% endif %}">
+                        {% if floor.is_deleted %}Deleted{% else %}Active{% endif %}
+                    </span>
+                </div>
+
+                <div class="floor-stats mb-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-door-open me-2"></i>
+                                <span>{{ floor.total_units }} <span data-i18n="floors.units"></span></span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user-check me-2"></i>
+                                <span>{{ floor.occupancy_rate }}% <span data-i18n="floors.occupied"></span></span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-building me-2"></i>
+                                <span>Floor {{ floor.number }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-tools me-2"></i>
+                                <span>{{ floor.maintenance_count }} <span data-i18n="floors.maintenance"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar bg-success"
+                         role="progressbar"
+                         style="width: {{ floor.occupancy_rate }}%"
+                         aria-valuenow="{{ floor.occupancy_rate }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center action-buttons">
+                    <a href="{{ url_for('floor_details', floor_id=floor.id) }}"
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-eye me-1"></i> <span data-i18n="floors.view">View</span>
+                    </a>
+                    {% if not floor.is_deleted %}
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary" onclick="editFloor('{{ floor.id }}')">
+                            <i class="fas fa-edit me-1"></i> <span data-i18n="floors.edit">Edit</span>
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="deleteFloor('{{ floor.id }}')">
+                            <i class="fas fa-trash me-1"></i> <span data-i18n="floors.delete">Delete</span>
+                        </button>
+                    </div>
+                    {% else %}
+                    <button class="btn btn-outline-success" onclick="restoreFloor('{{ floor.id }}')">
+                        <i class="fas fa-undo me-1"></i> <span data-i18n="floors.restore">Restore</span>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='js/floors.js') }}"></script>
+{% endblock %}
