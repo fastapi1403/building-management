@@ -1,281 +1,143 @@
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional, Union
+from datetime import datetime, timezone
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, func
-from datetime import datetime, UTC
-import logging
 
+from app.crud.base import CRUDBase
 from app.models.floor import Floor
 from app.schemas.floor import FloorCreate, FloorUpdate
-from core.exceptions import (
-    ResourceNotFoundException,
-    ResourceAlreadyExistsException,
-    BusinessLogicException,
-    DatabaseOperationException,
-    handle_exceptions
-)
-
-# Configure logger
-logger = logging.getLogger(__name__)
 
 
-class FloorCRUD:
-    def __init__(self, db_session: AsyncSession):
-        self.db = db_session
-
-    @handle_exceptions
-    async def create(self, floor_data: FloorCreate) -> Floor:
-        """
-        Create a new floor in the building
-        """
-        logger.info(f"Creating new floor with data: {floor_data}")
-
-        # Check if floor number already exists in the building
-        existing_floor = await self.get_by_floor_number(
-            building_id=floor_data.building_id,
-            floor_number=floor_data.floor_number
-        )
-
-        if existing_floor:
-            logger.error(f"Floor {floor_data.floor_number} already exists in building {floor_data.building_id}")
-            raise ResourceAlreadyExistsException(
-                resource_type="Floor",
-                identifier="floor_number",
-                value=floor_data.floor_number,
-                metadata={
-                    "building_id": floor_data.building_id,
-                    "attempted_at": datetime.now(UTC)
-                }
-            )
-
-        floor = Floor(
-            **floor_data.dict(),
-            created_at=datetime.now(UTC),
-            updated_at=datetime.now(UTC)
-        )
-
-        try:
-            self.db.add(floor)
-            await self.db.commit()
-            await self.db.refresh(floor)
-            logger.info(f"Successfully created floor with ID: {floor.id}")
-            return floor
-        except Exception as e:
-            logger.error(f"Error creating floor: {str(e)}")
-            await self.db.rollback()
-            raise DatabaseOperationException(
-                operation="create",
-                detail="Failed to create floor",
-                metadata={"error": str(e)}
-            )
-
-    @handle_exceptions
-    async def get(self, floor_id: int) -> Optional[Floor]:
-        """
-        Get floor by ID
-        """
-        logger.info(f"Fetching floor with ID: {floor_id}")
-
-        query = select(Floor).where(
-            and_(
-                Floor.id == floor_id,
-                Floor.deleted_at.is_(None)
-            )
-        )
-
-        result = await self.db.execute(query)
-        floor = result.scalar_one_or_none()
-
-        if not floor:
-            logger.warning(f"Floor with ID {floor_id} not found")
-            raise ResourceNotFoundException(
-                resource_type="Floor",
-                resource_id=floor_id
-            )
-
-        return floor
-
-    @handle_exceptions
-    async def get_by_floor_number(
+class CRUDFloor(CRUDBase[Floor, FloorCreate, FloorUpdate]):
+    async def create(
             self,
-            building_id: int,
-            floor_number: int
-    ) -> Optional[Floor]:
-        """
-        Get floor by floor number in a specific building
-        """
-        logger.info(f"Fetching floor number {floor_number} in building {building_id}")
-
-        query = select(Floor).where(
-            and_(
-                Floor.building_id == building_id,
-                Floor.floor_number == floor_number,
-                Floor.deleted_at.is_(None)
-            )
-        )
-
-        result = await self.db.execute(query)
-        return result.scalar_one_or_none()
-
-    @handle_exceptions
-    async def get_multi(
-            self,
-            building_id: Optional[int] = None,
-            skip: int = 0,
-            limit: int = 100,
-            filters: Optional[Dict[str, Any]] = None
-    ) -> List[Floor]:
-        """
-        Get multiple floors with optional filtering
-        """
-        logger.info(f"Fetching floors with filters: {filters}")
-
-        query = select(Floor).where(Floor.deleted_at.is_(None))
-
-        if building_id:
-            query = query.where(Floor.building_id == building_id)
-
-        if filters:
-            if 'min_units' in filters:
-                query = query.where(Floor.total_units >= filters['min_units'])
-            if 'max_units' in filters:
-                query = query.where(Floor.total_units <= filters['max_units'])
-
-        query = query.offset(skip).limit(limit)
-        result = await self.db.execute(query)
-
-        return result.scalars().all()
-
-    @handle_exceptions
-    async def update(
-            self,
-            floor_id: int,
-            floor_data: FloorUpdate
+            db: AsyncSession,
+            *,
+            obj_in: FloorCreate,
+            created_by: str = "fastapi1403"
     ) -> Floor:
         """
-        Update floor details
+        Create a new floor.
+
+        Args:
+            db: Database session
+            obj_in: Floor creation schema
+            created_by: Username of the creator
+
+        Returns:
+            Created floor instance
         """
-        logger.info(f"Updating floor {floor_id} with data: {floor_data}")
-
-        floor = await self.get(floor_id)
-
-        update_data = floor_data.dict(exclude_unset=True)
-
-        if 'total_units' in update_data:
-            # Validate if new total units is less than current occupied units
-            occupied_units = await self.get_occupied_units_count(floor_id)
-            if update_data['total_units'] < occupied_units:
-                raise BusinessLogicException(
-                    detail=f"Cannot reduce total units below current occupied units ({occupied_units})",
-                    metadata={
-                        "current_occupied": occupied_units,
-                        "requested_total": update_data['total_units']
-                    }
-                )
-
-        for field, value in update_data.items():
-            setattr(floor, field, value)
-
-        floor.updated_at = datetime.now(UTC)
-
-        try:
-            await self.db.commit()
-            await self.db.refresh(floor)
-            logger.info(f"Successfully updated floor {floor_id}")
-            return floor
-        except Exception as e:
-            logger.error(f"Error updating floor {floor_id}: {str(e)}")
-            await self.db.rollback()
-            raise DatabaseOperationException(
-                operation="update",
-                detail="Failed to update floor",
-                metadata={"error": str(e)}
-            )
-
-    @handle_exceptions
-    async def delete(self, floor_id: int) -> bool:
-        """
-        Soft delete a floor
-        """
-        logger.info(f"Attempting to delete floor {floor_id}")
-
-        floor = await self.get(floor_id)
-
-        # Check if floor has any occupied units
-        occupied_units = await self.get_occupied_units_count(floor_id)
-        if occupied_units > 0:
-            raise BusinessLogicException(
-                detail="Cannot delete floor with occupied units",
-                metadata={"occupied_units": occupied_units}
-            )
-
-        floor.deleted_at = datetime.now(UTC)
-
-        try:
-            await self.db.commit()
-            logger.info(f"Successfully deleted floor {floor_id}")
-            return True
-        except Exception as e:
-            logger.error(f"Error deleting floor {floor_id}: {str(e)}")
-            await self.db.rollback()
-            raise DatabaseOperationException(
-                operation="delete",
-                detail="Failed to delete floor",
-                metadata={"error": str(e)}
-            )
-
-    @handle_exceptions
-    async def get_occupied_units_count(self, floor_id: int) -> int:
-        """
-        Get count of occupied units in a floor
-        """
-        from app.models.unit import Unit  # Import here to avoid circular imports
-
-        query = select(func.count(Unit.id)).where(
-            and_(
-                Unit.floor_id == floor_id,
-                Unit.is_occupied.is_(True),
-                Unit.deleted_at.is_(None)
-            )
+        current_time = datetime.now()
+        db_obj = Floor(
+            number=obj_in.number,
+            name=obj_in.name,
+            building_id=obj_in.building_id,
+            total_units=obj_in.total_units,
+            description=obj_in.description,
         )
+        return await super().create(db, obj_in=db_obj)
 
-        result = await self.db.execute(query)
-        return result.scalar_one()
-
-    @handle_exceptions
-    async def get_floor_statistics(self, floor_id: int) -> Dict[str, Any]:
+    async def update(
+            self,
+            db: AsyncSession,
+            *,
+            db_obj: Floor,
+            obj_in: Union[FloorUpdate, Dict[str, Any]],
+    ) -> Floor:
         """
-        Get floor statistics including occupancy rate, maintenance status, etc.
+        Update a floor.
+
+        Args:
+            db: Database session
+            db_obj: Existing floor instance
+            obj_in: Update data
+
+        Returns:
+            Updated floor instance
         """
-        floor = await self.get(floor_id)
+        obj_data = obj_in.model_dump(exclude_unset=True) if isinstance(obj_in, FloorUpdate) else obj_in
+        return await super().update(db, db_obj=db_obj, obj_in=obj_data)
 
-        from app.models.unit import Unit
+    async def get_multi(
+            self,
+            db: AsyncSession,
+            *,
+            skip: int = 0,
+            limit: int = 100,
+            building_id: Optional[int] = None
+    ) -> List[Floor]:
+        """
+        Get multiple floors with optional filtering.
 
-        # Get total and occupied units
-        total_query = select(func.count(Unit.id)).where(
-            and_(
-                Unit.floor_id == floor_id,
-                Unit.deleted_at.is_(None)
-            )
-        )
-        occupied_query = select(func.count(Unit.id)).where(
-            and_(
-                Unit.floor_id == floor_id,
-                Unit.is_occupied.is_(True),
-                Unit.deleted_at.is_(None)
-            )
-        )
+        Args:
+            db: Database session
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            building_id: Optional building ID filter
 
-        total_units = await self.db.execute(total_query)
-        occupied_units = await self.db.execute(occupied_query)
+        Returns:
+            List of floor instances
+        """
+        query = select(Floor)
+        if building_id:
+            query = query.filter(Floor.building_id == building_id)
+        query = query.offset(skip).limit(limit)
+        result = await db.execute(query)
+        return result.scalars().all()
 
-        total = total_units.scalar_one()
-        occupied = occupied_units.scalar_one()
+    async def get_by_name(
+            self,
+            db: AsyncSession,
+            *,
+            name: str,
+            building_id: int
+    ) -> Optional[Floor]:
+        """
+        Get a floor by its name within a building.
+
+        Args:
+            db: Database session
+            name: Floor name to search for
+            building_id: Building ID to scope the search
+
+        Returns:
+            Floor instance if found, None otherwise
+        """
+        query = select(Floor).filter(Floor.name == name, Floor.building_id == building_id)
+        result = await db.execute(query)
+        return result.scalar_one_or_none()
+
+    async def get_stats(
+            self,
+            db: AsyncSession,
+            building_id: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        Get floor statistics.
+
+        Args:
+            db: Database session
+            building_id: Optional building ID to filter stats
+
+        Returns:
+            Dictionary containing floor statistics
+        """
+        query = select(Floor).filter(Floor.is_deleted == False)
+        if building_id:
+            query = query.filter(Floor.building_id == building_id)
+
+        result = await db.execute(query)
+        floors = result.scalars().all()
+
+        total_units = sum(floor.total_units for floor in floors)
+        occupied_units = 0
+        for floor in floors:
+            occupied_units += await self.get_occupied_units_count(db, floor.id)
 
         return {
-            "floor_number": floor.floor_number,
-            "total_units": total,
-            "occupied_units": occupied,
-            "vacancy_rate": ((total - occupied) / total * 100) if total > 0 else 0,
-            "occupancy_rate": (occupied / total * 100) if total > 0 else 0,
-            "last_updated": floor.updated_at
+            "total_floors": len(floors),
+            "total_units": total_units,
+            "occupied_units": occupied_units,
+            "vacant_units": total_units - occupied_units,
+            "occupancy_rate": (occupied_units / total_units * 100) if total_units > 0 else 0
         }

@@ -1,5 +1,5 @@
 from crud.building import CRUDBuilding
-from models import Building
+from models import Building, Floor
 
-building = CRUDBuilding(Building)
 crud_building = CRUDBuilding(Building)
+floor_building = CRUDBuilding(Floor)
