@@ -404,8 +404,8 @@ function hardDeleteBuilding(buildingId) {
     .then(data => {
         // Handle success response
         alert(langManager.translate('buildings.successHardDelete'));
-        // Optionally, remove the building from the DOM or refresh the page
-        document.getElementById(`building-${buildingId}`).remove();
+
+        window.location.href = '/dashboard/buildings';
     })
     .catch(error => {
         // Handle error response
