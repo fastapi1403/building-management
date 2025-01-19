@@ -121,61 +121,49 @@ const en = {
         networkErrorHardDelete: 'Network response was not ok',
         hardDelete: 'Permanent delete'
     },
-"floors": {
+    "floors": {
     "title": "Floors",
+    "add": "Add New Floor",
     "addNew": "Add New Floor",
-    "edit": "Edit",
-    "delete": "Delete",
-    "restore": "Restore",
-    "view": "View",
+    "edit": "Edit Floor",
+    "delete": "Delete Floor",
+    "view": "View Floor",
+    "formName": "Floor Name",
+    "formNumber": "Floor Number",
+    "formUnits": "Total Units",
+    "formDescription": "Description",
+    "formSave": "Save",
+    "formCancel": "Cancel",
+    "required": "is required",
+    "validationError": "Validation Error",
+    "validationNumber": "Floor number must be greater than 0",
+    "validationUnits": "Total units must be greater than 0",
+    "deleteConfirmation": "Are you sure you want to delete this floor?",
+    "deleteConfirmButton": "Yes, delete it!",
+    "restore": "Restore Floor",
+    "restoreConfirmation": "Do you want to restore this floor?",
+    "restoreConfirmButton": "Yes, restore it!",
     "units": "Units",
     "occupied": "Occupied",
     "maintenance": "Maintenance",
-    "searchPlaceholder": "Search floors...",
-    "status": {
-      "active": "Active",
-      "deleted": "Deleted"
-    },
-    "sort": {
-      "byName": "Sort by Name",
-      "byUnits": "Sort by Units"
-    },
-    "form": {
-      "create": {
-        "title": "Add New Floor",
-        "confirmButton": "Create"
-      },
-      "edit": {
-        "title": "Edit Floor",
-        "confirmButton": "Update"
-      },
-      "delete": {
-        "title": "Are you sure?",
-        "text": "You won't be able to revert this!",
-        "confirmButton": "Yes, delete it!"
-      },
-      "restore": {
-        "title": "Restore Floor?",
-        "text": "This will make the floor active again.",
-        "confirmButton": "Yes, restore it!"
-      },
-      "fields": {
-        "name": "Floor Name",
-        "number": "Floor Number",
-        "totalUnits": "Total Units"
-      },
-      "success": {
-        "create": "Floor Created Successfully",
-        "update": "Floor Updated Successfully",
-        "delete": "Floor Deleted Successfully",
-        "restore": "Floor Restored Successfully"
-      },
-      "error": {
-        "create": "Failed to create floor. Please try again.",
-        "update": "Failed to update floor. Please try again.",
-        "delete": "Failed to delete floor. Please try again.",
-        "restore": "Failed to restore floor. Please try again."
-      }
+    "messages": {
+      "loading": "Loading floor data...",
+      "saving": "Saving floor...",
+      "updating": "Updating floor...",
+      "deleting": "Deleting floor...",
+      "deleteWait": "Please wait while we delete the floor...",
+      "saveError": "Failed to save floor",
+      "updateSuccess": "Floor updated successfully",
+      "createSuccess": "Floor created successfully",
+      "deleteSuccess": "Floor deleted successfully",
+      "editError": "Error editing floor",
+      "fetchError": "Error fetching floor data",
+      "deleteFail": "Failed to delete floor",
+      "deleteError": "Error deleting floor",
+      "restoreSuccess": "Floor restored successfully",
+      "restoreFail": "Failed to restore floor",
+        "saveSuccess": "Floor saved successfully",
+        "updateError": "Error updating floor"
     }
   }
 };

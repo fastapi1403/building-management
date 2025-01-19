@@ -2,17 +2,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-router = APIRouter(prefix="/api/v1/floors")
+from app.schemas import FloorCreate, FloorUpdate
 
-class FloorCreate(BaseModel):
-    name: str
-    number: int
-    building_id: int
-    total_units: int
-    description: Optional[str] = None
-
-class FloorUpdate(FloorCreate):
-    pass
+router = APIRouter(prefix="/floors", tags=["floors"])
 
 @router.get("/{floor_id}")
 async def get_floor(floor_id: int):
