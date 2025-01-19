@@ -418,28 +418,132 @@ function filterFloors() {
     });
 }
 
-// Initialize page functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const sortBy = document.getElementById('sortBy');
+// Function to add a new floor card to the UI
+function addNewFloorCard(floor) {
+    const floorGrid = document.querySelector('.floor-grid');
+    if (!floorGrid) return;
 
-    if (searchInput) searchInput.addEventListener('input', filterFloors);
-    if (statusFilter) statusFilter.addEventListener('change', filterFloors);
-    if (sortBy) sortBy.addEventListener('change', filterFloors);
-});
+    const floorCard = createFloorCardHTML(floor);
+    const newColumn = document.createElement('div');
+    newColumn.className = 'col-md-6 col-lg-4 mb-4';
+    newColumn.innerHTML = floorCard;
+    floorGrid.insertBefore(newColumn, floorGrid.firstChild);
 
-// Helper function to reset form
+    // Initialize any tooltips or other Bootstrap components
+    const tooltips = newColumn.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+}
+
+// Function to update existing floor card
+function updateFloorCard(floor) {
+    const floorCard = document.querySelector(`#floor-${floor.id}`);
+    if (floorCard) {
+        const newCardHtml = createFloorCardHTML(floor);
+        floorCard.outerHTML = newCardHtml;
+
+        // Reinitialize tooltips
+        const tooltips = document.querySelectorAll(`#floor-${floor.id} [data-bs-toggle="tooltip"]`);
+        tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+    }
+}
+
+// Function to create floor card HTML
+function createFloorCardHTML(floor) {
+    const statusClass = floor.is_deleted ? 'status-inactive' : 'status-active';
+    const statusBadge = floor.is_deleted ?
+        `<span class="badge bg-danger status-badge">${langManager.translate('common.inactive')}</span>` :
+        `<span class="badge bg-success status-badge">${langManager.translate('common.active')}</span>`;
+
+    return `
+        <div class="card floor-card h-100" id="floor-${floor.id}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title">${escapeHtml(floor.name)}</h5>
+                    ${statusBadge}
+                </div>
+                <div class="floor-info">
+                    <p class="mb-2">
+                        <i class="bi bi-building"></i>
+                        <span data-i18n="floors.formNumber">${langManager.translate('floors.formNumber')}</span>: ${floor.number}
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-house-door"></i>
+                        <span data-i18n="floors.formUnits">${langManager.translate('floors.formUnits')}</span>: ${floor.total_units}
+                    </p>
+                    ${floor.description ? `
+                    <p class="mb-2">
+                        <i class="bi bi-info-circle"></i>
+                        <span data-i18n="floors.form.description">${langManager.translate('floors.form.description')}</span>: 
+                        ${escapeHtml(floor.description)}
+                    </p>
+                    ` : ''}
+                </div>
+                <div class="card-actions mt-3">
+                    <button class="btn btn-sm btn-primary" 
+                            onclick="editFloor(${floor.id})"
+                            data-bs-toggle="tooltip"
+                            title="${langManager.translate('floors.edit')}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    ${floor.is_deleted ? `
+                        <button class="btn btn-sm btn-success" 
+                                onclick="restoreFloor(${floor.id})"
+                                data-bs-toggle="tooltip"
+                                title="${langManager.translate('floors.restore')}">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                    ` : `
+                        <button class="btn btn-sm btn-danger" 
+                                onclick="deleteFloor(${floor.id})"
+                                data-bs-toggle="tooltip"
+                                title="${langManager.translate('floors.delete')}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    `}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Helper function to escape HTML to prevent XSS
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Function to reset form with validation states
 function resetForm() {
     const form = document.getElementById('floorForm');
     if (form) {
         form.reset();
+        // Clear any validation classes
         form.querySelectorAll('.is-valid, .is-invalid').forEach(element => {
             element.classList.remove('is-valid', 'is-invalid');
         });
-    }
-    const modalTitle = document.querySelector('#addFloorModal .modal-title');
-    if (modalTitle) {
-        modalTitle.textContent = langManager.translate('floors.add');
+        // Reset select elements to default
+        const buildingSelect = document.getElementById('buildingId');
+        if (buildingSelect) {
+            buildingSelect.value = '';
+        }
+        // Clear hidden fields
+        const floorId = document.getElementById('floorId');
+        if (floorId) {
+            floorId.value = '';
+        }
     }
 }
+
+// Add event listener for when modal is hidden
+document.addEventListener('DOMContentLoaded', function() {
+    const addFloorModal = document.getElementById('addFloorModal');
+    if (addFloorModal) {
+        addFloorModal.addEventListener('hidden.bs.modal', function () {
+            resetForm();
+        });
+    }
+});
