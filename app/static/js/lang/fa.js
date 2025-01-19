@@ -121,84 +121,61 @@ const fa = {
         networkErrorHardDelete: 'شبکه پاسخ مناسبی نداشت.',
         hardDelete: 'حذف دائم'
     },
-    floors: {
-        // General
-        title: "طبقات",
-        addNew: "افزودن طبقه جدید",
-        generalDetails: "جزئیات طبقه",
-        searchPlaceholder: "جستجوی طبقات...",
-        backToList: "بازگشت به لیست طبقات",
-
-        // Form Labels
-        formName: "نام طبقه",
-        formNumber: "شماره طبقه",
-        formUnits: "تعداد کل واحدها",
-        formDescription: "توضیحات",
-        formBuilding: "ساختمان",
-        formCancel: "انصراف",
-        formSave: "ذخیره طبقه",
-
-        // Status
-        status: {
-            active: "فعال",
-            deleted: "حذف شده",
-            maintenance: "در حال تعمیر"
-        },
-
-        // Statistics
-        units: "واحدها",
-        occupied: "اشغال شده",
-        vacant: "خالی",
-        occupancyRate: "نرخ اشغال",
-        maintenance: "وظایف نگهداری",
-
-        // Actions
-        edit: "ویرایش طبقه",
-        delete: "حذف طبقه",
-        restore: "بازیابی طبقه",
-        hardDelete: "حذف دائمی",
-        view: "مشاهده جزئیات",
-        addUnit: "افزودن واحد",
-        addMaintenance: "افزودن وظیفه نگهداری",
-
-        // Confirmations
-        deleteConfirmation: "آیا از حذف این طبقه اطمینان دارید؟",
-        restoreConfirmation: "آیا از بازیابی این طبقه اطمینان دارید؟",
-        hardDeleteConfirmation: "این عمل قابل بازگشت نیست. آیا اطمینان دارید؟",
-
-        // Messages
-        messages: {
-            creating: "در حال ایجاد طبقه جدید...",
-            updating: "در حال به‌روزرسانی طبقه...",
-            deleting: "در حال حذف طبقه...",
-            loading: "در حال بارگذاری اطلاعات طبقه...",
-            saving: "در حال ذخیره طبقه...",
-            createSuccess: "طبقه با موفقیت ایجاد شد",
-            updateSuccess: "طبقه با موفقیت به‌روزرسانی شد",
-            deleteSuccess: "طبقه با موفقیت حذف شد",
-            restoreSuccess: "طبقه با موفقیت بازیابی شد",
-            saveError: "خطا در ذخیره طبقه",
-            deleteError: "خطا در حذف طبقه",
-            fetchError: "خطا در دریافت اطلاعات طبقه",
-            editError: "خطا در ویرایش طبقه",
-            validationError: "لطفاً خطاهای فرم را بررسی کنید"
-        },
-
-        // Validation
-        required: "این فیلد الزامی است",
-        validationFloorNumber: "شماره طبقه باید بزرگتر از ۰ باشد",
-        validationUnits: "تعداد کل واحدها باید ۰ یا بیشتر باشد",
-        validationName: "نام طبقه الزامی است",
-
-        // Details
-        details: {
-            basicInfo: "اطلاعات پایه",
-            quickStats: "آمار سریع",
-            maintenance: "تاریخچه نگهداری",
-            units: "واحدها",
-            createdAt: "تاریخ ایجاد",
-            lastUpdated: "آخرین به‌روزرسانی",
-            noMaintenanceHistory: "تاریخچه نگهداری موجود نیست"
-        }
+    "floors": {
+    "title": "طبقات",
+    "addNew": "افزودن طبقه جدید",
+    "edit": "ویرایش",
+    "delete": "حذف",
+    "restore": "بازیابی",
+    "view": "مشاهده",
+    "units": "واحدها",
+    "occupied": "اشغال شده",
+    "maintenance": "نگهداری",
+    "searchPlaceholder": "جستجوی طبقات...",
+    "status": {
+      "active": "فعال",
+      "deleted": "حذف شده"
+    },
+    "sort": {
+      "byName": "مرتب‌سازی بر اساس نام",
+      "byUnits": "مرتب‌سازی بر اساس واحدها"
+    },
+    "form": {
+      "create": {
+        "title": "افزودن طبقه جدید",
+        "confirmButton": "ایجاد"
+      },
+      "edit": {
+        "title": "ویرایش طبقه",
+        "confirmButton": "به‌روزرسانی"
+      },
+      "delete": {
+        "title": "آیا مطمئن هستید؟",
+        "text": "این عمل قابل بازگشت نیست!",
+        "confirmButton": "بله، حذف شود!"
+      },
+      "restore": {
+        "title": "بازیابی طبقه؟",
+        "text": "این طبقه دوباره فعال خواهد شد.",
+        "confirmButton": "بله، بازیابی شود!"
+      },
+      "fields": {
+        "name": "نام طبقه",
+        "number": "شماره طبقه",
+        "totalUnits": "تعداد کل واحدها"
+      },
+      "success": {
+        "create": "طبقه با موفقیت ایجاد شد",
+        "update": "طبقه با موفقیت به‌روزرسانی شد",
+        "delete": "طبقه با موفقیت حذف شد",
+        "restore": "طبقه با موفقیت بازیابی شد"
+      },
+      "error": {
+        "create": "خطا در ایجاد طبقه. لطفاً دوباره تلاش کنید.",
+        "update": "خطا در به‌روزرسانی طبقه. لطفاً دوباره تلاش کنید.",
+        "delete": "خطا در حذف طبقه. لطفاً دوباره تلاش کنید.",
+        "restore": "خطا در بازیابی طبقه. لطفاً دوباره تلاش کنید."
+      }
     }
+  }
 };
