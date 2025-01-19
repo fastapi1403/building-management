@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}<span data-i18n="owners.detailTitle"></span>{% endblock %}
+
+{% block extra_css %}
+<style>
+    .owner-detail-container {
+        padding: 1.5rem;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+
+    .status-active {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-maintenance {
+        background-color: #fff7ed;
+        color: #9a3412;
+    }
+
+    .status-inactive {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+
+    .detail-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-stat {
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: #f8fafc;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .timeline-item {
+        padding: 1rem;
+        border-left: 2px solid #e5e7eb;
+        margin-left: 1rem;
+        position: relative;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -0.5rem;
+        top: 1.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 2px solid #3b82f6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="owner-detail-container">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2">{{ owner.name }}</h1>
+{#                    <nav aria-label="breadcrumb">#}
+{#                        <ol class="breadcrumb">#}
+{#                            <li class="breadcrumb-item">#}
+{#                                <a href="{{ url_for('owners') }}" data-i18n="owners.title"></a>#}
+{#                            </li>#}
+{#                            <li class="breadcrumb-item active" aria-current="page" data-i18n="owners.detailTitle"></li>#}
+{#                        </ol>#}
+{#                    </nav>#}
+                </div>
+                <div>
+                    <span class="status-badge {% if owner.is_deleted %}status-inactive{% else %}status-active{% endif %}">
+                        {% if owner.is_deleted %}<span data-i18n="owners.status.deleted"></span>{% else %}<span data-i18n="owners.status.active"></span>{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner Overview -->
+    <div class="row g-4 mb-4">
+        <!-- Basic Information -->
+        <div class="col-md-8">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="owners.details.basicInfo"></h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-muted" data-i18n="owners.name"></label>
+                            <p class="mb-3">{{ owner.name }}</p>
+
+                            <label class="text-muted" data-i18n="owners.floors"></label>
+                            <p class="mb-3">{{ owner.total_floors }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted" data-i18n="owners.details.createdAt"></label>
+                            <p class="mb-3">
+                                {% if owner.created_at %}
+                                    {{ owner.created_at.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
+
+                            <label class="text-muted" data-i18n="owners.details.lastUpdated"></label>
+                            <p>
+                                {% if owner.updated_at %}
+                                    {{ owner.updated_at.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="col-md-4">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="owners.details.quickStats"></h5>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                    <i class="fas fa-door-open"></i>
+                                </div>
+                                <div class="stat-value">{{ 28 }}</div>
+                                <div class="stat-label" data-i18n="owners.units"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="stat-value">100%</div>
+                                <div class="stat-label" data-i18n="owners.occupied"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Information -->
+    <div class="row g-4">
+        <!-- Financial Summary -->
+        <div class="col-md-6">
+            <div class="card detail-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4" data-i18n="owners.details.financialSummary"></h5>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-value text-success">
+                                    {% if owner.total_funds is defined %}
+                                        {{ "{:,.0f}".format(owner.total_funds) }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </div>
+                                <div class="stat-label" data-i18n="owners.details.totalIncome"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detail-stat">
+                                <div class="stat-value text-danger">{{ owner.total_costs }}</div>
+                                <div class="stat-label" data-i18n="owners.details.totalExpenses"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Status -->
+        {% if maintenance_history %}
+            {% for maintenance in maintenance_history %}
+                <div class="timeline-item">
+                    <p class="mb-1 fw-bold">{{ maintenance.title }}</p>
+                    <p class="text-muted small mb-0">{{ maintenance.description }}</p>
+                    <span class="text-muted smaller">
+                        {% if maintenance.date %}
+                            {{ maintenance.date.strftime('%Y-%m-%d') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+        {% else %}
+{#            <p class="text-muted" data-i18n="owners.details.noMaintenanceHistory">No maintenance history available</p>#}
+        {% endif %}
+    </div>
+
+<!-- Action Buttons -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+            {% if not owner.is_deleted %}
+                <button type="button" class="btn btn-outline-secondary" onclick="editOwner('{{ owner.id }}')">
+                    <i class="fas fa-edit me-1"></i> <span data-i18n="owners.edit"></span>
+                </button>
+                <button type="button" class="btn btn-outline-danger" onclick="deleteOwner('{{ owner.id }}')">
+                    <i class="fas fa-trash me-1"></i> <span data-i18n="owners.delete"></span>
+                </button>
+                 <!-- Hard Delete Button -->
+                <button type="button" class="btn btn-outline-danger" onclick="hardDeleteOwner('{{ owner.id }}')">
+                    <i class="fas fa-trash me-1"></i> <span data-i18n="owners.hardDelete"></span>
+                </button>
+            {% else %}
+                <!-- Disabled buttons for deleted owner -->
+                <button type="button" class="btn btn-outline-secondary" disabled title="Cannot edit deleted owner">
+                    <i class="fas fa-edit me-1"></i> <span data-i18n="owners.edit"></span>
+                </button>
+                <button type="button" class="btn btn-outline-danger" disabled title="Owner already deleted">
+                    <i class="fas fa-trash me-1"></i> <span data-i18n="owners.delete"></span>
+                </button>
+                <!-- Optional: Add restore button -->
+                <button type="button" class="btn btn-outline-success" onclick="restoreOwner('{{ owner.id }}')">
+                    <i class="fas fa-undo me-1"></i> <span data-i18n="owners.restore"></span>
+                </button>
+            {% endif %}
+            <a href="{{ url_for('owners') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-1"></i> <span data-i18n="owners.backToList"></span>
+            </a>
+        </div>
+    </div>
+</div></div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='js/owners.js') }}"></script>
+{#<script>#}
+{#document.addEventListener('DOMContentLoaded', function() {#}
+{#    // Initialize translations#}
+{#    langManager.translatePage();#}
+{##}
+{#    // Edit owner function#}
+{#    window.editOwner = function(ownerId) {#}
+{#        window.location.href = `{{ url_for('owners') }}#edit-${ownerId}`;#}
+{#    };#}
+{##}
+{#    // Delete owner function#}
+{#    window.deleteOwner = async function(ownerId) {#}
+{#        const result = await Swal.fire({#}
+{#            title: langManager.translate('owners.delete'),#}
+{#            text: langManager.translate('owners.deleteConfirmation'),#}
+{#            icon: 'warning',#}
+{#            showCancelButton: true,#}
+{#            confirmButtonColor: '#dc3545',#}
+{#            cancelButtonColor: '#6c757d',#}
+{#            confirmButtonText: langManager.translate('owners.deleteConfirmButton'),#}
+{#            cancelButtonText: langManager.translate('common.cancel')#}
+{#        });#}
+{##}
+{#        if (result.isConfirmed) {#}
+{#            try {#}
+{#                const response = await fetch(`/api/v1/owners/${ownerId}`, {#}
+{#                    method: 'DELETE',#}
+{#                    headers: {#}
+{#                        'Content-Type': 'application/json',#}
+{#                        'X-CSRFToken': getCsrfToken()#}
+{#                    }#}
+{#                });#}
+{##}
+{#                if (!response.ok) throw new Error(langManager.translate('owners.deleteFail'));#}
+{##}
+{#                await Swal.fire({#}
+{#                    title: langManager.translate('common.success'),#}
+{#                    text: langManager.translate('owners.deleteSuccess'),#}
+{#                    icon: 'success',#}
+{#                    timer: 2000#}
+{#                });#}
+{##}
+{#                // Refresh the page to show updated status#}
+{#                window.location.reload();#}
+{#            } catch (error) {#}
+{#                console.error('Error:', error);#}
+{#                Swal.fire({#}
+{#                    title: langManager.translate('common.error'),#}
+{#                    text: error.message,#}
+{#                    icon: 'error'#}
+{#                });#}
+{#            }#}
+{#        }#}
+{#    };#}
+{##}
+{#    // Restore owner function#}
+{#    window.restoreOwner = async function(ownerId) {#}
+{#        const result = await Swal.fire({#}
+{#            title: langManager.translate('owners.restore'),#}
+{#            text: langManager.translate('owners.restoreConfirmation'),#}
+{#            icon: 'question',#}
+{#            showCancelButton: true,#}
+{#            confirmButtonColor: '#198754',#}
+{#            cancelButtonColor: '#6c757d',#}
+{#            confirmButtonText: langManager.translate('owners.restoreConfirmButton'),#}
+{#            cancelButtonText: langManager.translate('common.cancel')#}
+{#        });#}
+{##}
+{#        if (result.isConfirmed) {#}
+{#            try {#}
+{#                const response = await fetch(`/api/v1/owners/${ownerId}/restore`, {#}
+{#                    method: 'POST',#}
+{#                    headers: {#}
+{#                        'Content-Type': 'application/json',#}
+{#                        'X-CSRFToken': getCsrfToken()#}
+{#                    }#}
+{#                });#}
+{##}
+{#                if (!response.ok) throw new Error(langManager.translate('owners.restoreFail'));#}
+{##}
+{#                await Swal.fire({#}
+{#                    title: langManager.translate('common.success'),#}
+{#                    text: langManager.translate('owners.restoreSuccess'),#}
+{#                    icon: 'success',#}
+{#                    timer: 2000#}
+{#                });#}
+{##}
+{#                // Refresh the page to show updated status#}
+{#                window.location.reload();#}
+{#            } catch (error) {#}
+{#                console.error('Error:', error);#}
+{#                Swal.fire({#}
+{#                    title: langManager.translate('common.error'),#}
+{#                    text: error.message,#}
+{#                    icon: 'error'#}
+{#                });#}
+{#            }#}
+{#        }#}
+{#    };#}
+{#});#}
+{#</script>#}
+{% endblock %}
