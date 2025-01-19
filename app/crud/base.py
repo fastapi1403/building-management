@@ -110,7 +110,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         Soft delete record.
         """
-        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now()
 
         setattr(db_obj, "is_deleted", True)
         setattr(db_obj, "deleted_at", current_time)
@@ -130,7 +130,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         Restore soft-deleted record.
         """
-        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now()
 
         setattr(db_obj, "is_deleted", False)
         setattr(db_obj, "deleted_at", None)

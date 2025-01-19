@@ -240,6 +240,14 @@
                                 <span data-i18n="base.floors"></span>
                             </a>
                         </li>
+                        <!-- Owners Navigation Item -->
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'owners' %}active{% endif %}"
+                               href="{{ url_for('owners') }}">
+                                <i class="fa-solid fa-building-user"></i>
+                                <span data-i18n="base.owners"></span>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'tenants' %}active{% endif %}"
 {#                               href="{{ url_for('tenants') }}">#}

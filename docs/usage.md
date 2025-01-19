@@ -51,7 +51,7 @@ from core.exceptions import (
 # Configure logger
 logger = logging.getLogger(__name__)
 
-class OwnerCRUD:
+class CRUDOwner:
     def __init__(self, db_session: AsyncSession):
         self.db = db_session
 

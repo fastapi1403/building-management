@@ -1,303 +1,143 @@
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional, Union
+from datetime import datetime, timezone
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, func, desc
-from datetime import datetime, UTC
-import logging
 
+from app.crud.base import CRUDBase
 from app.models.owner import Owner
-from app.models.unit import Unit
 from app.schemas.owner import OwnerCreate, OwnerUpdate
-from core.exceptions import (
-    ResourceNotFoundException,
-    ResourceAlreadyExistsException,
-    BusinessLogicException,
-    DatabaseOperationException,
-    handle_exceptions
-)
-
-# Configure logger
-logger = logging.getLogger(__name__)
 
 
-class OwnerCRUD:
-    def __init__(self, db_session: AsyncSession):
-        self.db = db_session
-
-    @handle_exceptions
-    async def create(self, owner_data: OwnerCreate) -> Owner:
-        """
-        Create a new owner with validation
-        """
-        logger.info(f"Creating new owner: {owner_data.email}")
-
-        # Check if owner with email already exists
-        existing_owner = await self.get_by_email(owner_data.email)
-        if existing_owner:
-            logger.error(f"Owner with email {owner_data.email} already exists")
-            raise ResourceAlreadyExistsException(
-                resource_type="Owner",
-                identifier="email",
-                value=owner_data.email,
-                metadata={"attempted_at": datetime.now(UTC)}
-            )
-
-        owner = Owner(
-            **owner_data.dict(),
-            created_at=datetime.now(UTC),
-            updated_at=datetime.now(UTC)
-        )
-
-        try:
-            self.db.add(owner)
-            await self.db.commit()
-            await self.db.refresh(owner)
-            logger.info(f"Successfully created owner with ID: {owner.id}")
-            return owner
-        except Exception as e:
-            logger.error(f"Error creating owner: {str(e)}")
-            await self.db.rollback()
-            raise DatabaseOperationException(
-                operation="create",
-                detail="Failed to create owner",
-                metadata={"error": str(e)}
-            )
-
-    @handle_exceptions
-    async def get(self, owner_id: int) -> Owner:
-        """
-        Get owner by ID
-        """
-        logger.info(f"Fetching owner with ID: {owner_id}")
-
-        query = select(Owner).where(
-            and_(
-                Owner.id == owner_id,
-                Owner.deleted_at.is_(None)
-            )
-        )
-
-        result = await self.db.execute(query)
-        owner = result.scalar_one_or_none()
-
-        if not owner:
-            raise ResourceNotFoundException(
-                resource_type="Owner",
-                resource_id=owner_id
-            )
-
-        return owner
-
-    @handle_exceptions
-    async def get_by_email(self, email: str) -> Optional[Owner]:
-        """
-        Get owner by email
-        """
-        query = select(Owner).where(
-            and_(
-                Owner.email == email,
-                Owner.deleted_at.is_(None)
-            )
-        )
-
-        result = await self.db.execute(query)
-        return result.scalar_one_or_none()
-
-    @handle_exceptions
-    async def get_multi(
+class CRUDOwner(CRUDBase[Owner, OwnerCreate, OwnerUpdate]):
+    async def create(
             self,
-            skip: int = 0,
-            limit: int = 100,
-            filters: Optional[Dict[str, Any]] = None
-    ) -> List[Owner]:
-        """
-        Get multiple owners with filtering options
-        """
-        query = select(Owner).where(Owner.deleted_at.is_(None))
-
-        if filters:
-            if filters.get("search"):
-                search_term = f"%{filters['search']}%"
-                query = query.where(
-                    or_(
-                        Owner.name.ilike(search_term),
-                        Owner.email.ilike(search_term)
-                    )
-                )
-            if filters.get("has_units"):
-                query = query.join(Unit).group_by(Owner.id)
-
-        query = query.order_by(desc(Owner.created_at)).offset(skip).limit(limit)
-        result = await self.db.execute(query)
-        return result.scalars().all()
-
-    @handle_exceptions
-    async def update(
-            self,
-            owner_id: int,
-            owner_data: OwnerUpdate
+            db: AsyncSession,
+            *,
+            obj_in: OwnerCreate,
+            created_by: str = "fastapi1403"
     ) -> Owner:
         """
-        Update owner information
+        Create a new owner.
+
+        Args:
+            db: Database session
+            obj_in: Owner creation schema
+            created_by: Username of the creator
+
+        Returns:
+            Created owner instance
         """
-        logger.info(f"Updating owner {owner_id}")
-
-        owner = await self.get(owner_id)
-        update_data = owner_data.dict(exclude_unset=True)
-
-        if "email" in update_data and update_data["email"] != owner.email:
-            existing_owner = await self.get_by_email(update_data["email"])
-            if existing_owner:
-                raise ResourceAlreadyExistsException(
-                    resource_type="Owner",
-                    identifier="email",
-                    value=update_data["email"]
-                )
-
-        for field, value in update_data.items():
-            setattr(owner, field, value)
-
-        owner.updated_at = datetime.now(UTC)
-
-        try:
-            await self.db.commit()
-            await self.db.refresh(owner)
-            logger.info(f"Successfully updated owner {owner_id}")
-            return owner
-        except Exception as e:
-            logger.error(f"Error updating owner {owner_id}: {str(e)}")
-            await self.db.rollback()
-            raise DatabaseOperationException(
-                operation="update",
-                detail="Failed to update owner",
-                metadata={"error": str(e)}
-            )
-
-    @handle_exceptions
-    async def delete(self, owner_id: int) -> bool:
-        """
-        Soft delete owner with validation
-        """
-        logger.info(f"Attempting to delete owner {owner_id}")
-
-        owner = await self.get(owner_id)
-
-        # Check if owner has any active units
-        active_units = await self.get_owner_active_units(owner_id)
-        if active_units:
-            raise BusinessLogicException(
-                detail="Cannot delete owner with active units",
-                metadata={"active_units": len(active_units)}
-            )
-
-        owner.deleted_at = datetime.now(UTC)
-
-        try:
-            await self.db.commit()
-            logger.info(f"Successfully deleted owner {owner_id}")
-            return True
-        except Exception as e:
-            logger.error(f"Error deleting owner {owner_id}: {str(e)}")
-            await self.db.rollback()
-            raise DatabaseOperationException(
-                operation="delete",
-                detail="Failed to delete owner"
-            )
-
-    @handle_exceptions
-    async def get_owner_active_units(self, owner_id: int) -> List[Unit]:
-        """
-        Get all active units owned by an owner
-        """
-        query = select(Unit).where(
-            and_(
-                Unit.current_owner_id == owner_id,
-                Unit.deleted_at.is_(None)
-            )
+        current_time = datetime.now()
+        db_obj = Owner(
+            number=obj_in.number,
+            name=obj_in.name,
+            building_id=obj_in.building_id,
+            total_units=obj_in.total_units,
+            description=obj_in.description,
         )
-        result = await self.db.execute(query)
+        return await super().create(db, obj_in=db_obj)
+
+    async def update(
+            self,
+            db: AsyncSession,
+            *,
+            db_obj: Owner,
+            obj_in: Union[OwnerUpdate, Dict[str, Any]],
+    ) -> Owner:
+        """
+        Update a owner.
+
+        Args:
+            db: Database session
+            db_obj: Existing owner instance
+            obj_in: Update data
+
+        Returns:
+            Updated owner instance
+        """
+        obj_data = obj_in.model_dump(exclude_unset=True) if isinstance(obj_in, OwnerUpdate) else obj_in
+        return await super().update(db, db_obj=db_obj, obj_in=obj_data)
+
+    async def get_multi(
+            self,
+            db: AsyncSession,
+            *,
+            skip: int = 0,
+            limit: int = 100,
+            building_id: Optional[int] = None
+    ) -> List[Owner]:
+        """
+        Get multiple owners with optional filtering.
+
+        Args:
+            db: Database session
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            building_id: Optional building ID filter
+
+        Returns:
+            List of owner instances
+        """
+        query = select(Owner)
+        if building_id:
+            query = query.filter(Owner.building_id == building_id)
+        query = query.offset(skip).limit(limit)
+        result = await db.execute(query)
         return result.scalars().all()
 
-    @handle_exceptions
-    async def get_owner_statistics(self, owner_id: int) -> Dict[str, Any]:
+    async def get_by_name(
+            self,
+            db: AsyncSession,
+            *,
+            name: str,
+            building_id: int
+    ) -> Optional[Owner]:
         """
-        Get comprehensive statistics about an owner
+        Get a owner by its name within a building.
+
+        Args:
+            db: Database session
+            name: Owner name to search for
+            building_id: Building ID to scope the search
+
+        Returns:
+            Owner instance if found, None otherwise
         """
-        owner = await self.get(owner_id)
+        query = select(Owner).filter(Owner.name == name, Owner.building_id == building_id)
+        result = await db.execute(query)
+        return result.scalar_one_or_none()
 
-        # Get units statistics
-        units_query = select(
-            func.count(Unit.id).label('total_units'),
-            func.count(Unit.id).filter(Unit.is_occupied.is_(True)).label('occupied_units'),
-            func.sum(Unit.area_sqft).label('total_area'),
-            func.sum(Unit.monthly_maintenance).label('total_maintenance')
-        ).where(
-            and_(
-                Unit.current_owner_id == owner_id,
-                Unit.deleted_at.is_(None)
-            )
-        )
+    async def get_stats(
+            self,
+            db: AsyncSession,
+            building_id: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        Get owner statistics.
 
-        result = await self.db.execute(units_query)
-        stats = result.one()
+        Args:
+            db: Database session
+            building_id: Optional building ID to filter stats
+
+        Returns:
+            Dictionary containing owner statistics
+        """
+        query = select(Owner).filter(Owner.is_deleted == False)
+        if building_id:
+            query = query.filter(Owner.building_id == building_id)
+
+        result = await db.execute(query)
+        owners = result.scalars().all()
+
+        total_units = sum(owner.total_units for owner in owners)
+        occupied_units = 0
+        for owner in owners:
+            occupied_units += await self.get_occupied_units_count(db, owner.id)
 
         return {
-            "owner_name": owner.name,
-            "owner_email": owner.email,
-            "total_units": stats.total_units or 0,
-            "occupied_units": stats.occupied_units or 0,
-            "vacancy_rate": ((stats.total_units - stats.occupied_units) / stats.total_units * 100)
-            if stats.total_units else 0,
-            "total_area_owned": round(stats.total_area or 0, 2),
-            "total_monthly_maintenance": round(stats.total_maintenance or 0, 2),
-            "member_since": owner.created_at,
-            "last_updated": owner.updated_at
+            "total_owners": len(owners),
+            "total_units": total_units,
+            "occupied_units": occupied_units,
+            "vacant_units": total_units - occupied_units,
+            "occupancy_rate": (occupied_units / total_units * 100) if total_units > 0 else 0
         }
-
-    @handle_exceptions
-    async def transfer_units(
-            self,
-            from_owner_id: int,
-            to_owner_id: int,
-            unit_ids: List[int]
-    ) -> bool:
-        """
-        Transfer units from one owner to another
-        """
-        logger.info(f"Transferring units {unit_ids} from owner {from_owner_id} to {to_owner_id}")
-
-        from_owner = await self.get(from_owner_id)
-        to_owner = await self.get(to_owner_id)
-
-        try:
-            # Update units ownership
-            update_query = (
-                Unit.__table__.update()
-                .where(
-                    and_(
-                        Unit.id.in_(unit_ids),
-                        Unit.current_owner_id == from_owner_id
-                    )
-                )
-                .values(
-                    current_owner_id=to_owner_id,
-                    updated_at=datetime.now(UTC)
-                )
-            )
-
-            await self.db.execute(update_query)
-            await self.db.commit()
-
-            logger.info(f"Successfully transferred units from owner {from_owner_id} to {to_owner_id}")
-            return True
-        except Exception as e:
-            logger.error(f"Error transferring units: {str(e)}")
-            await self.db.rollback()
-            raise DatabaseOperationException(
-                operation="transfer",
-                detail="Failed to transfer units",
-                metadata={
-                    "from_owner": from_owner_id,
-                    "to_owner": to_owner_id,
-                    "units": unit_ids
-                }
-            )
