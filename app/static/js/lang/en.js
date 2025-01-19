@@ -18,7 +18,8 @@ const en = {
         maintenance: "Maintenance",
         reports: "Reports",
         footer_text: "© 2025 Building Management System. All rights reserved.",
-        current_utc_time: "Current Time:"
+        current_utc_time: "Current Time:",
+        floors: "Floors"
     },
     common: {
         add: "Add",

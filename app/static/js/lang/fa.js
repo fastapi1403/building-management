@@ -18,7 +18,8 @@ const fa = {
         maintenance: "نگهداری",
         reports: "گزارش‌ها",
         footer_text: "© 2025 سیستم مدیریت ساختمان. کلیه حقوق محفوظ است.",
-        current_utc_time: "زمان فعلی:"
+        current_utc_time: "زمان فعلی:",
+        floors: "طبقات"
     },
     common: {
         add: "افزودن",

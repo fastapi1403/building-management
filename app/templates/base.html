@@ -232,6 +232,14 @@
                                 <span data-i18n="base.buildings"></span>
                             </a>
                         </li>
+                        <!-- Floors Navigation Item -->
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'floors' %}active{% endif %}"
+                               href="{{ url_for('floors') }}">
+                                <i class="fas fa-layer-group me-2"></i>
+                                <span data-i18n="base.floors"></span>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'tenants' %}active{% endif %}"
 {#                               href="{{ url_for('tenants') }}">#}
