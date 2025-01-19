@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.building import BuildingCreate, BuildingUpdate, BuildingResponse
 from app.models.building import Building
-from crud import crud_building
+from app.crud import crud_building
 from db.session import get_db
 
 router = APIRouter(prefix="/buildings", tags=["buildings"])
