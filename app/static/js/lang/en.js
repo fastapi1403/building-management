@@ -89,7 +89,8 @@ const en = {
             createSuccess: "Building created successfully!",
             updateSuccess: "Building updated successfully!",
             loadError: "Failed to load building details. Please try again.",
-            saveError: "There was an error saving the building. Please try again."
+            saveError: "There was an error saving the building. Please try again.",
+            loading: "Loading building data. Please wait!",
         },
         detailTitle: "Building Details",
         details: {

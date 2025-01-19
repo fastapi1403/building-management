@@ -102,7 +102,7 @@ async function saveBuilding() {
         // Show loading state with translations
         Swal.fire({
             title: langManager.translate('common.loading'),
-            text: langManager.translate(isEditing ? 'buildings.messages.updating' : 'buildings.messages.saving'),
+            text: langManager.translate(isEditing ? langManager.translate('buildings.messages.updating') : langManager.translate('buildings.messages.saving')),
             allowOutsideClick: false,
             allowEscapeKey: false,
             showConfirmButton: false,
