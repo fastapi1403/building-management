@@ -382,6 +382,37 @@ async function deleteBuilding(buildingId) {
     }
 }
 
+function hardDeleteBuilding(buildingId) {
+    // Confirm the deletion action with the user
+    if (!confirm( langManager.translate('buildings.confirmHardDelete'))) {
+        return;
+    }
+
+    // Perform an AJAX request to delete the building
+    fetch(`/api/buildings/${buildingId}/permanent`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(langManager.translate('buildings.networkErrorHardDelete'));
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Handle success response
+        alert(langManager.translate('buildings.successHardDelete'));
+        // Optionally, remove the building from the DOM or refresh the page
+        document.getElementById(`building-${buildingId}`).remove();
+    })
+    .catch(error => {
+        // Handle error response
+        alert(langManager.translate('buildings.errorHardDelete'));
+    });
+}
+
 // Validation function
 function validateBuildingData(data) {
     const requiredFields = ['name', 'total_floors'];

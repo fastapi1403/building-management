@@ -112,6 +112,11 @@ const en = {
         restoreSuccess: "The building has been successfully restored.",
         restoreFail: "Failed to restore building",
         cannotEditDeleted: "Cannot edit deleted building",
-        alreadyDeleted: "Building already deleted"
+        alreadyDeleted: "Building already deleted",
+        confirmHardDelete: 'Are you sure you want to permanently delete this building? This action cannot be undone.',
+        successHardDelete: 'Building deleted successfully',
+        errorHardDelete: 'Failed to delete the building. Please try again.',
+        networkErrorHardDelete: 'Network response was not ok'
+
     }
 };
