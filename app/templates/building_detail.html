@@ -241,6 +241,10 @@
                 <button type="button" class="btn btn-outline-danger" onclick="deleteBuilding('{{ building.id }}')">
                     <i class="fas fa-trash me-1"></i> <span data-i18n="buildings.delete"></span>
                 </button>
+                 <!-- Hard Delete Button -->
+                <button type="button" class="btn btn-outline-danger" onclick="hardDeleteBuilding('{{ building.id }}')">
+                    <i class="fas fa-trash me-1"></i> <span data-i18n="buildings.hardDelete"></span>
+                </button>
             {% else %}
                 <!-- Disabled buttons for deleted building -->
                 <button type="button" class="btn btn-outline-secondary" disabled title="Cannot edit deleted building">

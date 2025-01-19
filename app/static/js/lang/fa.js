@@ -116,6 +116,7 @@ const fa = {
         confirmHardDelete: 'آیا مطمئن هستید که می‌خواهید این ساختمان را به طور دائمی حذف کنید؟ این عمل قابل بازگشت نیست.',
         successHardDelete: 'ساختمان با موفقیت حذف شد',
         errorHardDelete: 'حذف ساختمان ناموفق بود. لطفاً دوباره تلاش کنید.',
-        networkErrorHardDelete: 'شبکه پاسخ مناسبی نداشت.'
+        networkErrorHardDelete: 'شبکه پاسخ مناسبی نداشت.',
+        hardDelete: 'حذف دائم'
     }
 };

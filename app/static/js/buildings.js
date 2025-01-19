@@ -389,7 +389,7 @@ function hardDeleteBuilding(buildingId) {
     }
 
     // Perform an AJAX request to delete the building
-    fetch(`/api/buildings/${buildingId}/permanent`, {
+    fetch(`/api/v1/buildings/${buildingId}/permanent`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
