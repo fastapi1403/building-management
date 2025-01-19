@@ -164,6 +164,15 @@ const fa = {
       "restoreFail": "خطا در بازیابی طبقه",
         "saveSuccess": "طبقه با موفقیت ذخیره شد",
         "updateError": "خطا در به‌روزرسانی طبقه"
+    },
+    "floors": {
+    "form": {
+      "building": "ساختمان",
+      "description": "توضیحات",
+      "selectBuilding": "ساختمان را انتخاب کنید",
+      "buildingRequired": "لطفاً یک ساختمان انتخاب کنید",
+      "descriptionPlaceholder": "توضیحات طبقه را وارد کنید (اختیاری)"
     }
+  }
   }
 };

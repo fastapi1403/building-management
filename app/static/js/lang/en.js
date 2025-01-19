@@ -164,6 +164,13 @@ const en = {
       "restoreFail": "Failed to restore floor",
         "saveSuccess": "Floor saved successfully",
         "updateError": "Error updating floor"
+    },
+    "form": {
+      "building": "Building",
+      "description": "Description",
+      "selectBuilding": "Select Building",
+      "buildingRequired": "Please select a building",
+      "descriptionPlaceholder": "Enter floor description (optional)"
     }
   }
 };

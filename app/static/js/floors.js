@@ -1,6 +1,20 @@
 // Floor management functions
 async function createFloor() {
     try {
+        // First, fetch the buildings list
+        const buildingsResponse = await fetch('/api/v1/buildings');
+        if (!buildingsResponse.ok) {
+            throw new Error('Failed to fetch buildings');
+        }
+        const buildings = await buildingsResponse.json();
+
+        // Create building options HTML
+        const buildingOptions = buildings
+            .filter(building => !building.is_deleted)
+            .map(building => `
+                <option value="${building.id}">${building.name}</option>
+            `).join('');
+
         let modal = document.getElementById('addFloorModal');
         if (!modal) {
             const modalHTML = `
@@ -15,6 +29,13 @@ async function createFloor() {
                                 <form id="floorForm">
                                     <input type="hidden" id="floorId">
                                     <div class="mb-3">
+                                        <label for="buildingId" class="form-label">${langManager.translate('floors.form.building')}</label>
+                                        <select class="form-select" id="buildingId" required>
+                                            <option value="">${langManager.translate('floors.form.selectBuilding')}</option>
+                                            ${buildingOptions}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
                                         <label for="floorName" class="form-label">${langManager.translate('floors.formName')}</label>
                                         <input type="text" class="form-control" id="floorName" required>
                                     </div>
@@ -25,6 +46,11 @@ async function createFloor() {
                                     <div class="mb-3">
                                         <label for="totalUnits" class="form-label">${langManager.translate('floors.formUnits')}</label>
                                         <input type="number" class="form-control" id="totalUnits" required min="1">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">${langManager.translate('floors.form.description')}</label>
+                                        <textarea class="form-control" id="description" rows="3" 
+                                                 placeholder="${langManager.translate('floors.form.descriptionPlaceholder')}"></textarea>
                                     </div>
                                 </form>
                             </div>
@@ -52,23 +78,25 @@ async function createFloor() {
         console.error('Error:', error);
         Swal.fire({
             title: langManager.translate('common.error'),
-            text: langManager.translate('floors.messages.saveError'),
+            text: error.message || langManager.translate('floors.messages.createError'),
             icon: 'error',
             confirmButtonColor: '#dc3545'
         });
     }
 }
 
+// Update the saveFloor function to include building_id and description
 async function saveFloor() {
     try {
-        // Get form data
         const floorId = document.getElementById('floorId')?.value;
         const isEditing = !!floorId;
 
         const floorData = {
+            building_id: document.getElementById('buildingId').value,
             name: document.getElementById('floorName').value,
             number: parseInt(document.getElementById('floorNumber').value),
-            total_units: parseInt(document.getElementById('totalUnits').value)
+            total_units: parseInt(document.getElementById('totalUnits').value),
+            description: document.getElementById('description').value
         };
 
         // Validate data
@@ -87,11 +115,9 @@ async function saveFloor() {
             }
         });
 
-        // Prepare request
         const url = isEditing ? `/api/v1/floors/${floorId}` : '/api/v1/floors';
         const method = isEditing ? 'PUT' : 'POST';
 
-        // Make API request
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -110,7 +136,6 @@ async function saveFloor() {
 
         const savedFloor = await response.json();
 
-        // Show success message
         await Swal.fire({
             icon: 'success',
             title: langManager.translate(
@@ -121,14 +146,12 @@ async function saveFloor() {
             timerProgressBar: true
         });
 
-        // Update UI
         if (isEditing) {
             updateFloorCard(savedFloor);
         } else {
             addNewFloorCard(savedFloor);
         }
 
-        // Close modal if open
         const modal = bootstrap.Modal.getInstance(document.getElementById('addFloorModal'));
         if (modal) {
             modal.hide();
@@ -148,9 +171,18 @@ async function saveFloor() {
     }
 }
 
-// Helper function to validate floor data
+// Update the validation function to include building_id
 function validateFloorData(data) {
-    // Check required fields
+    if (!data.building_id) {
+        Swal.fire({
+            icon: 'error',
+            title: langManager.translate('common.error'),
+            text: langManager.translate('floors.form.buildingRequired'),
+            confirmButtonColor: '#dc3545'
+        });
+        return false;
+    }
+
     if (!data.name || !data.number || !data.total_units) {
         Swal.fire({
             icon: 'error',
@@ -161,7 +193,6 @@ function validateFloorData(data) {
         return false;
     }
 
-    // Validate floor number
     if (data.number <= 0) {
         Swal.fire({
             icon: 'error',
@@ -172,7 +203,6 @@ function validateFloorData(data) {
         return false;
     }
 
-    // Validate total units
     if (data.total_units <= 0) {
         Swal.fire({
             icon: 'error',
