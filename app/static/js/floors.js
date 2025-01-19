@@ -86,88 +86,99 @@ async function createFloor() {
 }
 
 // Update the saveFloor function to include building_id and description
+let currentFloorId = null;
+
+async function editFloor(floorId) {
+    try {
+        currentFloorId = floorId;
+
+        // Show loading spinner
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        if (loadingSpinner) loadingSpinner.classList.remove('d-none');
+
+        // Fetch floor data
+        const floorResponse = await fetch(`/api/v1/floors/${floorId}`);
+        if (!floorResponse.ok) throw new Error('Failed to fetch floor data');
+        const floor = await floorResponse.json();
+
+        // Fetch buildings data
+        const buildingsResponse = await fetch('/api/v1/buildings');
+        if (!buildingsResponse.ok) throw new Error('Failed to fetch buildings data');
+        const buildings = await buildingsResponse.json();
+
+        // Populate buildings dropdown
+        const buildingSelect = document.getElementById('buildingSelect');
+        buildingSelect.innerHTML = '<option value="">Select Building</option>';
+        buildings.forEach(building => {
+            const option = new Option(building.name, building.id);
+            buildingSelect.add(option);
+        });
+
+        // Set form values
+        document.getElementById('floorId').value = floor.id;
+        document.getElementById('floorName').value = floor.name || '';
+        document.getElementById('floorNumber').value = floor.number || '';
+        document.getElementById('totalUnits').value = floor.total_units || '';
+        document.getElementById('buildingSelect').value = floor.building_id || '';
+        document.getElementById('description').value = floor.description || '';
+
+        // Hide loading spinner
+        if (loadingSpinner) loadingSpinner.classList.add('d-none');
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editFloorModal'));
+        modal.show();
+
+    } catch (error) {
+        console.error('Error:', error);
+        // Hide loading spinner
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        if (loadingSpinner) loadingSpinner.classList.add('d-none');
+
+        // Show error message
+        alert('Error loading floor data: ' + error.message);
+    }
+}
+
 async function saveFloor() {
     try {
-        const floorId = document.getElementById('floorId')?.value;
-        const isEditing = !!floorId;
+        if (!currentFloorId) throw new Error('No floor selected');
 
-        const floorData = {
-            building_id: document.getElementById('buildingId').value,
+        const formData = {
             name: document.getElementById('floorName').value,
             number: parseInt(document.getElementById('floorNumber').value),
             total_units: parseInt(document.getElementById('totalUnits').value),
+            building_id: parseInt(document.getElementById('buildingSelect').value),
             description: document.getElementById('description').value
         };
 
-        // Validate data
-        if (!validateFloorData(floorData)) {
-            return false;
+        // Validate form data
+        if (!formData.name || !formData.number || !formData.total_units || !formData.building_id) {
+            alert('Please fill in all required fields');
+            return;
         }
 
-        // Show loading state
-        Swal.fire({
-            title: langManager.translate(isEditing ? 'floors.messages.updating' : 'floors.messages.saving'),
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showConfirmButton: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        const url = isEditing ? `/api/v1/floors/${floorId}` : '/api/v1/floors';
-        const method = isEditing ? 'PUT' : 'POST';
-
-        const response = await fetch(url, {
-            method: method,
+        const response = await fetch(`/api/v1/floors/${currentFloorId}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCsrfToken()
             },
-            body: JSON.stringify(floorData)
+            body: JSON.stringify(formData)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || langManager.translate(
-                isEditing ? 'floors.messages.updateError' : 'floors.messages.saveError'
-            ));
-        }
+        if (!response.ok) throw new Error('Failed to update floor');
 
-        const savedFloor = await response.json();
+        // Hide modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editFloorModal'));
+        modal.hide();
 
-        await Swal.fire({
-            icon: 'success',
-            title: langManager.translate(
-                isEditing ? 'floors.messages.updateSuccess' : 'floors.messages.saveSuccess'
-            ),
-            timer: 1500,
-            showConfirmButton: false,
-            timerProgressBar: true
-        });
-
-        if (isEditing) {
-            updateFloorCard(savedFloor);
-        } else {
-            addNewFloorCard(savedFloor);
-        }
-
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addFloorModal'));
-        if (modal) {
-            modal.hide();
-        }
-
-        return true;
+        // Refresh page
+        window.location.reload();
 
     } catch (error) {
         console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: langManager.translate('common.error'),
-            text: error.message,
-            confirmButtonColor: '#dc3545'
-        });
-        return false;
+        alert('Error saving floor: ' + error.message);
     }
 }
 
@@ -216,147 +227,6 @@ function validateFloorData(data) {
     return true;
 }
 
-async function editFloor(floorId) {
-    try {
-        const response = await fetch(`/api/v1/floors/${floorId}`);
-        const floor = await response.json();
-
-        // First, fetch the buildings list
-        const buildingsResponse = await fetch('/api/v1/buildings');
-        if (!buildingsResponse.ok) {
-            throw new Error('Failed to fetch buildings');
-        }
-        const buildings = await buildingsResponse.json();
-
-        // Create building options HTML
-        const buildingOptions = buildings
-            .filter(building => !building.is_deleted)
-            .map(building =>
-                `<option value="${building.id}"` +
-                (building.id === floor.building_id ? ' selected="selected"' : '') +
-                `>${building.name}</option>`
-            ).join('');
-
-        let modal = document.getElementById('editFloorModal');
-        if (!modal) {
-            const modalHTML = `
-                <div class="modal fade" id="editFloorModal" tabindex="-1" aria-labelledby="editFloorModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editFloorModalLabel">${langManager.translate('floors.edit')}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="floorForm">
-                                    <input type="hidden" id="floorId">
-                                    <div class="mb-3">
-                                        <label for="buildingId" class="form-label">${langManager.translate('floors.form.building')}</label>
-                                        <select class="form-select" id="buildingId" required>
-                                            <option value="">${langManager.translate('floors.form.selectBuilding')}</option>
-                                            ${buildingOptions}
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="floorName" class="form-label">${langManager.translate('floors.formName')}</label>
-                                        <input type="text" class="form-control" id="floorName" value="${floor.name}" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="floorNumber" class="form-label">${langManager.translate('floors.formNumber')}</label>
-                                        <input type="number" class="form-control" id="floorNumber" value="${floor.number}" required min="1">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="totalUnits" class="form-label">${langManager.translate('floors.formUnits')}</label>
-                                        <input type="number" class="form-control" id="totalUnits" value="${floor.total_units}" required min="1">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="description" class="form-label">${langManager.translate('floors.form.description')}</label>
-                                        <textarea class="form-control" id="description" rows="3" 
-                                                 placeholder="${langManager.translate('floors.form.descriptionPlaceholder')}">${floor.description}</textarea>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    ${langManager.translate('floors.formCancel')}
-                                </button>
-                                <button type="button" class="btn btn-primary" onclick="saveFloor()">
-                                    ${langManager.translate('floors.formSave')}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            modal = document.getElementById('editFloorModal');
-        }
-
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
-        langManager.translatePage();
-
-        // const response = await fetch(`/api/v1/floors/${floorId}`);
-        // const floor = await response.json();
-        //
-        // const { value: formValues } = await Swal.fire({
-        //     title: langManager.translate('floors.edit'),
-        //     html: `
-        //         <input id="floorName" class="swal2-input"
-        //                placeholder="${langManager.translate('floors.formName')}" value="${floor.name}">
-        //         <input id="floorNumber" type="number" class="swal2-input"
-        //                placeholder="${langManager.translate('floors.formNumber')}" value="${floor.number}">
-        //         <input id="totalUnits" type="number" class="swal2-input"
-        //                placeholder="${langManager.translate('floors.formUnits')}" value="${floor.total_units}">
-        //         <input id="totalUnits" type="number" class="swal2-input"
-        //                placeholder="${langManager.translate('floors.formDescription')}" value="${floor.total_units}">
-        //     `,
-        //     focusConfirm: false,
-        //     showCancelButton: true,
-        //     confirmButtonText: langManager.translate('floors.formSave'),
-        //     cancelButtonText: langManager.translate('floors.formCancel'),
-        //     preConfirm: () => {
-        //         return {
-        //             name: document.getElementById('floorName').value,
-        //             number: document.getElementById('floorNumber').value,
-        //             total_units: document.getElementById('totalUnits').value
-        //         }
-        //     }
-        // });
-        //
-        // if (formValues) {
-        //     const response = await fetch(`/api/v1/floors/${floorId}`, {
-        //         method: 'PUT',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'X-CSRFToken': getCsrfToken()
-        //         },
-        //         body: JSON.stringify(formValues)
-        //     });
-        //
-        //     if (!response.ok) {
-        //         throw new Error(langManager.translate('floors.messages.saveError'));
-        //     }
-        //
-        //     await Swal.fire({
-        //         icon: 'success',
-        //         title: langManager.translate('floors.messages.updateSuccess'),
-        //         showConfirmButton: false,
-        //         timer: 1500
-        //     });
-        //
-        //     window.location.reload();
-        // }
-    } catch (error) {
-        console.error('Error:', error);
-        Swal.fire({
-            title: langManager.translate('common.error'),
-            text: error.message || langManager.translate('floors.messages.editError'),
-            icon: 'error',
-            confirmButtonColor: '#dc3545'
-        });
-    }
-}
 
 async function deleteFloor(floorId) {
     const result = await Swal.fire({

@@ -1,0 +1,41 @@
+<div class="modal fade" id="editFloorModal" tabindex="-1" aria-labelledby="editFloorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editFloorModalLabel">Edit Floor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="floorForm">
+                    <input type="hidden" id="floorId">
+                    <div class="mb-3">
+                        <label for="floorName" class="form-label">Floor Name</label>
+                        <input type="text" class="form-control" id="floorName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="floorNumber" class="form-label">Floor Number</label>
+                        <input type="number" class="form-control" id="floorNumber" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="totalUnits" class="form-label">Total Units</label>
+                        <input type="number" class="form-control" id="totalUnits" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="buildingSelect" class="form-label">Building</label>
+                        <select class="form-select" id="buildingSelect" required>
+                            <option value="">Select Building</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveFloor()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
