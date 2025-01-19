@@ -120,5 +120,85 @@ const fa = {
         errorHardDelete: 'حذف ساختمان ناموفق بود. لطفاً دوباره تلاش کنید.',
         networkErrorHardDelete: 'شبکه پاسخ مناسبی نداشت.',
         hardDelete: 'حذف دائم'
+    },
+    floors: {
+        // General
+        title: "طبقات",
+        addNew: "افزودن طبقه جدید",
+        generalDetails: "جزئیات طبقه",
+        searchPlaceholder: "جستجوی طبقات...",
+        backToList: "بازگشت به لیست طبقات",
+
+        // Form Labels
+        formName: "نام طبقه",
+        formNumber: "شماره طبقه",
+        formUnits: "تعداد کل واحدها",
+        formDescription: "توضیحات",
+        formBuilding: "ساختمان",
+        formCancel: "انصراف",
+        formSave: "ذخیره طبقه",
+
+        // Status
+        status: {
+            active: "فعال",
+            deleted: "حذف شده",
+            maintenance: "در حال تعمیر"
+        },
+
+        // Statistics
+        units: "واحدها",
+        occupied: "اشغال شده",
+        vacant: "خالی",
+        occupancyRate: "نرخ اشغال",
+        maintenance: "وظایف نگهداری",
+
+        // Actions
+        edit: "ویرایش طبقه",
+        delete: "حذف طبقه",
+        restore: "بازیابی طبقه",
+        hardDelete: "حذف دائمی",
+        view: "مشاهده جزئیات",
+        addUnit: "افزودن واحد",
+        addMaintenance: "افزودن وظیفه نگهداری",
+
+        // Confirmations
+        deleteConfirmation: "آیا از حذف این طبقه اطمینان دارید؟",
+        restoreConfirmation: "آیا از بازیابی این طبقه اطمینان دارید؟",
+        hardDeleteConfirmation: "این عمل قابل بازگشت نیست. آیا اطمینان دارید؟",
+
+        // Messages
+        messages: {
+            creating: "در حال ایجاد طبقه جدید...",
+            updating: "در حال به‌روزرسانی طبقه...",
+            deleting: "در حال حذف طبقه...",
+            loading: "در حال بارگذاری اطلاعات طبقه...",
+            saving: "در حال ذخیره طبقه...",
+            createSuccess: "طبقه با موفقیت ایجاد شد",
+            updateSuccess: "طبقه با موفقیت به‌روزرسانی شد",
+            deleteSuccess: "طبقه با موفقیت حذف شد",
+            restoreSuccess: "طبقه با موفقیت بازیابی شد",
+            saveError: "خطا در ذخیره طبقه",
+            deleteError: "خطا در حذف طبقه",
+            fetchError: "خطا در دریافت اطلاعات طبقه",
+            editError: "خطا در ویرایش طبقه",
+            validationError: "لطفاً خطاهای فرم را بررسی کنید"
+        },
+
+        // Validation
+        required: "این فیلد الزامی است",
+        validationFloorNumber: "شماره طبقه باید بزرگتر از ۰ باشد",
+        validationUnits: "تعداد کل واحدها باید ۰ یا بیشتر باشد",
+        validationName: "نام طبقه الزامی است",
+
+        // Details
+        details: {
+            basicInfo: "اطلاعات پایه",
+            quickStats: "آمار سریع",
+            maintenance: "تاریخچه نگهداری",
+            units: "واحدها",
+            createdAt: "تاریخ ایجاد",
+            lastUpdated: "آخرین به‌روزرسانی",
+            noMaintenanceHistory: "تاریخچه نگهداری موجود نیست"
+        }
     }
 };

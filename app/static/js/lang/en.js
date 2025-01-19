@@ -120,6 +120,85 @@ const en = {
         errorHardDelete: 'Failed to delete the building. Please try again.',
         networkErrorHardDelete: 'Network response was not ok',
         hardDelete: 'Permanent delete'
+    },
+    floors: {
+        // General
+        title: "Floors",
+        addNew: "Add New Floor",
+        generalDetails: "Floor Details",
+        searchPlaceholder: "Search floors...",
+        backToList: "Back to Floors List",
 
+        // Form Labels
+        formName: "Floor Name",
+        formNumber: "Floor Number",
+        formUnits: "Total Units",
+        formDescription: "Description",
+        formBuilding: "Building",
+        formCancel: "Cancel",
+        formSave: "Save Floor",
+
+        // Status
+        status: {
+            active: "Active",
+            deleted: "Deleted",
+            maintenance: "Under Maintenance"
+        },
+
+        // Statistics
+        units: "Units",
+        occupied: "Occupied",
+        vacant: "Vacant",
+        occupancyRate: "Occupancy Rate",
+        maintenance: "Maintenance Tasks",
+
+        // Actions
+        edit: "Edit Floor",
+        delete: "Delete Floor",
+        restore: "Restore Floor",
+        hardDelete: "Permanently Delete",
+        view: "View Details",
+        addUnit: "Add Unit",
+        addMaintenance: "Add Maintenance Task",
+
+        // Confirmations
+        deleteConfirmation: "Are you sure you want to delete this floor?",
+        restoreConfirmation: "Are you sure you want to restore this floor?",
+        hardDeleteConfirmation: "This action cannot be undone. Are you sure?",
+
+        // Messages
+        messages: {
+            creating: "Creating new floor...",
+            updating: "Updating floor...",
+            deleting: "Deleting floor...",
+            loading: "Loading floor data...",
+            saving: "Saving floor...",
+            createSuccess: "Floor created successfully",
+            updateSuccess: "Floor updated successfully",
+            deleteSuccess: "Floor deleted successfully",
+            restoreSuccess: "Floor restored successfully",
+            saveError: "Failed to save floor",
+            deleteError: "Failed to delete floor",
+            fetchError: "Failed to fetch floor data",
+            editError: "Failed to edit floor",
+            validationError: "Please check the form for errors"
+        },
+
+        // Validation
+        required: "This field is required",
+        validationFloorNumber: "Floor number must be greater than 0",
+        validationUnits: "Total units must be 0 or greater",
+        validationName: "Floor name is required",
+
+        // Details
+        details: {
+            basicInfo: "Basic Information",
+            quickStats: "Quick Statistics",
+            maintenance: "Maintenance History",
+            units: "Units",
+            createdAt: "Created At",
+            lastUpdated: "Last Updated",
+            noMaintenanceHistory: "No maintenance history available"
+        }
     }
 };
