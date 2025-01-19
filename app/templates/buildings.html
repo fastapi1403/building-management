@@ -196,41 +196,41 @@
     </div>
 
     <!-- Add Building Modal -->
-    <div class="modal fade" id="addBuildingModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <form id="buildingForm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><span data-i18n="buildings.addNew"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addBuildingForm">
-                        <input type="hidden" id="buildingId" name="buildingId">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label"><span data-i18n="buildings.name"></label>
-                                <input type="text" class="form-control" name="name" id="buildingName" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label"><span data-i18n="buildings.formFloors"></label>
-                                <input type="number" class="form-control" name="total_floors" id="buildingFloors" required>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label"><span data-i18n="buildings.formDescription"></label>
-                                <textarea class="form-control" name="description" rows="2" id="buildingDescription"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><span data-i18n="buildings.formCancel"></button>
-                    <button type="button" class="btn btn-primary" onclick="saveBuilding()"><span data-i18n="buildings.formSave"></button>
-                </div>
-            </div>
-            </form>
-        </div>
-    </div>
+{#    <div class="modal fade" id="addBuildingModal" tabindex="-1">#}
+{#        <div class="modal-dialog modal-lg">#}
+{#            <form id="buildingForm">#}
+{#            <div class="modal-content">#}
+{#                <div class="modal-header">#}
+{#                    <h5 class="modal-title"><span data-i18n="buildings.addNew"></h5>#}
+{#                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>#}
+{#                </div>#}
+{#                <div class="modal-body">#}
+{#                    <form id="addBuildingForm">#}
+{#                        <input type="hidden" id="buildingId" name="buildingId">#}
+{#                        <div class="row g-3">#}
+{#                            <div class="col-md-6">#}
+{#                                <label class="form-label"><span data-i18n="buildings.name"></label>#}
+{#                                <input type="text" class="form-control" name="name" id="buildingName" required>#}
+{#                            </div>#}
+{#                            <div class="col-md-6">#}
+{#                                <label class="form-label"><span data-i18n="buildings.formFloors"></label>#}
+{#                                <input type="number" class="form-control" name="total_floors" id="buildingFloors" required>#}
+{#                            </div>#}
+{#                            <div class="col-12">#}
+{#                                <label class="form-label"><span data-i18n="buildings.formDescription"></label>#}
+{#                                <textarea class="form-control" name="description" rows="2" id="buildingDescription"></textarea>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </form>#}
+{#                </div>#}
+{#                <div class="modal-footer">#}
+{#                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><span data-i18n="buildings.formCancel"></button>#}
+{#                    <button type="button" class="btn btn-primary" onclick="saveBuilding()"><span data-i18n="buildings.formSave"></button>#}
+{#                </div>#}
+{#            </div>#}
+{#            </form>#}
+{#        </div>#}
+{#    </div>#}
 </div>
 {% endblock %}
 
@@ -252,7 +252,7 @@
 {#            card.closest('.col-md-6').style.display = 'none';#}
 {#        }#}
 {#    });#}
-{#});#}
+{# });#}
 {##}
 {#// Status filter#}
 {#document.getElementById('statusFilter').addEventListener('change', function(e) {#}
@@ -267,7 +267,7 @@
 {#            card.closest('.col-md-6').style.display = 'none';#}
 {#        }#}
 {#    });#}
-{#});#}
+{# });#}
 {##}
 {#async function saveBuilding() {#}
 {#    const buildingId = document.getElementById('buildingId')?.value;#}
@@ -322,7 +322,7 @@
 {#            confirmButtonColor: '#dc3545'#}
 {#        });#}
 {#    }#}
-{#}#}
+{# }#}
 {##}
 {#// Function to add a new building card to the UI#}
 {#function addNewBuildingCard(building) {#}
@@ -401,7 +401,7 @@
 {##}
 {#    // Add the new building card to the beginning of the container#}
 {#    buildingsContainer.insertAdjacentHTML('afterbegin', newBuildingHtml);#}
-{#}#}
+{# }#}
 {##}
 {#// Function to update existing building card#}
 {#function updateBuildingCard(building) {#}
@@ -429,7 +429,7 @@
 {#            buildingCard.classList.remove('building-updated');#}
 {#        }, 1000);#}
 {#    }#}
-{#}#}
+{# }#}
 {##}
 {#// Helper function to reset form and validation states#}
 {#function resetForm() {#}
@@ -452,7 +452,7 @@
 {#    if (modalTitle) {#}
 {#        modalTitle.textContent = 'Add New Building';#}
 {#    }#}
-{#}#}
+{# }#}
 {##}
 {#// Modified editBuilding function to prepare the form for editing#}
 {#function editBuilding(buildingId) {#}
@@ -519,7 +519,7 @@
 {#            confirmButtonColor: '#dc3545'#}
 {#        });#}
 {#    }#}
-{#}#}
+{# }#}
 {##}
 {#// Add event listeners when document is ready#}
 {#document.addEventListener('DOMContentLoaded', function() {#}
@@ -535,7 +535,7 @@
 {#    modal.addEventListener('hidden.bs.modal', function() {#}
 {#        resetForm();#}
 {#    });#}
-{#});#}
+{# });#}
 {##}
 {#// Building operations#}
 {#async function deleteBuilding(buildingId) {#}
@@ -616,7 +616,7 @@
 {#            });#}
 {#        }#}
 {#    }#}
-{#}#}
+{# }#}
 {##}
 {#// Validation function#}
 {#function validateBuildingData(data) {#}
@@ -647,7 +647,7 @@
 {#    }#}
 {##}
 {#    return true;#}
-{#}#}
+{# }#}
 {##}
 {#// Form validation on input#}
 {#document.querySelectorAll('#buildingForm input, #buildingForm select').forEach(element => {#}
@@ -663,11 +663,11 @@
 {#            this.classList.add('is-invalid');#}
 {#        }#}
 {#    });#}
-{#});#}
+{# });#}
 {##}
 {#// Initialize translations when page loads#}
 {#document.addEventListener('DOMContentLoaded', function() {#}
 {#    langManager.translatePage();#}
-{#});#}
+{# });#}
 {#</script>#}
 {% endblock %}

@@ -270,7 +270,7 @@ function resetForm() {
 // Modified editBuilding function to prepare the form for editing
 async function editBuilding(buildingId) {
     try {
-        await Swal.fire({
+        Swal.fire({
             title: langManager.translate('common.loading'),
             text: langManager.translate('buildings.messages.loading'),
             allowOutsideClick: false,
@@ -280,14 +280,14 @@ async function editBuilding(buildingId) {
                 Swal.showLoading();
             }
         });
-
+console.log('before fetch')
         const response = await fetch(`/api/v1/buildings/${buildingId}`);
         if (!response.ok) {
             throw new Error(langManager.translate('buildings.messages.fetchError'));
         }
-
+console.log('after fetch')
         const building = await response.json();
-
+console.log('before modal')
         // Ensure modal exists in DOM
         let modal = document.getElementById('addBuildingModal');
         if (!modal) {
