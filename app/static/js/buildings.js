@@ -383,33 +383,55 @@ async function deleteBuilding(buildingId) {
 }
 
 function hardDeleteBuilding(buildingId) {
-    // Confirm the deletion action with the user
-    if (!confirm( langManager.translate('buildings.confirmHardDelete'))) {
-        return;
-    }
-
-    // Perform an AJAX request to delete the building
-    fetch(`/api/v1/buildings/${buildingId}/permanent`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
+    // Confirm the deletion action with the user using Swal
+    Swal.fire({
+        title: langManager.translate('buildings.confirmHardDeleteTitle'),
+        text: langManager.translate('buildings.confirmHardDeleteText'),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: langManager.translate('common.confirm'),
+        cancelButtonText: langManager.translate('common.cancel')
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Perform an AJAX request to delete the building
+            fetch(`/api/v1/buildings/${buildingId}/permanent`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(langManager.translate('buildings.networkErrorHardDelete'));
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Handle success response
+                Swal.fire({
+                    title: langManager.translate('common.success'),
+                    text: langManager.translate('buildings.successHardDelete'),
+                    icon: 'success',
+                    confirmButtonColor: '#198754',
+                    timer: 2000,
+                    timerProgressBar: true
+                }).then(() => {
+                    // Redirect to the buildings list page
+                    window.location.href = '/dashboard/buildings';
+                });
+            })
+            .catch(error => {
+                // Handle error response
+                Swal.fire({
+                    title: langManager.translate('common.error'),
+                    text: langManager.translate('buildings.errorHardDelete'),
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
+            });
         }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(langManager.translate('buildings.networkErrorHardDelete'));
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle success response
-        alert(langManager.translate('buildings.successHardDelete'));
-
-        window.location.href = '/dashboard/buildings';
-    })
-    .catch(error => {
-        // Handle error response
-        alert(langManager.translate('buildings.errorHardDelete'));
     });
 }
 
