@@ -1,88 +1,48 @@
-// Search functionality
-// document.getElementById('searchBuilding').addEventListener('keyup', function(e) {
-//     const searchTerm = e.target.value.toLowerCase();
-//     const buildingCards = document.querySelectorAll('.building-card');
-//
-//     buildingCards.forEach(card => {
-//         const buildingName = card.querySelector('.card-title').textContent.toLowerCase();
-//         if (buildingName.includes(searchTerm)) {
-//             card.closest('.col-md-6').style.display = '';
-//         } else {
-//             card.closest('.col-md-6').style.display = 'none';
-//         }
-//     });
-// });
-//
-// // Status filter
-// document.getElementById('statusFilter').addEventListener('change', function(e) {
-//     const status = e.target.value.toLowerCase();
-//     const buildingCards = document.querySelectorAll('.building-card');
-//
-//     buildingCards.forEach(card => {
-//         const buildingStatus = card.querySelector('.status-badge').textContent.trim().toLowerCase();
-//         if (status === '' || buildingStatus === status) {
-//             card.closest('.col-md-6').style.display = '';
-//         } else {
-//             card.closest('.col-md-6').style.display = 'none';
-//         }
-//     });
-// });
-
 // Function to update existing building card
 function updateBuildingCard(building) {
     const buildingCard = document.querySelector(`[data-building-id="${building.id}"]`);
     if (buildingCard) {
-        // Update building name
         buildingCard.querySelector('.card-title').textContent = building.name;
 
-        // Update floors
         const floorsElement = buildingCard.querySelector('.fa-building').nextElementSibling;
         if (floorsElement) {
             floorsElement.textContent = `${building.total_floors} Floors`;
         }
 
-        // Update status badge
         const statusBadge = buildingCard.querySelector('.status-badge');
         if (statusBadge) {
             statusBadge.className = `status-badge ${building.is_deleted ? 'status-inactive' : 'status-active'}`;
             statusBadge.textContent = building.is_deleted ? 'Deleted' : 'Active';
         }
 
-        // Update description if it exists
         const descriptionElement = buildingCard.querySelector('.building-description');
         if (descriptionElement && building.description) {
             descriptionElement.textContent = building.description;
         }
 
-        // Add animation to show the card was updated
         buildingCard.classList.add('building-updated');
         setTimeout(() => {
             buildingCard.classList.remove('building-updated');
         }, 1000);
 
-        // Update dynamic data
         const updateInfo = buildingCard.querySelector('.update-info');
         if (updateInfo) {
             updateInfo.textContent = `Updated: ${building.updated_at}`;
         }
 
-        // Add CSS animation to highlight the update
         buildingCard.style.transition = 'background-color 0.5s ease';
         buildingCard.style.backgroundColor = '#e8f5e9';
         setTimeout(() => {
             buildingCard.style.backgroundColor = '';
         }, 1500);
 
-        // Translate any new content
         langManager.translatePage();
     } else {
-        // If card doesn't exist, reload the page
-        console.log('Building card not found, reloading page...');
         window.location.reload();
     }
 }
 
-// Update saveBuilding function to handle the response better
+// Save building function to handle the save/update process
 async function saveBuilding() {
     const buildingId = document.getElementById('buildingId')?.value;
     const isEditing = !!buildingId;
@@ -93,16 +53,14 @@ async function saveBuilding() {
         description: document.getElementById('buildingDescription').value,
     };
 
-    // Form validation with translations
     if (!validateBuildingData(buildingData)) {
         return false;
     }
 
     try {
-        // Show loading state with translations
         Swal.fire({
             title: langManager.translate('common.loading'),
-            text: langManager.translate(isEditing ? langManager.translate('buildings.messages.updating') : langManager.translate('buildings.messages.saving')),
+            text: langManager.translate(isEditing ? 'buildings.messages.updating' : 'buildings.messages.saving'),
             allowOutsideClick: false,
             allowEscapeKey: false,
             showConfirmButton: false,
@@ -111,11 +69,7 @@ async function saveBuilding() {
             }
         });
 
-        // Make API call to save/update building
-        const url = isEditing
-            ? `/api/v1/buildings/${buildingId}`
-            : '/api/v1/buildings';
-
+        const url = isEditing ? `/api/v1/buildings/${buildingId}` : '/api/v1/buildings';
         const response = await fetch(url, {
             method: isEditing ? 'PUT' : 'POST',
             headers: {
@@ -133,7 +87,6 @@ async function saveBuilding() {
 
         const savedBuilding = await response.json();
 
-        // Success message with translations
         await Swal.fire({
             title: langManager.translate('common.success'),
             text: langManager.translate(isEditing ? 'buildings.messages.updateSuccess' : 'buildings.messages.createSuccess'),
@@ -143,14 +96,12 @@ async function saveBuilding() {
             timerProgressBar: true
         });
 
-        // Update UI
         if (isEditing) {
             updateBuildingCard(savedBuilding);
         } else {
             addNewBuildingCard(savedBuilding);
         }
 
-        // Close modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('addBuildingModal'));
         if (modal) {
             modal.hide();
@@ -242,10 +193,8 @@ function addNewBuildingCard(building) {
         </div>
     `;
 
-    // Add the new building card to the beginning of the container
     buildingsContainer.insertAdjacentHTML('afterbegin', newBuildingHtml);
 }
-
 
 // Helper function to reset form and validation states
 function resetForm() {
@@ -267,7 +216,7 @@ function resetForm() {
     }
 }
 
-// Modified editBuilding function to prepare the form for editing
+// Edit building function to prepare the form for editing
 async function editBuilding(buildingId) {
     try {
         Swal.fire({
@@ -280,18 +229,18 @@ async function editBuilding(buildingId) {
                 Swal.showLoading();
             }
         });
-console.log('before fetch')
+
         const response = await fetch(`/api/v1/buildings/${buildingId}`);
+        Swal.close();
+
         if (!response.ok) {
             throw new Error(langManager.translate('buildings.messages.fetchError'));
         }
-console.log('after fetch')
+
         const building = await response.json();
-console.log('before modal')
-        // Ensure modal exists in DOM
+
         let modal = document.getElementById('addBuildingModal');
         if (!modal) {
-            // If modal doesn't exist, create it
             const modalHTML = `
                 <div class="modal fade" id="addBuildingModal" tabindex="-1" aria-labelledby="addBuildingModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -304,22 +253,22 @@ console.log('before modal')
                                 <form id="buildingForm">
                                     <input type="hidden" id="buildingId">
                                     <div class="mb-3">
-                                        <label for="buildingName" class="form-label" data-i18n="buildings.name"></label>
+                                        <label for="buildingName" class="form-label" data-i18n="buildings.formName"></label>
                                         <input type="text" class="form-control" id="buildingName" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="buildingFloors" class="form-label" data-i18n="buildings.floors"></label>
+                                        <label for="buildingFloors" class="form-label" data-i18n="buildings.formFloors"></label>
                                         <input type="number" class="form-control" id="buildingFloors" required min="1">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="buildingDescription" class="form-label" data-i18n="buildings.description"></label>
+                                        <label for="buildingDescription" class="form-label" data-i18n="buildings.formDescription"></label>
                                         <textarea class="form-control" id="buildingDescription" rows="3"></textarea>
                                     </div>
                                 </form>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel"></button>
-                                <button type="button" class="btn btn-primary" onclick="saveBuilding()" data-i18n="common.save"></button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="buildings.formCancel"></button>
+                                <button type="button" class="btn btn-primary" onclick="saveBuilding()" data-i18n="buildings.formSave"></button>
                             </div>
                         </div>
                     </div>
@@ -329,13 +278,11 @@ console.log('before modal')
             modal = document.getElementById('addBuildingModal');
         }
 
-        // Now we can safely access modal elements
         const modalTitle = modal.querySelector('.modal-title');
         if (modalTitle) {
             modalTitle.textContent = langManager.translate('buildings.edit');
         }
 
-        // Set form values
         const buildingIdInput = document.getElementById('buildingId');
         if (!buildingIdInput) {
             const input = document.createElement('input');
@@ -348,14 +295,11 @@ console.log('before modal')
         document.getElementById('buildingFloors').value = building.total_floors || '';
         document.getElementById('buildingDescription').value = building.description || '';
 
-        // Close loading dialog
         await Swal.close();
 
-        // Show modal
         const bsModal = new bootstrap.Modal(modal);
         bsModal.show();
 
-        // Initialize translations for new modal content
         langManager.translatePage();
 
     } catch (error) {
@@ -369,8 +313,7 @@ console.log('before modal')
     }
 }
 
-
-// Building operations
+// Delete building function
 async function deleteBuilding(buildingId) {
     const result = await Swal.fire({
         title: langManager.translate('buildings.delete'),
@@ -468,7 +411,7 @@ function validateBuildingData(data) {
     return true;
 }
 
-// Building Detail Page Functions
+// Restore building function
 function restoreBuilding(buildingId) {
     return Swal.fire({
         title: langManager.translate('buildings.restore'),
@@ -499,7 +442,6 @@ function restoreBuilding(buildingId) {
                     timer: 2000
                 });
 
-                // Refresh the page to show updated status
                 window.location.reload();
             } catch (error) {
                 console.error('Error:', error);
@@ -513,19 +455,16 @@ function restoreBuilding(buildingId) {
     });
 }
 
-// Modified editBuilding for detail page
+// Edit building detail page function
 function editBuildingDetail(buildingId) {
     window.location.href = `/buildings#edit-${buildingId}`;
 }
 
-// Initialize the page functionality based on existing elements
+// Initialize the page functionality
 function initializePage() {
-    // Only initialize features if we're on the buildings list page
-    // Check if we're on the buildings list page by looking for a unique element
     const isBuildingsListPage = !!document.querySelector('.buildings-container');
 
     if (isBuildingsListPage) {
-        // Search functionality - only initialize if search element exists
         const searchBuilding = document.getElementById('searchBuilding');
         if (searchBuilding) {
             searchBuilding.addEventListener('keyup', function(e) {
@@ -543,7 +482,6 @@ function initializePage() {
             });
         }
 
-        // Status filter - only initialize if filter element exists
         const statusFilter = document.getElementById('statusFilter');
         if (statusFilter) {
             statusFilter.addEventListener('change', function(e) {
@@ -561,7 +499,6 @@ function initializePage() {
             });
         }
 
-        // Form initialization - only if form exists
         const buildingForm = document.getElementById('buildingForm');
         if (buildingForm) {
             buildingForm.addEventListener('submit', function(e) {
@@ -569,16 +506,14 @@ function initializePage() {
                 saveBuilding();
             });
 
-            // Form validation on input
             buildingForm.querySelectorAll('input, select').forEach(element => {
-                element.addEventListener('input', function(e) {
+                element.addEventListener('input', function() {
                     this.classList.remove('is-invalid', 'is-valid');
                     this.classList.add(this.checkValidity() ? 'is-valid' : 'is-invalid');
                 });
             });
         }
 
-        // Modal initialization - only if modal exists
         const addBuildingModal = document.getElementById('addBuildingModal');
         if (addBuildingModal) {
             addBuildingModal.addEventListener('hidden.bs.modal', function() {
@@ -586,8 +521,7 @@ function initializePage() {
             });
         }
     }
-
 }
 
-// Call initialization when DOM is ready
+// Initialize page when DOM is ready
 document.addEventListener('DOMContentLoaded', initializePage);
