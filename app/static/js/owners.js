@@ -180,7 +180,6 @@ async function editOwner(ownerId) {
 
         // Close loading state
         if (loadingSwal) {
-            loadingSwal;
             Swal.close();
         }
 
@@ -218,12 +217,14 @@ async function editOwner(ownerId) {
         const modal = new bootstrap.Modal(document.getElementById('addOwnerModal'));
         modal.show();
 
+        // Call saveOwner with isEditing set to true
+        await saveOwner(true, ownerId);
+
     } catch (error) {
         console.error('Error:', error);
 
         // Make sure loading state is closed
         if (loadingSwal) {
-            loadingSwal;
             Swal.close();
         }
 
