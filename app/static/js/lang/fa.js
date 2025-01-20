@@ -243,6 +243,13 @@ const fa = {
             totalIncome: "درآمد کل",
             totalExpenses: "هزینه‌های کل"
         },
+        form: {
+            name: "نام مالک",
+            formDescription: "توضیحات",
+            formCancel: "لغو",
+            formSave: "ذخیره مالک",
+
+        },
         backToList: "بازگشت به لیست مالکین",
         maintenanceHistory: "تاریخچه نگهداری",
         restore: "بازگردانی مالک",

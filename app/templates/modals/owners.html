@@ -1,0 +1,63 @@
+
+<!-- Add/Edit Owner Modal -->
+<div class="modal fade" id="addOwnerModal" tabindex="-1" aria-labelledby="addOwnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addOwnerModalLabel">
+                    <span data-i18n="owners.addNew">Add New Owner</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="ownerForm">
+                    <input type="hidden" id="ownerId">
+                    <div class="mb-3">
+                        <label for="ownerName" class="form-label" data-i18n="owners.form.name">Name</label>
+                        <input type="text" class="form-control" id="ownerName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerId" class="form-label" data-i18n="owners.form.Id">Phone</label>
+                        <input type="text" class="form-control" id="ownerId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerPhone" class="form-label" data-i18n="owners.form.phone">Phone</label>
+                        <input type="text" class="form-control" id="ownerPhone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerPhoneAlt" class="form-label" data-i18n="owners.form.phoneAlt">Phone 2</label>
+                        <input type="text" class="form-control" id="ownerPhoneAlt">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerPhoneEmergency" class="form-label" data-i18n="owners.form.phoneEmergency">Phone 2</label>
+                        <input type="text" class="form-control" id="ownerPhoneEmergency">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerPhoneEmergencyName" class="form-label" data-i18n="owners.form.phoneEmergencyName">Phone 2</label>
+                        <input type="text" class="form-control" id="ownerPhoneEmergencyName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerEmail" class="form-label" data-i18n="owners.form.email">Email</label>
+                        <input type="text" class="form-control" id="ownerEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerWhatsapp" class="form-label" data-i18n="owners.form.whatsapp">Whatsapp</label>
+                        <input type="text" class="form-control" id="ownerWhatsapp">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerTelegram" class="form-label" data-i18n="owners.form.telegram">Telegram</label>
+                        <input type="text" class="form-control" id="ownerTelegram">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerNotes" class="form-label" data-i18n="owners.form.description">Notes</label>
+                        <textarea class="form-control" id="ownerNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="owners.form.cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveOwner()" data-i18n="owners.form.save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
