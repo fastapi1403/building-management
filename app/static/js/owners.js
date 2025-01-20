@@ -165,7 +165,9 @@ async function saveOwner() {
 }
 
 async function editOwner(ownerId) {
+    let loadingSwal;
     try {
+        // Show loading state
         loadingSwal = Swal.fire({
             title: langManager.translate('common.loading'),
             text: langManager.translate('owners.messages.loading'),
@@ -179,6 +181,7 @@ async function editOwner(ownerId) {
 
         const response = await fetch(`/api/v1/owners/${ownerId}`);
 
+        // Close loading state
         if (loadingSwal) {
             loadingSwal;
             Swal.close();
@@ -190,14 +193,19 @@ async function editOwner(ownerId) {
 
         const owner = await response.json();
 
-        // Update modal title and set owner ID
-        document.getElementById('ownerId').value = owner.id; // FIXED: Set the owner ID correctly
+        // Set hidden owner ID field for form submission
+        const ownerIdInput = document.getElementById('ownerId');
+        if (ownerIdInput) {
+            ownerIdInput.value = ownerId; // Use the actual owner ID, not national_id
+        }
+
+        // Update modal title
         const modalTitle = document.querySelector('#addOwnerModalLabel span');
         if (modalTitle) {
             modalTitle.textContent = langManager.translate('owners.edit');
         }
 
-        // Fill form fields
+        // Fill form fields with proper field IDs
         document.getElementById('ownerName').value = owner.name || '';
         document.getElementById('ownerId').value = owner.national_id || '';
         document.getElementById('ownerPhone').value = owner.phone || '';
@@ -209,15 +217,21 @@ async function editOwner(ownerId) {
         document.getElementById('ownerTelegram').value = owner.telegram || '';
         document.getElementById('ownerNotes').value = owner.note || '';
 
-
-
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('addOwnerModal'));
         modal.show();
 
     } catch (error) {
         console.error('Error:', error);
-        await Swal.fire({
+
+        // Make sure loading state is closed
+        if (loadingSwal) {
+            await loadingSwal;
+            Swal.close();
+        }
+
+        // Show error message
+        Swal.fire({
             title: langManager.translate('common.error'),
             text: error.message || langManager.translate('owners.messages.editError'),
             icon: 'error',
