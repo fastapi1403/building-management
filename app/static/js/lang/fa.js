@@ -245,10 +245,17 @@ const fa = {
         },
         form: {
             name: "نام مالک",
-            formDescription: "توضیحات",
-            formCancel: "لغو",
-            formSave: "ذخیره مالک",
-
+            id: "کد ملی",
+            phone: "تلفن",
+            phoneAlt: "تلفن جایگزین",
+            phoneEmergency: "تلفن اضطراری",
+            phoneEmergencyName: "نام تلفن اضطراری",
+            email: "ایمیل",
+            whatsapp: "واتس‌اپ",
+            telegram: "تلگرام",
+            note: "یادداشت",
+            cancel: "لغو",
+            save: "ذخیره مالک"
         },
         backToList: "بازگشت به لیست مالکین",
         maintenanceHistory: "تاریخچه نگهداری",

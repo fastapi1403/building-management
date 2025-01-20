@@ -243,6 +243,20 @@ const en = {
             totalIncome: "Total Income",
             totalExpenses: "Total Expenses"
         },
+        form: {
+            name: "Owner Name",
+            id: "Identification No.",
+            phone: "Phone",
+            phoneAlt: "Alternative phone",
+            phoneEmergency: "Emergency phone",
+            phoneEmergencyName: "Emergency phone name",
+            email: "Email",
+            whatsapp: "Whatsapp",
+            telegram: "Telegram",
+            note: "Note",
+            cancel: "Cancel",
+            save: "Save Owner"
+        },
         backToList: "Back to Owners",
         maintenanceHistory: "Maintenance History",
         restore: "Restore Owner",
@@ -257,6 +271,6 @@ const en = {
         successHardDelete: 'Owner deleted successfully',
         errorHardDelete: 'Failed to delete the building. Please try again.',
         networkErrorHardDelete: 'Network response was not ok',
-        hardDelete: 'Permanent delete'
+        hardDelete: 'Permanent delete',
     }
 };

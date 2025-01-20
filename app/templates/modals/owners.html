@@ -1,7 +1,6 @@
-
 <!-- Add/Edit Owner Modal -->
 <div class="modal fade" id="addOwnerModal" tabindex="-1" aria-labelledby="addOwnerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addOwnerModalLabel">
@@ -12,45 +11,54 @@
             <div class="modal-body">
                 <form id="ownerForm">
                     <input type="hidden" id="ownerId">
-                    <div class="mb-3">
-                        <label for="ownerName" class="form-label" data-i18n="owners.form.name">Name</label>
-                        <input type="text" class="form-control" id="ownerName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerId" class="form-label" data-i18n="owners.form.Id">Phone</label>
-                        <input type="text" class="form-control" id="ownerId" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerPhone" class="form-label" data-i18n="owners.form.phone">Phone</label>
-                        <input type="text" class="form-control" id="ownerPhone" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerPhoneAlt" class="form-label" data-i18n="owners.form.phoneAlt">Phone 2</label>
-                        <input type="text" class="form-control" id="ownerPhoneAlt">
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerPhoneEmergency" class="form-label" data-i18n="owners.form.phoneEmergency">Phone 2</label>
-                        <input type="text" class="form-control" id="ownerPhoneEmergency">
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerPhoneEmergencyName" class="form-label" data-i18n="owners.form.phoneEmergencyName">Phone 2</label>
-                        <input type="text" class="form-control" id="ownerPhoneEmergencyName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerEmail" class="form-label" data-i18n="owners.form.email">Email</label>
-                        <input type="text" class="form-control" id="ownerEmail">
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerWhatsapp" class="form-label" data-i18n="owners.form.whatsapp">Whatsapp</label>
-                        <input type="text" class="form-control" id="ownerWhatsapp">
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerTelegram" class="form-label" data-i18n="owners.form.telegram">Telegram</label>
-                        <input type="text" class="form-control" id="ownerTelegram">
-                    </div>
-                    <div class="mb-3">
-                        <label for="ownerNotes" class="form-label" data-i18n="owners.form.description">Notes</label>
-                        <textarea class="form-control" id="ownerNotes" rows="3"></textarea>
+                    <div class="row g-3">
+                        <!-- First line -->
+                        <div class="col-md-4">
+                            <label for="ownerName" class="form-label" data-i18n="owners.form.name">Name</label>
+                            <input type="text" class="form-control" id="ownerName" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ownerPhoneNumber" class="form-label" data-i18n="owners.form.id">ID</label>
+                            <input type="text" class="form-control" id="ownerPhoneNumber" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ownerPhone" class="form-label" data-i18n="owners.form.phone">Phone</label>
+                            <input type="text" class="form-control" id="ownerPhone" required>
+                        </div>
+
+                        <!-- Second line -->
+                        <div class="col-md-4">
+                            <label for="ownerPhoneAlt" class="form-label" data-i18n="owners.form.phoneAlt">Phone 2</label>
+                            <input type="text" class="form-control" id="ownerPhoneAlt">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ownerPhoneEmergency" class="form-label" data-i18n="owners.form.phoneEmergency">Emergency Phone</label>
+                            <input type="text" class="form-control" id="ownerPhoneEmergency">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ownerPhoneEmergencyName" class="form-label" data-i18n="owners.form.phoneEmergencyName">Emergency Contact Name</label>
+                            <input type="text" class="form-control" id="ownerPhoneEmergencyName">
+                        </div>
+
+                        <!-- Third line -->
+                        <div class="col-md-4">
+                            <label for="ownerEmail" class="form-label" data-i18n="owners.form.email">Email</label>
+                            <input type="email" class="form-control" id="ownerEmail">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ownerWhatsapp" class="form-label" data-i18n="owners.form.whatsapp">WhatsApp</label>
+                            <input type="text" class="form-control" id="ownerWhatsapp">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ownerTelegram" class="form-label" data-i18n="owners.form.telegram">Telegram</label>
+                            <input type="text" class="form-control" id="ownerTelegram">
+                        </div>
+
+                        <!-- Notes (full width) -->
+                        <div class="col-12">
+                            <label for="ownerNote" class="form-label" data-i18n="owners.form.note">Note</label>
+                            <textarea class="form-control" id="ownerNote" rows="3"></textarea>
+                        </div>
                     </div>
                 </form>
             </div>
