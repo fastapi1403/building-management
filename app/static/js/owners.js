@@ -28,16 +28,13 @@ function validatePhone(phone) {
 }
 
 // Save owner function to handle the save/update process
-async function saveOwner() {
+async function saveOwner(isEditing = false, ownerId = null) {
     let loadingSwal;
     try {
         const form = document.getElementById('ownerForm');
         if (!form) {
             throw new Error('Owner form not found');
         }
-
-        const ownerId = document.getElementById('ownerId')?.value;
-        const isEditing = !!ownerId;
 
         // Collect data from all form fields
         const ownerData = {
@@ -150,7 +147,7 @@ async function saveOwner() {
 
         // Make sure loading state is closed
         if (loadingSwal) {
-            await loadingSwal;
+            loadingSwal;
             Swal.close();
         }
 
@@ -167,6 +164,7 @@ async function saveOwner() {
 async function editOwner(ownerId) {
     let loadingSwal;
     try {
+        console.log('Show loading state');
         // Show loading state
         loadingSwal = Swal.fire({
             title: langManager.translate('common.loading'),
@@ -179,32 +177,33 @@ async function editOwner(ownerId) {
             }
         });
 
+        console.log('before fetch');
         const response = await fetch(`/api/v1/owners/${ownerId}`);
-
+        console.log('after fetch');
         // Close loading state
         if (loadingSwal) {
-            loadingSwal;
-            Swal.close();
+            loadingSwal.close();
         }
-
+        console.log('after close');
         if (!response.ok) {
             throw new Error(langManager.translate('owners.messages.fetchError'));
         }
-
+        console.log('before await response.json');
         const owner = await response.json();
+        console.log('after await response.json');
 
         // Set hidden owner ID field for form submission
         const ownerIdInput = document.getElementById('ownerId');
         if (ownerIdInput) {
             ownerIdInput.value = ownerId; // Use the actual owner ID, not national_id
         }
-
+        console.log('after Update modal title');
         // Update modal title
         const modalTitle = document.querySelector('#addOwnerModalLabel span');
         if (modalTitle) {
             modalTitle.textContent = langManager.translate('owners.edit');
         }
-
+        console.log('Fill form fields with proper field IDs');
         // Fill form fields with proper field IDs
         document.getElementById('ownerName').value = owner.name || '';
         document.getElementById('ownerId').value = owner.national_id || '';
@@ -216,10 +215,13 @@ async function editOwner(ownerId) {
         document.getElementById('ownerWhatsapp').value = owner.whatsapp || '';
         document.getElementById('ownerTelegram').value = owner.telegram || '';
         document.getElementById('ownerNotes').value = owner.note || '';
-
+        console.log('Show modal');
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('addOwnerModal'));
         modal.show();
+        console.log('Call saveOwner with isEditing set to true');
+        // Call saveOwner with isEditing set to true
+        saveOwner(true, ownerId);
 
     } catch (error) {
         console.error('Error:', error);
