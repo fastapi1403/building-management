@@ -14,7 +14,6 @@ class CRUDOwner(CRUDBase[Owner, OwnerCreate, OwnerUpdate]):
             db: AsyncSession,
             *,
             obj_in: OwnerCreate,
-            created_by: str = "fastapi1403"
     ) -> Owner:
         """
         Create a new owner.
@@ -29,11 +28,9 @@ class CRUDOwner(CRUDBase[Owner, OwnerCreate, OwnerUpdate]):
         """
         current_time = datetime.now()
         db_obj = Owner(
-            number=obj_in.number,
+            phone=obj_in.phone,
             name=obj_in.name,
-            building_id=obj_in.building_id,
-            total_units=obj_in.total_units,
-            description=obj_in.description,
+            description=obj_in.note,
         )
         return await super().create(db, obj_in=db_obj)
 

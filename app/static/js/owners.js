@@ -57,7 +57,7 @@ async function saveOwner() {
             return false;
         }
 
-        await Swal.fire({
+        Swal.fire({
             title: langManager.translate('common.loading'),
             text: langManager.translate(isEditing ? 'owners.messages.updating' : 'owners.messages.saving'),
             allowOutsideClick: false,
@@ -78,6 +78,8 @@ async function saveOwner() {
             },
             body: JSON.stringify(ownerData)
         });
+
+        Swal.close();
 
         if (!response.ok) {
             const errorData = await response.json();

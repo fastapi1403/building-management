@@ -20,12 +20,12 @@ class OwnerBase(BaseSchema):
         default=OwnerType.INDIVIDUAL,
         description="Current status of the owner"
     )
-    email: EmailStr = Field(
-        ...,
+    email: Optional[EmailStr] = Field(
+        default=None,
         description="Primary email address"
     )
-    phone: str = Field(
-        ...,
+    phone: Optional[str] = Field(
+        default=None,
         description="Primary phone number",
         min_length=8,
         max_length=20
@@ -36,14 +36,8 @@ class OwnerBase(BaseSchema):
         min_length=8,
         max_length=20
     )
-    address: str = Field(
-        ...,
-        description="Primary address",
-        min_length=5,
-        max_length=200
-    )
-    identification_number: str = Field(
-        ...,
+    identification_number: Optional[str] = Field(
+        default=None,
         description="Identification document number",
         max_length=50
     )
