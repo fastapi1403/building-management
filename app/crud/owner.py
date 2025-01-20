@@ -30,7 +30,7 @@ class CRUDOwner(CRUDBase[Owner, OwnerCreate, OwnerUpdate]):
         db_obj = Owner(
             phone=obj_in.phone,
             name=obj_in.name,
-            description=obj_in.note,
+            description=obj_in.notes,
         )
         return await super().create(db, obj_in=db_obj)
 

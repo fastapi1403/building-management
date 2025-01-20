@@ -48,7 +48,7 @@ class Owner(TableBase, table=True):
     emergency_contact_phone: Optional[str] = Field(default=None, description="Emergency contact phone number")
     emergency_contact_name: Optional[str] = Field(default=None, description="Emergency contact name")
     email: Optional[str] = Field(default=None, description="Email address of the owner")
-    identification_number: str = Field(..., unique=True, description="Unique identification number")
+    identification_number: Optional[str] = Field(default=None, unique=True, description="Unique identification number")
     whatsapp: Optional[str] = Field(default=None, description="WhatsApp contact")
     telegram: Optional[str] = Field(default=None, description="Telegram contact")
     notes: Optional[str] = Field(default=None, description="Additional notes about the owner")
