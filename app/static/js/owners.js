@@ -118,7 +118,6 @@ async function saveOwner() {
 function validateOwnerData(data) {
     const requiredFields = [
         { field: 'name', label: 'Name' },
-        { field: 'national_id', label: 'ID' },
         { field: 'phone', label: 'Phone' }
     ];
 
