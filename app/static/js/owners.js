@@ -578,4 +578,260 @@ function initializePage() {
 }
 
 // Initialize page when DOM is ready
-document.addEventListener('DOMContentLoaded', initializePage);
+// document.addEventListener('DOMContentLoaded', initializePage);
+
+// Save owner function to handle the save/update process
+async function saveOwner() {
+    const ownerId = document.getElementById('ownerId')?.value;
+    const isEditing = !!ownerId;
+
+    // Collect data from all form fields
+    const ownerData = {
+        name: document.getElementById('ownerName').value,
+        national_id: document.getElementById('ownerPhoneNumber').value,
+        phone: document.getElementById('ownerPhone').value,
+        phone_alt: document.getElementById('ownerPhoneAlt').value,
+        phone_emergency: document.getElementById('ownerPhoneEmergency').value,
+        phone_emergency_name: document.getElementById('ownerPhoneEmergencyName').value,
+        email: document.getElementById('ownerEmail').value,
+        whatsapp: document.getElementById('ownerWhatsapp').value,
+        telegram: document.getElementById('ownerTelegram').value,
+        notes: document.getElementById('ownerNotes').value
+    };
+
+    // Validate required fields
+    if (!validateOwnerData(ownerData)) {
+        return false;
+    }
+
+    try {
+        Swal.fire({
+            title: langManager.translate('common.loading'),
+            text: langManager.translate(isEditing ? 'owners.messages.updating' : 'owners.messages.saving'),
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const url = isEditing ? `/api/v1/owners/${ownerId}` : '/api/v1/owners';
+        const response = await fetch(url, {
+            method: isEditing ? 'PUT' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(ownerData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || langManager.translate('owners.messages.saveError'));
+        }
+
+        const savedOwner = await response.json();
+
+        await Swal.fire({
+            title: langManager.translate('common.success'),
+            text: langManager.translate(isEditing ? 'owners.messages.updateSuccess' : 'owners.messages.createSuccess'),
+            icon: 'success',
+            confirmButtonColor: '#198754',
+            timer: 2000,
+            timerProgressBar: true
+        });
+
+        if (isEditing) {
+            updateOwnerCard(savedOwner);
+        } else {
+            addNewOwnerCard(savedOwner);
+        }
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addOwnerModal'));
+        if (modal) {
+            modal.hide();
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: langManager.translate('common.error'),
+            text: error.message || langManager.translate('owners.messages.saveError'),
+            icon: 'error',
+            confirmButtonColor: '#dc3545'
+        });
+    }
+}
+
+// Edit owner function to load data into the modal
+async function editOwner(ownerId) {
+    try {
+        Swal.fire({
+            title: langManager.translate('common.loading'),
+            text: langManager.translate('owners.messages.loading'),
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const response = await fetch(`/api/v1/owners/${ownerId}`);
+
+        if (!response.ok) {
+            throw new Error(langManager.translate('owners.messages.fetchError'));
+        }
+
+        const owner = await response.json();
+
+        // Update modal title
+        const modalTitle = document.querySelector('#addOwnerModalLabel span');
+        if (modalTitle) {
+            modalTitle.textContent = langManager.translate('owners.edit');
+        }
+
+        // Set form values
+        document.getElementById('ownerId').value = owner.id;
+        document.getElementById('ownerName').value = owner.name || '';
+        document.getElementById('ownerPhoneNumber').value = owner.national_id || '';
+        document.getElementById('ownerPhone').value = owner.phone || '';
+        document.getElementById('ownerPhoneAlt').value = owner.phone_alt || '';
+        document.getElementById('ownerPhoneEmergency').value = owner.phone_emergency || '';
+        document.getElementById('ownerPhoneEmergencyName').value = owner.phone_emergency_name || '';
+        document.getElementById('ownerEmail').value = owner.email || '';
+        document.getElementById('ownerWhatsapp').value = owner.whatsapp || '';
+        document.getElementById('ownerTelegram').value = owner.telegram || '';
+        document.getElementById('ownerNotes').value = owner.notes || '';
+
+        await Swal.close();
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('addOwnerModal'));
+        modal.show();
+
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: langManager.translate('common.error'),
+            text: error.message || langManager.translate('owners.messages.editError'),
+            icon: 'error',
+            confirmButtonColor: '#dc3545'
+        });
+    }
+}
+
+// Validate owner data
+function validateOwnerData(data) {
+    // Required fields
+    const requiredFields = ['name', 'national_id', 'phone'];
+
+    for (const field of requiredFields) {
+        if (!data[field]) {
+            Swal.fire({
+                title: langManager.translate('owners.validationError'),
+                text: langManager.translate(`owners.${field}Required`),
+                icon: 'error',
+                confirmButtonText: langManager.translate('common.ok')
+            });
+            return false;
+        }
+    }
+
+    // Validate email format if provided
+    if (data.email && !validateEmail(data.email)) {
+        Swal.fire({
+            title: langManager.translate('owners.validationError'),
+            text: langManager.translate('owners.invalidEmail'),
+            icon: 'error',
+            confirmButtonText: langManager.translate('common.ok')
+        });
+        return false;
+    }
+
+    // Validate phone numbers
+    if (!validatePhone(data.phone)) {
+        Swal.fire({
+            title: langManager.translate('owners.validationError'),
+            text: langManager.translate('owners.invalidPhone'),
+            icon: 'error',
+            confirmButtonText: langManager.translate('common.ok')
+        });
+        return false;
+    }
+
+    return true;
+}
+
+// Helper function to validate email format
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Helper function to validate phone numbers
+function validatePhone(phone) {
+    // Adjust the regex pattern according to your phone number format requirements
+    return /^\+?[\d\s-]{10,}$/.test(phone);
+}
+
+// Reset form helper
+function resetForm() {
+    const form = document.getElementById('ownerForm');
+    if (form) {
+        form.reset();
+
+        // Reset hidden owner ID
+        const ownerIdInput = document.getElementById('ownerId');
+        if (ownerIdInput) {
+            ownerIdInput.value = '';
+        }
+
+        // Reset validation states
+        form.querySelectorAll('.is-valid, .is-invalid').forEach(element => {
+            element.classList.remove('is-valid', 'is-invalid');
+        });
+
+        // Reset modal title
+        const modalTitle = document.querySelector('#addOwnerModalLabel span');
+        if (modalTitle) {
+            modalTitle.textContent = langManager.translate('owners.addNew');
+        }
+    }
+}
+
+// Initialize page when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize modal
+    const addOwnerModal = document.getElementById('addOwnerModal');
+    if (addOwnerModal) {
+        // Reset form when modal is hidden
+        addOwnerModal.addEventListener('hidden.bs.modal', resetForm);
+    }
+
+    // Initialize form validation
+    const ownerForm = document.getElementById('ownerForm');
+    if (ownerForm) {
+        ownerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveOwner();
+        });
+
+        // Add real-time validation feedback
+        ownerForm.querySelectorAll('input, select, textarea').forEach(element => {
+            element.addEventListener('input', function() {
+                this.classList.remove('is-invalid', 'is-valid');
+                if (this.value) {
+                    if (this.id === 'ownerEmail' && this.value) {
+                        this.classList.add(validateEmail(this.value) ? 'is-valid' : 'is-invalid');
+                    } else if (this.id === 'ownerPhone' || this.id === 'ownerPhoneAlt' || this.id === 'ownerPhoneEmergency') {
+                        this.classList.add(validatePhone(this.value) ? 'is-valid' : 'is-invalid');
+                    } else {
+                        this.classList.add('is-valid');
+                    }
+                }
+            });
+        });
+    }
+});
