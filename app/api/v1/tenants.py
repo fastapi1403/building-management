@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.tenant import TenantCreate, TenantUpdate, TenantResponse
 from app.models.tenant import Tenant
-from app.crud import crud_tenant
+from app.crud import crud_tenant, crud_unit
 from db.session import get_db
 
 router = APIRouter(prefix="/tenants", tags=["tenants"])
@@ -30,6 +30,21 @@ async def create_tenant(
     """
     Create new tenant.
     """
+    # First check if the unit exists
+    unit = await crud_unit.get(db=db, id=tenant_in.unit_id)
+    if not unit:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Unit with id {tenant_in.unit_id} not found"
+        )
+
+    # Check if unit already has a tenant
+    existing_tenant = await crud_tenant.get_by_unit_id(db=db, unit_id=tenant_in.unit_id)
+    if existing_tenant:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unit {tenant_in.unit_id} is already occupied"
+        )
     return await crud_tenant.create(db=db, obj_in=tenant_in)
 
 @router.get("/{tenant_id}", response_model=TenantResponse, name="api_v1_read_tenant")

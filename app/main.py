@@ -22,6 +22,7 @@ from app.front_page.routers import (
     floors as front_page_floors,
     owners as front_page_owners,
     tenants as front_page_tenants,
+    units as front_page_units,
     home as front_page_home,
 )
 
@@ -69,6 +70,7 @@ app.include_router(front_page_home.router, prefix="", tags=["dashboards"])
 app.include_router(front_page_floors.router, prefix="", tags=["dashboards"])
 app.include_router(front_page_owners.router, prefix="", tags=["dashboards"])
 app.include_router(front_page_tenants.router, prefix="", tags=["dashboards"])
+app.include_router(front_page_units.router, prefix="", tags=["dashboards"])
 
 
 # Add health check endpoint

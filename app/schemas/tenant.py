@@ -7,6 +7,10 @@ from app.models.tenant import TenantType, TenantStatus
 
 class TenantBase(BaseSchema):
     """Base Tenant Schema with common attributes"""
+    unit_id: int = Field(
+        ...,  # This means the field is required
+        description="ID of the associated unit"
+    )
     name: str = Field(
         ...,
         description="Full name of the tenant",

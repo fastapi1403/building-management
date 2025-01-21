@@ -1,0 +1,71 @@
+<!-- Add/Edit Unit Modal -->
+<div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUnitModalLabel">
+                    <span data-i18n="units.addNew">Add New Unit</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="unitForm">
+                    <input type="hidden" id="unitId">
+                    <div class="row g-3">
+                        <!-- First line -->
+                        <div class="col-md-4">
+                            <label for="unitName" class="form-label" data-i18n="units.form.name">Name</label>
+                            <input type="text" class="form-control" id="unitName" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="unitIdentificationID" class="form-label" data-i18n="units.form.id">ID</label>
+                            <input type="text" class="form-control" id="unitIdentificationID">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="unitPhone" class="form-label" data-i18n="units.form.phone">Phone</label>
+                            <input type="text" class="form-control" id="unitPhone" required>
+                        </div>
+
+                        <!-- Second line -->
+                        <div class="col-md-4">
+                            <label for="unitPhoneAlt" class="form-label" data-i18n="units.form.phoneAlt">Phone 2</label>
+                            <input type="text" class="form-control" id="unitPhoneAlt">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="unitPhoneEmergency" class="form-label" data-i18n="units.form.phoneEmergency">Emergency Phone</label>
+                            <input type="text" class="form-control" id="unitPhoneEmergency">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="unitPhoneEmergencyName" class="form-label" data-i18n="units.form.phoneEmergencyName">Emergency Contact Name</label>
+                            <input type="text" class="form-control" id="unitPhoneEmergencyName">
+                        </div>
+
+                        <!-- Third line -->
+                        <div class="col-md-4">
+                            <label for="unitEmail" class="form-label" data-i18n="units.form.email">Email</label>
+                            <input type="email" class="form-control" id="unitEmail">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="unitWhatsapp" class="form-label" data-i18n="units.form.whatsapp">WhatsApp</label>
+                            <input type="text" class="form-control" id="unitWhatsapp">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="unitTelegram" class="form-label" data-i18n="units.form.telegram">Telegram</label>
+                            <input type="text" class="form-control" id="unitTelegram">
+                        </div>
+
+                        <!-- Notes (full width) -->
+                        <div class="col-12">
+                            <label for="unitNotes" class="form-label" data-i18n="units.form.note">Note</label>
+                            <textarea class="form-control" id="unitNotes" rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="units.form.cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveUnit()" data-i18n="units.form.save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
