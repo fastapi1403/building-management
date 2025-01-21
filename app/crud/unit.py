@@ -20,7 +20,7 @@ from core.exceptions import (
 logger = logging.getLogger(__name__)
 
 
-class TenantCRUD:
+class CRUDTenant:
     def __init__(self, db_session: AsyncSession):
         self.db = db_session
 

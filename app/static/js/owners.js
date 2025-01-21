@@ -28,62 +28,43 @@ function validatePhone(phone) {
 }
 
 // Save owner function to handle the save/update process
-async function saveOwner(isEditing = false, ownerId = null) {
+async function saveOwner() {
     let loadingSwal;
     try {
+        const ownerId = document.getElementById('ownerId')?.value
+        const isEditing = ownerId !== '';
+
+        // Get the form element
         const form = document.getElementById('ownerForm');
         if (!form) {
-            throw new Error('Owner form not found');
+            throw new Error(langManager.translate('owners.formNotFound'));
         }
 
-        // Collect data from all form fields
+        // Collect data from form fields with null coalescing and trimming
         const ownerData = {
             name: document.getElementById('ownerName')?.value?.trim() || '',
             phone: document.getElementById('ownerPhone')?.value?.trim() || '',
+            // Optional fields
+            national_id: document.getElementById('ownerIdentificationID')?.value?.trim() || '',
+            phone_alt: document.getElementById('ownerPhoneAlt')?.value?.trim() || '',
+            phone_emergency: document.getElementById('ownerPhoneEmergency')?.value?.trim() || '',
+            phone_emergency_name: document.getElementById('ownerPhoneEmergencyName')?.value?.trim() || '',
+            email: document.getElementById('ownerEmail')?.value?.trim() || '',
+            whatsapp: document.getElementById('ownerWhatsapp')?.value?.trim() || '',
+            telegram: document.getElementById('ownerTelegram')?.value?.trim() || '',
+            note: document.getElementById('ownerNotes')?.value?.trim() || ''
         };
 
-        // Add optional fields only if they have values
-        const national_id = document.getElementById('ownerPhoneNumber')?.value?.trim();
-        if (national_id) {
-            ownerData.national_id = national_id;
-        }
 
-        const phone_alt = document.getElementById('ownerPhoneAlt')?.value?.trim();
-        if (phone_alt) {
-            ownerData.phone_alt = phone_alt;
-        }
 
-        const phone_emergency = document.getElementById('ownerPhoneEmergency')?.value?.trim();
-        if (phone_emergency) {
-            ownerData.phone_emergency = phone_emergency;
-        }
+        // Remove empty optional fields
+        Object.keys(ownerData).forEach(key => {
+            if (!ownerData[key] && key !== 'name' && key !== 'phone') {
+                delete ownerData[key];
+            }
+        });
 
-        const phone_emergency_name = document.getElementById('ownerPhoneEmergencyName')?.value?.trim();
-        if (phone_emergency_name) {
-            ownerData.phone_emergency_name = phone_emergency_name;
-        }
-
-        const email = document.getElementById('ownerEmail')?.value?.trim();
-        if (email) {
-            ownerData.email = email;
-        }
-
-        const whatsapp = document.getElementById('ownerWhatsapp')?.value?.trim();
-        if (whatsapp) {
-            ownerData.whatsapp = whatsapp;
-        }
-
-        const telegram = document.getElementById('ownerTelegram')?.value?.trim();
-        if (telegram) {
-            ownerData.telegram = telegram;
-        }
-
-        const note = document.getElementById('ownerNotes')?.value?.trim();
-        if (note) {
-            ownerData.note = note;
-        }
-
-        // Validate required fields
+        // Validate owner data
         if (!validateOwnerData(ownerData)) {
             return false;
         }
@@ -100,9 +81,13 @@ async function saveOwner(isEditing = false, ownerId = null) {
             }
         });
 
+        // Prepare request URL and method
         const url = isEditing ? `/api/v1/owners/${ownerId}` : '/api/v1/owners';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        // Make API request
         const response = await fetch(url, {
-            method: isEditing ? 'PUT' : 'POST',
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCsrfToken(),
@@ -111,44 +96,60 @@ async function saveOwner(isEditing = false, ownerId = null) {
             body: JSON.stringify(ownerData)
         });
 
-        // Close loading state
-        if (loadingSwal) {
-            loadingSwal;
-            Swal.close();
-        }
-
+        // Parse response
         const data = await response.json();
 
+        // Handle non-successful responses
         if (!response.ok) {
-            throw new Error(data.detail?.[0]?.msg || data.detail || langManager.translate('owners.messages.saveError'));
+            throw new Error(
+                data.detail?.[0]?.msg ||
+                data.detail ||
+                langManager.translate('owners.messages.saveError')
+            );
+        }
+
+        // Close loading dialog
+        if (loadingSwal) {
+            loadingSwal.close();
         }
 
         // Show success message
-        await Swal.fire({
+        Swal.fire({
             title: langManager.translate('common.success'),
-            text: langManager.translate(isEditing ? 'owners.messages.updateSuccess' : 'owners.messages.createSuccess'),
+            text: langManager.translate(
+                isEditing ?
+                'owners.messages.updateSuccess' :
+                'owners.messages.createSuccess'
+            ),
             icon: 'success',
             confirmButtonColor: '#198754',
             timer: 2000,
             timerProgressBar: true
         });
 
-        // Close modal
+        // Close the modal if it exists
         const modal = bootstrap.Modal.getInstance(document.getElementById('addOwnerModal'));
         if (modal) {
             modal.hide();
         }
 
-        // Refresh page
+        // Clear form validation states
+        form.querySelectorAll('.is-valid, .is-invalid').forEach(element => {
+            element.classList.remove('is-valid', 'is-invalid');
+        });
+
+        // Reset form
+        form.reset();
+
+        // Refresh the page to show updated data
         window.location.reload();
 
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Save Owner Error:', error);
 
-        // Make sure loading state is closed
+        // Close loading state if it exists
         if (loadingSwal) {
-            loadingSwal;
-            Swal.close();
+            loadingSwal.close();
         }
 
         // Show error message
@@ -189,21 +190,9 @@ async function editOwner(ownerId) {
 
         const owner = await response.json();
 
-        // Set hidden owner ID field for form submission
-        const ownerIdInput = document.getElementById('ownerId');
-        if (ownerIdInput) {
-            ownerIdInput.value = ownerId; // Use the actual owner ID, not national_id
-        }
-
-        // Update modal title
-        const modalTitle = document.querySelector('#addOwnerModalLabel span');
-        if (modalTitle) {
-            modalTitle.textContent = langManager.translate('owners.edit');
-        }
-
         // Fill form fields with proper field IDs
         document.getElementById('ownerName').value = owner.name || '';
-        document.getElementById('ownerId').value = owner.national_id || '';
+        document.getElementById('ownerIdentificationID').value = owner.national_id || '';
         document.getElementById('ownerPhone').value = owner.phone || '';
         document.getElementById('ownerPhoneAlt').value = owner.phone_alt || '';
         document.getElementById('ownerPhoneEmergency').value = owner.phone_emergency || '';
@@ -212,13 +201,25 @@ async function editOwner(ownerId) {
         document.getElementById('ownerWhatsapp').value = owner.whatsapp || '';
         document.getElementById('ownerTelegram').value = owner.telegram || '';
         document.getElementById('ownerNotes').value = owner.note || '';
+        console.log('ownerId = ', ownerId)
+        document.getElementById('ownerId').value = ownerId;
+
+        // Update modal title to indicate creating new owner
+        const modalTitle = document.querySelector('#addOwnerModalLabel span');
+        if (modalTitle) {
+            modalTitle.textContent = langManager.translate('owners.createNew');
+        }
 
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('addOwnerModal'));
         modal.show();
 
-        // Call saveOwner with isEditing set to true
-        await saveOwner(true, ownerId);
+        // Add event listener for form submission
+        // const form = document.getElementById('ownerForm');
+        // form.onsubmit = async (e) => {
+        //     e.preventDefault();
+        //     await saveOwner(true); // Pass false to indicate creating new owner
+        // };
 
     } catch (error) {
         console.error('Error:', error);
@@ -292,7 +293,7 @@ async function deleteOwner(ownerId) {
         });
 
         if (result.isConfirmed) {
-            await Swal.fire({
+            Swal.fire({
                 title: langManager.translate('owners.deleting'),
                 allowOutsideClick: false,
                 allowEscapeKey: false,
@@ -315,7 +316,7 @@ async function deleteOwner(ownerId) {
                 throw new Error(langManager.translate('owners.deleteFail'));
             }
 
-            await Swal.fire({
+            Swal.fire({
                 title: langManager.translate('common.success'),
                 text: langManager.translate('owners.deleteSuccess'),
                 icon: 'success',

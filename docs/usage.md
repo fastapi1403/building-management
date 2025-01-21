@@ -341,7 +341,7 @@ async def get_expiring_leases(
     days: int = 30,
     db: AsyncSession = Depends(get_db)
 ):
-    tenant_crud = TenantCRUD(db)
+    tenant_crud = CRUDTenant(db)
     expiring_leases = await tenant_crud.get_expiring_leases(days)
     return [
         {

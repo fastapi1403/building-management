@@ -1,9 +1,12 @@
 from datetime import date
 from enum import Enum
 from typing import Optional, List
-from sqlmodel import SQLModel, Field, Relationship
+
 from sqlalchemy import Column, Enum as SQLEnum
+from sqlmodel import Field, Relationship
+
 from app.models.base import TableBase
+
 
 # Enumeration for tenant types
 class TenantType(str, Enum):
@@ -13,6 +16,7 @@ class TenantType(str, Enum):
     STUDENT = "student"  # Student tenant
     GOVERNMENT = "government"  # Government tenant
     ORGANIZATION = "organization"  # Organization tenant
+
 
 # Enumeration for tenant statuses
 class TenantStatus(str, Enum):
@@ -24,6 +28,7 @@ class TenantStatus(str, Enum):
     MOVED_OUT = "moved_out"  # Former tenant
     EVICTED = "evicted"  # Evicted tenant
     BLACKLISTED = "blacklisted"  # Blacklisted tenant
+
 
 # Model for representing a tenant in the building management system
 class Tenant(TableBase, table=True):
@@ -83,6 +88,7 @@ class Tenant(TableBase, table=True):
                 "lease_end_date": "2025-12-31"
             }
         }
+
 
 # Forward references for type hints
 from app.models.unit import Unit

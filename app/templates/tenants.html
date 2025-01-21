@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}<span data-i18n="tenants.title"></span>{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tenants-container {
+        padding: 1.5rem;
+    }
+
+    .tenant-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: none;
+        border-radius: 12px;
+    }
+
+    .tenant-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+
+    .status-active {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-maintenance {
+        background-color: #fff7ed;
+        color: #9a3412;
+    }
+
+    .status-inactive {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+
+    .tenant-stats {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .action-buttons .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+    }
+
+    .search-box {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 0.75rem 1rem;
+    }
+
+    .filter-dropdown {
+        min-width: 200px;
+    }
+
+    .is-invalid {
+    border-color: #dc3545;
+    }
+
+    .is-valid {
+        border-color: #198754;
+    }
+
+    .form-loading {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tenants-container">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0" data-i18n="tenants.title">Tenants Management</h1>
+            <p class="text-muted" data-i18n="tenants.subtitle">Manage and monitor all your tenants</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+            <i class="fas fa-plus-circle me-2"></i>
+            <span data-i18n="tenants.addNew">Add New Tenant</span>
+        </button>
+    </div>
+
+    <!-- Filters and Search Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control search-box" placeholder="Search tenants..." id="searchTenant">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select filter-dropdown" id="statusFilter">
+                        <option value="1">Active</option>
+                        <option value="0">Deleted</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select filter-dropdown" id="sortBy">
+                        <option value="name">Sort by Name</option>
+                        <option value="units">Sort by Floors</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenants Grid -->
+    <div class="row g-4">
+        {% for tenant in tenants %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card tenant-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">{{ tenant.name }}</h5>
+{#                        <span class="status-badge status-{{ tenant.status.lower() }}">#}
+                        <span class="status-badge {% if tenant.is_deleted %}status-inactive{% else %}status-active{% endif %}">
+{#                            {{ tenant.status }}#}
+                            {% if tenant.is_deleted %}Deleted{% else %}Active{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="tenant-stats mb-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-tenant me-2"></i>
+                                    <span>{{ tenant.total_floors }} <span data-i18n="tenants.floors"></span></span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-door-open me-2"></i>
+{#                                    <span>{{ tenant.total_units }} Units</span>#}
+                                    <span>28 <span data-i18n="tenants.units"></span></span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-check me-2"></i>
+{#                                    <span>{{ tenant.occupancy_rate }}% Occupied</span>#}
+                                    <span>100% <span data-i18n="tenants.occupied"></span></span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-check me-2"></i>
+{#                                    <span>Since {{ tenant.established_date.strftime('%Y') }}</span>#}
+                                    <span>2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-3" style="height: 6px;">
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+{#                             style="width: {{ tenant.occupancy_rate }}%"#}
+{#                             aria-valuenow="{{ tenant.occupancy_rate }}"#}
+                             style="width: 50%"
+                             aria-valuenow="30"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center action-buttons">
+                        <a href="{{ url_for('tenant_details', tenant_id=tenant.id) }}"
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i> <span data-i18n="tenants.details.details">
+                        </a>
+                        <div class="">
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    onclick="editTenant('{{ tenant.id }}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button"
+                                    class="btn btn-outline-danger"
+                                    onclick="deleteTenant('{{ tenant.id }}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+<!-- Include modals -->
+{% include "modals/tenants.html" %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='js/tenants.js') }}"></script>
+{% endblock %}

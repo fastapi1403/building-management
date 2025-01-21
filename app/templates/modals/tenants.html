@@ -1,0 +1,71 @@
+<!-- Add/Edit Tenant Modal -->
+<div class="modal fade" id="addTenantModal" tabindex="-1" aria-labelledby="addTenantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTenantModalLabel">
+                    <span data-i18n="tenants.addNew">Add New Tenant</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tenantForm">
+                    <input type="hidden" id="tenantId">
+                    <div class="row g-3">
+                        <!-- First line -->
+                        <div class="col-md-4">
+                            <label for="tenantName" class="form-label" data-i18n="tenants.form.name">Name</label>
+                            <input type="text" class="form-control" id="tenantName" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tenantIdentificationID" class="form-label" data-i18n="tenants.form.id">ID</label>
+                            <input type="text" class="form-control" id="tenantIdentificationID">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tenantPhone" class="form-label" data-i18n="tenants.form.phone">Phone</label>
+                            <input type="text" class="form-control" id="tenantPhone" required>
+                        </div>
+
+                        <!-- Second line -->
+                        <div class="col-md-4">
+                            <label for="tenantPhoneEmergency" class="form-label" data-i18n="tenants.form.phoneEmergency">Emergency Phone</label>
+                            <input type="text" class="form-control" id="tenantPhoneEmergency">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tenantPhoneEmergencyName" class="form-label" data-i18n="tenants.form.phoneEmergencyName">Emergency Contact Name</label>
+                            <input type="text" class="form-control" id="tenantPhoneEmergencyName">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tenantPhoneEmergencyRelation" class="form-label" data-i18n="tenants.form.phoneEmergencyRelation">Emergency Contact Relation</label>
+                            <input type="text" class="form-control" id="tenantPhoneEmergencyRelation">
+                        </div>
+
+                        <!-- Third line -->
+                        <div class="col-md-4">
+                            <label for="tenantEmail" class="form-label" data-i18n="tenants.form.email">Email</label>
+                            <input type="email" class="form-control" id="tenantEmail">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tenantWhatsapp" class="form-label" data-i18n="tenants.form.whatsapp">WhatsApp</label>
+                            <input type="text" class="form-control" id="tenantWhatsapp">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tenantTelegram" class="form-label" data-i18n="tenants.form.telegram">Telegram</label>
+                            <input type="text" class="form-control" id="tenantTelegram">
+                        </div>
+
+                        <!-- Notes (full width) -->
+                        <div class="col-12">
+                            <label for="tenantNotes" class="form-label" data-i18n="tenants.form.note">Note</label>
+                            <textarea class="form-control" id="tenantNotes" rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="tenants.form.cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveTenant()" data-i18n="tenants.form.save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
