@@ -21,8 +21,8 @@ class TenantBase(BaseSchema):
         default=TenantStatus.ACTIVE,
         description="Current status of the tenant"
     )
-    email: EmailStr = Field(
-        ...,
+    email: Optional[EmailStr] = Field(
+        default=None,
         description="Primary email address"
     )
     phone: str = Field(
@@ -37,14 +37,8 @@ class TenantBase(BaseSchema):
         min_length=8,
         max_length=20
     )
-    address: str = Field(
-        ...,
-        description="Primary address",
-        min_length=5,
-        max_length=200
-    )
-    identification_number: str = Field(
-        ...,
+    identification_number: Optional[str] = Field(
+        default=None,
         description="Identification document number",
         max_length=50
     )
@@ -127,14 +121,13 @@ class TenantUpdate(BaseSchema):
         max_length=20
     )
     alternative_phone: Optional[str] = None
-    address: Optional[str] = None
     identification_number: Optional[str] = None
     emergency_contact_name: Optional[str] = None
     emergency_contact_phone: Optional[str] = None
     occupation: Optional[str] = None
     employer: Optional[str] = None
-    contract_start_date: Optional[date] = None
-    contract_end_date: Optional[date] = None
+    lease_start_date: Optional[date] = None
+    lease_end_date: Optional[date] = None
     notes: Optional[str] = None
 
 

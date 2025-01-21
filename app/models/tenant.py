@@ -55,12 +55,12 @@ class Tenant(TableBase, table=True):
     notes: Optional[str] = Field(default=None, description="Additional notes about the tenant")
     vehicle_info: Optional[str] = Field(default=None, description="Information about the tenant's vehicle")
     email: Optional[str] = Field(default=None, description="Email address of the tenant")
-    identification_number: str = Field(..., unique=True, description="Unique identification number")
+    identification_number: Optional[str] = Field(default=None, unique=True, description="Unique identification number")
     whatsapp: Optional[str] = Field(default=None, description="WhatsApp contact")
     telegram: Optional[str] = Field(default=None, description="Telegram contact")
     occupant_count: int = Field(default=1, description="Number of occupants in the unit")
-    lease_start_date: date = Field(..., description="Start date of the lease")
-    lease_end_date: date = Field(..., description="End date of the lease")
+    lease_start_date: Optional[date] = Field(default=None, description="Start date of the lease")
+    lease_end_date: Optional[date] = Field(default=None, description="End date of the lease")
 
     # Relationships
     unit: "Unit" = Relationship(back_populates="tenant")
