@@ -32,14 +32,22 @@ class UnitBase(BaseSchema):
         default=UnitStatus.VACANT,
         description="Current status of the unit"
     )
-    monthly_maintenance: float = Field(
-        default=0.0,
-        ge=0,
-        description="Monthly maintenance charges"
-    )
-    current_owner_id: Optional[int] = Field(
-        default=None,
+    owner_id: Optional[int] = Field(
+        ...,
+        gt=0,
         description="ID of the current owner of the unit"
+    )
+    has_parking: bool = Field(
+        default=False,
+        description="Parking status of the unit"
+    )
+    parking_space_number: Optional[str] = Field(
+        default=None,
+        description="Parking number of the unit"
+    )
+    constant_extra_charge: Optional[float] = Field(
+        default=0.0,
+        description="Extra charge of the unit"
     )
 
     model_config = ConfigDict(
@@ -112,10 +120,9 @@ class UnitUpdate(BaseModel):
         max_length=10
     )
     type: Optional[UnitType] = None
-    area_sqft: Optional[float] = Field(None, gt=0, le=10000)
+    area: Optional[float] = Field(None, gt=0, le=10000)
     status: Optional[UnitStatus] = None
-    monthly_maintenance: Optional[float] = Field(None, ge=0)
-    current_owner_id: Optional[int] = None
+    owner_id: Optional[int] = None
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -153,10 +160,6 @@ class UnitUpdate(BaseModel):
 
 class UnitResponse(UnitBase):
     id: int
-    last_maintenance_date: Optional[datetime] = Field(
-        default=None,
-        description="Date of the last maintenance check"
-    )
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -220,10 +223,6 @@ class UnitDetailResponse(UnitResponse):
     floor_number: int = Field(..., description="Floor number where the unit is located")
     owner_name: Optional[str] = Field(None, description="Name of the current owner")
     tenant_name: Optional[str] = Field(None, description="Name of the current tenant")
-    occupancy_rate: Optional[float] = Field(
-        None,
-        description="Percentage of time the unit has been occupied"
-    )
 
     model_config = ConfigDict(
         from_attributes=True,
