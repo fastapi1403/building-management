@@ -14,49 +14,55 @@
                     <div class="row g-3">
                         <!-- First line -->
                         <div class="col-md-4">
-                            <label for="unitName" class="form-label" data-i18n="units.form.name">Name</label>
-                            <input type="text" class="form-control" id="unitName" required>
+                            <label for="buildingSelect" class="form-label" data-i18n="units.form.building">Building</label>
+                            <select class="form-select" id="buildingSelect" required>
+                                <option value="" data-i18n="units.form.selectBuilding">Select Building</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="unitIdentificationID" class="form-label" data-i18n="units.form.id">ID</label>
-                            <input type="text" class="form-control" id="unitIdentificationID">
+                            <label for="floorSelect" class="form-label" data-i18n="units.form.floor">Floor</label>
+                            <select class="form-select" id="floorSelect" required>
+                                <option value="" data-i18n="units.form.selectFloor">Select Floor</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="unitPhone" class="form-label" data-i18n="units.form.phone">Phone</label>
-                            <input type="text" class="form-control" id="unitPhone" required>
+                            <label for="ownerSelect" class="form-label" data-i18n="units.form.owner">Owner</label>
+                            <select class="form-select" id="ownerSelect" required>
+                                <option value="" data-i18n="units.form.selectOwner">Select Owner</option>
+                            </select>
                         </div>
-
                         <!-- Second line -->
                         <div class="col-md-4">
-                            <label for="unitPhoneAlt" class="form-label" data-i18n="units.form.phoneAlt">Phone 2</label>
-                            <input type="text" class="form-control" id="unitPhoneAlt">
+                            <label for="unitNumber" class="form-label" data-i18n="units.form.unitNumber">Unit Number</label>
+                            <input type="text" class="form-control" id="unitNumber" required>
                         </div>
                         <div class="col-md-4">
-                            <label for="unitPhoneEmergency" class="form-label" data-i18n="units.form.phoneEmergency">Emergency Phone</label>
-                            <input type="text" class="form-control" id="unitPhoneEmergency">
+                            <label for="unitArea" class="form-label" data-i18n="units.form.unitArea">Unit Area</label>
+                            <input type="text" class="form-control" id="unitArea">
                         </div>
                         <div class="col-md-4">
-                            <label for="unitPhoneEmergencyName" class="form-label" data-i18n="units.form.phoneEmergencyName">Emergency Contact Name</label>
-                            <input type="text" class="form-control" id="unitPhoneEmergencyName">
+                            <label for="unitHasParking" class="form-label" data-i18n="units.form.unitHasParking">Unit has Parking</label>
+                            <select class="form-select" id="ownerSelect" required>
+                                <option value="no" data-i18n="units.form.no" selected="selected">No</option>
+                                <option value="yes" data-i18n="units.form.yes">Yes</option>
+                            </select>
                         </div>
 
                         <!-- Third line -->
                         <div class="col-md-4">
-                            <label for="unitEmail" class="form-label" data-i18n="units.form.email">Email</label>
-                            <input type="email" class="form-control" id="unitEmail">
+                            <label for="unitParkingNumber" class="form-label" data-i18n="units.form.unitParkingNumber">Unit Parking Number</label>
+                            <input type="text" class="form-control" id="unitParkingNumber">
                         </div>
                         <div class="col-md-4">
-                            <label for="unitWhatsapp" class="form-label" data-i18n="units.form.whatsapp">WhatsApp</label>
-                            <input type="text" class="form-control" id="unitWhatsapp">
+                            <label for="unitConstantExtraCharge" class="form-label" data-i18n="units.form.unitConstantExtraCharge">Unit Constant Extra Charge</label>
+                            <input type="text" class="form-control" id="unitConstantExtraCharge">
                         </div>
                         <div class="col-md-4">
-                            <label for="unitTelegram" class="form-label" data-i18n="units.form.telegram">Telegram</label>
-                            <input type="text" class="form-control" id="unitTelegram">
                         </div>
 
                         <!-- Notes (full width) -->
                         <div class="col-12">
-                            <label for="unitNotes" class="form-label" data-i18n="units.form.note">Note</label>
+                            <label for="unitNotes" class="form-label" data-i18n="units.form.notes">Note</label>
                             <textarea class="form-control" id="unitNotes" rows="3"></textarea>
                         </div>
                     </div>

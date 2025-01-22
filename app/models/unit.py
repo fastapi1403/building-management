@@ -36,9 +36,10 @@ class Unit(TableBase, table=True):
     area: float = Field(description="Area of the unit in square meters")
     has_parking: bool = Field(default=False, description="Whether the unit has an associated parking space")
     parking_space_number: Optional[str] = Field(default=None, description="Parking space number if available")
-    is_occupied: bool = Field(default=False, description="Whether the unit is currently occupied")
-    resident_count: int = Field(default=0, description="Number of residents in the unit")
+    # is_occupied: bool = Field(default=False, description="Whether the unit is currently vacant") # must calculate from tenant
+    # resident_count: int = Field(default=0, description="Number of residents in the unit") # must calculate from tenant
     constant_extra_charge: float = Field(default=0.0, description="Any constant extra charge associated with the unit")
+    notes: Optional[str] = Field(default=None, description="Additional notes about the unit")
 
     # Relationships
     floor: "Floor" = Relationship(back_populates="units")
